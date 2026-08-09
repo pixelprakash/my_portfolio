@@ -1,0 +1,22 @@
+.back {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--color-border-strong);
+  background: var(--color-surface);
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--color-text);
+  transition: background var(--transition-fast), transform var(--transition-fast);
+}
+
+.back:hover {
+  background: var(--color-surface-strong);
+  transform: translateX(-2px);
+}
+
+.arrow {
+  font-size: 1rem;
+}

@@ -1,0 +1,98 @@
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-6);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  transition: transform var(--transition-base), border-color var(--transition-base),
+    box-shadow var(--transition-base);
+}
+
+.card:hover {
+  transform: translateY(-6px);
+  border-color: var(--color-border-strong);
+}
+
+.cardBlue:hover {
+  box-shadow: var(--shadow-glow-blue);
+}
+
+.cardRed:hover {
+  box-shadow: var(--shadow-glow-red);
+}
+
+.top {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--space-2) var(--space-3);
+}
+
+.tag {
+  font-family: var(--font-display);
+  font-size: 0.65rem;
+  letter-spacing: 1.5px;
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--color-border-strong);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.tagBlue {
+  color: var(--color-blue);
+  border-color: rgba(0, 212, 255, 0.4);
+}
+
+.tagRed {
+  color: var(--color-red);
+  border-color: rgba(255, 59, 14, 0.4);
+}
+
+.meta {
+  font-size: 0.75rem;
+  color: var(--color-text-faint);
+  white-space: nowrap;
+}
+
+.title {
+  font-size: clamp(1.1rem, 2.5vw, 1.4rem);
+  color: var(--color-text);
+}
+
+.summary {
+  color: var(--color-text-secondary);
+  font-size: 0.95rem;
+}
+
+.link {
+  margin-top: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.linkBlue {
+  color: var(--color-blue);
+}
+
+.linkRed {
+  color: var(--color-red);
+}
+
+/* Stretched-link pattern: the anchor's text stays in normal flow (so the
+   title lays out and wraps like any other heading); an invisible ::after
+   overlay — not the anchor itself — is what stretches to cover the card
+   and makes the whole thing clickable. */
+.stretchedLink::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+}

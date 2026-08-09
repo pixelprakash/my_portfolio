@@ -1,0 +1,85 @@
+.footer {
+  border-top: 1px solid var(--color-border);
+  background: var(--color-bg-elevated);
+  padding: var(--space-8) 0 var(--space-6);
+}
+
+.heading {
+  font-size: clamp(2rem, 6vw, 3.25rem);
+  color: var(--color-blue);
+  margin-bottom: var(--space-5);
+}
+
+.rows {
+  border-top: 1px solid var(--color-border);
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-4) 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.label {
+  font-family: var(--font-display);
+  font-size: 0.7rem;
+  letter-spacing: 1.5px;
+  color: var(--color-text-faint);
+}
+
+.value {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-weight: 600;
+  color: var(--color-text);
+  transition: color var(--transition-fast);
+}
+
+.value:hover {
+  color: var(--color-blue);
+}
+
+.icon {
+  font-size: 0.85em;
+}
+
+.bottom {
+  margin-top: var(--space-6);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.quickLinks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-5);
+}
+
+.quickLinks a {
+  color: var(--color-text-muted);
+  font-size: 0.9rem;
+}
+
+.quickLinks a:hover {
+  color: var(--color-text);
+}
+
+.meta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-5);
+  font-size: 0.85rem;
+  color: var(--color-text-faint);
+}
+
+.meta a {
+  font-weight: 700;
+  color: var(--color-text-secondary);
+}

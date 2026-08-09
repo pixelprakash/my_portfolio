@@ -1,0 +1,84 @@
+.section {
+  padding: var(--space-9) 0;
+  border-top: 1px solid var(--color-border);
+}
+
+.header {
+  max-width: 640px;
+  margin-bottom: var(--space-7);
+}
+
+.heading {
+  font-size: clamp(1.75rem, 4vw, 2.5rem);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--space-5);
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  padding: var(--space-6);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+}
+
+.quote {
+  font-size: 1.05rem;
+  line-height: 1.6;
+  color: var(--color-text);
+}
+
+.quote::before {
+  content: '\201C';
+}
+
+.quote::after {
+  content: '\201D';
+}
+
+.person {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.avatar {
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  color: var(--color-bg);
+}
+
+.avatarBlue {
+  background: linear-gradient(135deg, var(--color-blue), var(--color-blue-deep));
+}
+
+.avatarRed {
+  background: linear-gradient(135deg, var(--color-red), var(--color-red-deep));
+}
+
+.name {
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--color-text);
+}
+
+.role {
+  font-size: 0.8rem;
+  color: var(--color-text-faint);
+}

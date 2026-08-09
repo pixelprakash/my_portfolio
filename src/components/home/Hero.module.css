@@ -1,0 +1,186 @@
+.hero {
+  position: relative;
+  width: 100%;
+  min-height: calc(100vh - var(--nav-height));
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.split {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  z-index: 0;
+}
+
+.splitBlue,
+.splitRed {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+}
+
+.splitBlue {
+  background: linear-gradient(135deg, #001f3f 0%, #003d7a 100%);
+}
+
+.splitRed {
+  background: linear-gradient(135deg, #4a0000 0%, #8b0000 100%);
+}
+
+/* Name card — currently disabled in Hero.jsx; styles kept so it's a
+   one-line swap to bring back. */
+.content {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: var(--space-5) var(--container-padding) 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.intro {
+  text-align: center;
+  padding: var(--space-4) var(--space-6);
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(20px);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-md);
+  max-width: 560px;
+}
+
+.name {
+  font-size: clamp(1.15rem, 2.6vw, 1.75rem);
+  margin: 0 0 var(--space-1);
+  background: linear-gradient(90deg, var(--color-blue), #ffffff, var(--color-red));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: 1px;
+}
+
+.tagline {
+  font-size: clamp(0.75rem, 1.4vw, 0.9rem);
+  color: var(--color-text-secondary);
+  margin: 0;
+  font-family: var(--font-body);
+}
+
+.location {
+  font-size: clamp(0.7rem, 1.2vw, 0.8rem);
+  color: var(--color-text-faint);
+  font-family: var(--font-body);
+  margin-top: 2px;
+}
+
+/* Portrait: sized directly off the viewport (matching .hero's own
+   min-height formula) so it fills the hero exactly, edge to edge, with no
+   dependence on ancestor flex/percentage-height resolution. */
+
+.portraitFrame {
+  position: relative;
+  z-index: 2;
+  height: calc(100vh - var(--nav-height));
+  max-height: calc(100vh - var(--nav-height));
+}
+
+.glow {
+  position: absolute;
+  inset: -12%;
+  z-index: 0;
+  background:
+    radial-gradient(circle at 28% 62%, rgba(0, 212, 255, 0.4), transparent 55%),
+    radial-gradient(circle at 72% 62%, rgba(255, 59, 14, 0.4), transparent 55%),
+    radial-gradient(ellipse at 50% 45%, rgba(0, 0, 0, 0.55), transparent 72%);
+  filter: blur(40px);
+}
+
+.portraitImg {
+  position: relative;
+  z-index: 1;
+  display: block;
+  height: 100%;
+  width: auto;
+  max-width: none;
+  filter: drop-shadow(0 24px 48px rgba(0, 0, 0, 0.65));
+}
+
+.badge {
+  position: absolute;
+  z-index: 2;
+  bottom: 6%;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-pill);
+  font-family: var(--font-display);
+  font-size: clamp(0.6rem, 1.4vw, 0.75rem);
+  letter-spacing: 1px;
+  color: var(--color-text);
+  background: rgba(6, 6, 8, 0.75);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--color-border-strong);
+  white-space: nowrap;
+}
+
+.badgeDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+}
+
+.badgeBlue {
+  left: -6%;
+}
+
+.badgeBlue .badgeDot {
+  background: var(--color-blue);
+  box-shadow: 0 0 8px rgba(0, 212, 255, 0.9);
+}
+
+.badgeRed {
+  right: -6%;
+}
+
+.badgeRed .badgeDot {
+  background: var(--color-red);
+  box-shadow: 0 0 8px rgba(255, 59, 14, 0.9);
+}
+
+/* Below ~640px there isn't enough width to size the portrait by height
+   without it overflowing sideways, so it switches to width-constrained. */
+@media (max-width: 640px) {
+  .intro {
+    padding: var(--space-4) var(--space-5);
+  }
+
+  .portraitFrame {
+    height: auto;
+    max-height: none;
+    width: clamp(220px, 78vw, 360px);
+  }
+
+  .portraitImg {
+    height: auto;
+    width: 100%;
+  }
+
+  .badge {
+    padding: var(--space-1) var(--space-3);
+  }
+
+  .badgeBlue {
+    left: -3%;
+  }
+
+  .badgeRed {
+    right: -3%;
+  }
+}

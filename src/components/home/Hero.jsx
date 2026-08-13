@@ -50,8 +50,8 @@ export default function Hero() {
           decoding="async"
         />
         <span className={`${styles.badge} ${styles.badgeBlue}`}>
-          <span className={styles.badgeDot} aria-hidden="true" />
           Designer
+          <span className={styles.badgeDot} aria-hidden="true" />
         </span>
         <span className={`${styles.badge} ${styles.badgeRed}`}>
           <span className={styles.badgeDot} aria-hidden="true" />

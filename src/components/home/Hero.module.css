@@ -114,14 +114,14 @@
 .badge {
   position: absolute;
   z-index: 2;
-  bottom: 6%;
+  bottom: 20%;
   display: inline-flex;
   align-items: center;
-  gap: var(--space-2);
-  padding: var(--space-2) var(--space-4);
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-6);
   border-radius: var(--radius-pill);
   font-family: var(--font-display);
-  font-size: clamp(0.6rem, 1.4vw, 0.75rem);
+  font-size: clamp(0.85rem, 2vw, 1.15rem);
   letter-spacing: 1px;
   color: var(--color-text);
   background: rgba(6, 6, 8, 0.75);
@@ -131,32 +131,37 @@
 }
 
 .badgeDot {
-  width: 7px;
-  height: 7px;
+  width: 11px;
+  height: 11px;
   border-radius: 50%;
+  flex-shrink: 0;
 }
 
 .badgeBlue {
-  left: -6%;
+  left: -12%;
 }
 
 .badgeBlue .badgeDot {
   background: var(--color-blue);
-  box-shadow: 0 0 8px rgba(0, 212, 255, 0.9);
+  box-shadow: 0 0 10px rgba(0, 212, 255, 0.9);
 }
 
 .badgeRed {
-  right: -6%;
+  right: -12%;
 }
 
 .badgeRed .badgeDot {
   background: var(--color-red);
-  box-shadow: 0 0 8px rgba(255, 59, 14, 0.9);
+  box-shadow: 0 0 10px rgba(255, 59, 14, 0.9);
 }
 
-/* Below ~640px there isn't enough width to size the portrait by height
-   without it overflowing sideways, so it switches to width-constrained. */
-@media (max-width: 640px) {
+/* Sizing the portrait by height only works when width is comfortably
+   abundant relative to height (wide desktop/laptop windows). Portrait-
+   oriented tablets (e.g. 768x1024) have less width than that, and with
+   the badges' side offsets on top, a height-driven image gets wide enough
+   to push them off-screen — so anything up to a small-laptop width also
+   falls back to being width-constrained instead. */
+@media (max-width: 1024px) {
   .intro {
     padding: var(--space-4) var(--space-5);
   }
@@ -164,7 +169,7 @@
   .portraitFrame {
     height: auto;
     max-height: none;
-    width: clamp(220px, 78vw, 360px);
+    width: clamp(220px, 45vw, 460px);
   }
 
   .portraitImg {
@@ -173,14 +178,62 @@
   }
 
   .badge {
-    padding: var(--space-1) var(--space-3);
+    bottom: 18%;
   }
 
   .badgeBlue {
-    left: -3%;
+    left: -8%;
   }
 
   .badgeRed {
-    right: -3%;
+    right: -8%;
+  }
+}
+
+/* Phones: the tablet sizing above still leaves badges cramped/small on a
+   narrow phone, so shrink them further here. */
+@media (max-width: 480px) {
+  .badge {
+    bottom: 16%;
+    padding: var(--space-2) var(--space-4);
+    gap: var(--space-2);
+  }
+
+  .badgeDot {
+    width: 9px;
+    height: 9px;
+  }
+
+  .badgeBlue {
+    left: -6%;
+  }
+
+  .badgeRed {
+    right: -6%;
+  }
+}
+
+/* Below ~360px, the portrait frame has already hit its width floor
+   (clamp min above), so each badge is wider than half the image — at any
+   offset they'd collide. Shrink them further and pull them in almost
+   flush with the image edges so they sit side by side without touching. */
+@media (max-width: 360px) {
+  .badge {
+    padding: var(--space-1) var(--space-3);
+    gap: 6px;
+    font-size: 0.7rem;
+  }
+
+  .badgeDot {
+    width: 7px;
+    height: 7px;
+  }
+
+  .badgeBlue {
+    left: -4%;
+  }
+
+  .badgeRed {
+    right: -4%;
   }
 }

@@ -79,6 +79,12 @@
 .sidebar {
   position: sticky;
   top: calc(var(--nav-height) + var(--space-5));
+  /* Without this, the grid item's automatic minimum size is based on its
+     content's min-content width — which, below 900px, is the unwrapped
+     width of every pill in .sidebarList's horizontally-scrolling row —
+     and stretches the whole single-column layout wider than the
+     viewport even though .sidebarList itself scrolls. */
+  min-width: 0;
 }
 
 .sidebarList {

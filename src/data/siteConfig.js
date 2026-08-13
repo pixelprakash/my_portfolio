@@ -5,16 +5,14 @@ export const siteConfig = {
   shortName: 'Surya Prakash',
   role: 'Designer & Developer',
   tagline: 'Working at DIC, Design Department — IIT Hyderabad',
-  email: 'musunuri.surya.prakash@gmail.com',
+  email: 'hello@uxsurya.com',
   location: 'Hyderabad, India',
 
   social: {
-    github: 'https://github.com/your-username',
-    linkedin: 'https://linkedin.com/in/your-username',
+    github: 'https://github.com/pixelprakash',
+    linkedin: 'https://www.linkedin.com/in/suryaprakashmusunuri/',
     twitter: 'https://twitter.com/your-username',
   },
-
-  resumeUrl: '/resume.pdf',
 
   navItems: [
     { label: 'Home', href: '/' },
@@ -25,8 +23,7 @@ export const siteConfig = {
 
   footerLinks: [
     { label: 'Work', href: '/#work' },
-    { label: 'GitHub', href: 'https://github.com/your-username' },
+    { label: 'GitHub', href: 'https://github.com/pixelprakash' },
     { label: 'Testimonials', href: '/#testimonials' },
-    { label: 'Resume', href: '/resume.pdf' },
   ],
 };

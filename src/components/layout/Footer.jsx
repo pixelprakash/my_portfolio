@@ -6,7 +6,6 @@ const contactRows = [
   { label: 'Mail', value: siteConfig.email, href: `mailto:${siteConfig.email}` },
   { label: 'LinkedIn', value: 'View profile', href: siteConfig.social.linkedin },
   { label: 'GitHub', value: 'View profile', href: siteConfig.social.github },
-  { label: 'Resume', value: 'Download PDF', href: siteConfig.resumeUrl },
 ];
 
 export default function Footer() {

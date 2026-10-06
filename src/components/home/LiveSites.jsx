@@ -10,7 +10,7 @@ const liveSites = [
     accent: 'blue',
   },
   {
-    title: 'Deepak John Mathew',
+    title: 'Prof. Deepak John Mathew Portfolio Site',
     href: 'https://djn.vercel.app/',
     accent: 'red',
   },

@@ -123,7 +123,7 @@ export const caseStudies = [
   {
     slug: 'deepak-john-mathew-website',
     tag: 'Design + Dev',
-    title: 'Academic Profile Site for a Design Professor',
+    title: 'Prof. Deepak John Mathew Portfolio Site',
     summary:
       'A personal website for Deepak John Mathew, Professor of Design at IIT Hyderabad — designed and built solo, with a CMS-powered blog and news feed his team can update without touching code.',
     role: 'Solo Designer & Developer',

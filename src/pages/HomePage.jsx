@@ -1,4 +1,5 @@
 import Hero from '../components/home/Hero';
+import LiveSites from '../components/home/LiveSites';
 // import Works from '../components/home/Works';
 // import Testimonials from '../components/home/Testimonials';
 import { useDocumentHead } from '../hooks/useDocumentHead';
@@ -15,8 +16,11 @@ export default function HomePage() {
     <>
       <Hero />
 
-      {/* Rest of the home page is temporarily disabled while it's being
-          rebuilt around the new hero — nothing deleted, just switched off.
+      <LiveSites />
+
+      {/* Full case-study grid and testimonials are switched off for now —
+          the case studies are still partly placeholder copy and the
+          testimonials are placeholder quotes.
       <Works />
       <Testimonials />
       */}
@@ -39,7 +43,7 @@ export default function HomePage() {
             marginRight: 'auto',
           }}
         >
-          The rest of this site — case studies, testimonials — is being rebuilt. Check back soon.
+          Testimonials are being rebuilt. Check back soon.
         </p>
       </section>
     </>

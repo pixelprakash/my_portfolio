@@ -118,6 +118,120 @@ export const caseStudies = [
       },
     ],
   },
+  // Compiled from the project's git history (31 commits, Feb – Oct 2026) at
+  // ~/djn2/djn and the live site at djn.vercel.app — first draft, edit freely.
+  {
+    slug: 'deepak-john-mathew-website',
+    tag: 'Design + Dev',
+    title: 'Academic Profile Site for a Design Professor',
+    summary:
+      'A personal website for Deepak John Mathew, Professor of Design at IIT Hyderabad — designed and built solo, with a CMS-powered blog and news feed his team can update without touching code.',
+    role: 'Solo Designer & Developer',
+    timeline: '8 months (Feb – Oct 2026)',
+    timelineShort: '8 months',
+    tools: ['React', 'Vite', 'React Router', 'GSAP', 'Framer Motion', 'Sanity', 'Vercel'],
+    coverAlt:
+      'Homepage of the Deepak John Mathew website with a large title, portrait, and a stacked-scrolling works section',
+    accent: 'red',
+    sections: [
+      {
+        id: 'context',
+        label: 'Context',
+        heading: 'Why this project',
+        body: [
+          {
+            type: 'paragraph',
+            text: 'Deepak John Mathew is a Professor of Design at IIT Hyderabad whose work spans research, publications, exhibitions, and a design lab (the DIC Lab). That body of work lived in scattered places — department pages, PDFs, and social posts. He needed one personal site that presents it clearly to students, collaborators, and colleagues, and that he could keep current himself.',
+          },
+        ],
+      },
+      {
+        id: 'problem-space',
+        label: 'Problem space',
+        heading: 'A lot to show, and it keeps changing',
+        body: [
+          {
+            type: 'paragraph',
+            text: 'The content is varied — an About page, selected works, a résumé, lab projects with video, blog posts, and news — and new publications and updates arrive regularly. A hand-edited static site would have gone stale, so the site needed both a strong visual identity and a way to publish new content without a developer.',
+          },
+        ],
+      },
+      {
+        id: 'design-build',
+        label: 'Design & Build',
+        heading: 'What I built',
+        body: [
+          {
+            type: 'paragraph',
+            text: 'I designed and built the full site solo on React 19 and Vite, with React Router for seven pages: Home, About, Work, Résumé, Lab, Blog, and Contact. A written design system with shared tokens keeps type, colour, and spacing consistent across all of them, rather than each page setting its own sizes.',
+          },
+          {
+            type: 'list',
+            items: [
+              'A single typeface and shared page-title style, so every page reads as part of one system',
+              'An opening animation, animated page titles, and a custom cursor, built with GSAP and Framer Motion',
+              'Stacked, scroll-driven sections on the home page and a works timeline',
+              'A Lab page with an image slider and project videos for the DIC Lab',
+              'Illustration stickers on page headers and a floating menu for navigation',
+            ],
+          },
+        ],
+      },
+      {
+        id: 'content-management',
+        label: 'Content management',
+        heading: 'Publishing without code',
+        body: [
+          {
+            type: 'paragraph',
+            text: 'In the final stretch I connected the Blog and news sections to Sanity, a headless CMS, and rendered article bodies with Portable Text. New posts and news items can be written and published from the CMS and appear on the site, with dedicated article pages, instead of being hard-coded into the repo.',
+          },
+        ],
+      },
+      {
+        id: 'performance',
+        label: 'Performance & mobile',
+        heading: 'Making it fast and usable on phones',
+        body: [
+          {
+            type: 'paragraph',
+            text: 'Much of the audience opens the site on a phone, so after the first build I did a dedicated mobile pass, fixed the mobile navigation, and then worked on load speed. The site is deployed on Vercel with a region setting chosen for faster loads in India.',
+          },
+          {
+            type: 'list',
+            items: [
+              'Route-level code splitting and lazy loading',
+              'Compressed images',
+              'Route preloading for smoother page transitions',
+              'An accessibility stylesheet and a design-system document to keep fixes consistent',
+            ],
+          },
+        ],
+      },
+      {
+        id: 'results',
+        label: 'Results',
+        heading: 'Where it stands',
+        body: [
+          {
+            type: 'paragraph',
+            text: 'Live at djn.vercel.app, built and iterated over 31 commits from February to October 2026. Publications, news, and blog posts can now be added through the CMS, while the design stays consistent across pages.',
+          },
+        ],
+      },
+      {
+        id: 'retrospective',
+        label: 'Retrospective',
+        heading: 'What I’d do differently',
+        body: [
+          {
+            type: 'paragraph',
+            text: 'The design system document came after most pages were already built, so I spent a round of commits aligning title sizes and spacing that shared tokens would have handled from the start. Next time, tokens and the CMS content model get defined before the first page.',
+          },
+        ],
+      },
+    ],
+  },
   {
     slug: 'campus-club-connect',
     tag: 'Design',

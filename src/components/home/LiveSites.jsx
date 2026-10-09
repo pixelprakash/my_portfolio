@@ -27,6 +27,18 @@ const liveSites = [
     accent: 'red',
     inProgress: true,
   },
+  {
+    title: 'Pedagogy Playcards',
+    href: 'https://cards-omega-topaz.vercel.app/',
+    accent: 'blue',
+    inProgress: true,
+  },
+  {
+    title: 'Sricharan Reddy Portfolio Site',
+    href: 'https://sricharan-port.vercel.app/',
+    accent: 'red',
+    inProgress: true,
+  },
 ];
 
 export default function LiveSites() {

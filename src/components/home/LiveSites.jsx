@@ -14,6 +14,18 @@ const liveSites = [
     href: 'https://djn.vercel.app/',
     accent: 'red',
   },
+  {
+    title: 'Ganesh Kumar Malthurkar Portfolio Site',
+    href: 'https://ganeshmalthurkar.com/',
+    accent: 'blue',
+    inProgress: true,
+  },
+  {
+    title: 'DIC · IITH — Design Innovation Centre Website',
+    href: 'https://dic-site.vercel.app/',
+    accent: 'red',
+    inProgress: true,
+  },
 ];
 
 export default function LiveSites() {
@@ -35,6 +47,14 @@ export default function LiveSites() {
                 <article
                   className={`${cardStyles.card} ${isBlue ? cardStyles.cardBlue : cardStyles.cardRed}`}
                 >
+                  {site.inProgress && (
+                    <span
+                      className={`${cardStyles.tag} ${isBlue ? cardStyles.tagBlue : cardStyles.tagRed}`}
+                      style={{ alignSelf: 'flex-start' }}
+                    >
+                      IN PROGRESS
+                    </span>
+                  )}
                   <h3 className={cardStyles.title}>
                     <a
                       className={cardStyles.stretchedLink}

@@ -1,5 +1,5 @@
 import Hero from '../components/home/Hero';
-import LiveSites from '../components/home/LiveSites';
+import ProjectShowcase from '../components/home/ProjectShowcase';
 // import Works from '../components/home/Works';
 // import Testimonials from '../components/home/Testimonials';
 import { useDocumentHead } from '../hooks/useDocumentHead';
@@ -16,7 +16,7 @@ export default function HomePage() {
     <>
       <Hero />
 
-      <LiveSites />
+      <ProjectShowcase />
 
       {/* Full case-study grid and testimonials are switched off for now —
           the case studies are still partly placeholder copy and the

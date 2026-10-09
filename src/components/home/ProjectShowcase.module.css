@@ -1,0 +1,273 @@
+/* ── Filter chips ── */
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-bottom: var(--space-6);
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--color-border-strong);
+  background: transparent;
+  color: var(--color-text-secondary);
+  font: inherit;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background var(--transition-fast), color var(--transition-fast),
+    border-color var(--transition-fast);
+}
+
+.chip:hover {
+  border-color: var(--color-text);
+  color: var(--color-text);
+}
+
+.chipActive {
+  background: var(--color-text);
+  border-color: var(--color-text);
+  color: var(--color-bg);
+}
+
+.chipActive:hover {
+  color: var(--color-bg);
+}
+
+.count {
+  font-size: 0.75rem;
+  opacity: 0.65;
+}
+
+/* ── Grid: 1 col phone, 2 col tablet, 3 col desktop ── */
+.grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-5);
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+@media (min-width: 640px) {
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1100px) {
+  .grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.item {
+  display: flex;
+}
+
+.item > article {
+  flex: 1;
+}
+
+/* ── Card: cover on top, text below (overrides the text-only card padding) ── */
+.card {
+  padding: var(--space-3);
+  gap: var(--space-4);
+}
+
+.cover {
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-elevated);
+}
+
+/* browser frame for website covers */
+.chrome {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: 0.5rem 0.75rem;
+  background: #16161a;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.dots {
+  display: inline-flex;
+  gap: 5px;
+}
+
+.dots i {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.22);
+}
+
+.host {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding: 2px 10px;
+  border-radius: var(--radius-pill);
+  background: rgba(255, 255, 255, 0.07);
+  color: var(--color-text-muted);
+  font-size: 0.7rem;
+  text-align: center;
+}
+
+.shot {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 16 / 10;
+}
+
+.shot img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+  transition: transform 700ms var(--transition-slow);
+}
+
+.card:hover .shot img {
+  transform: scale(1.05);
+}
+
+/* video: native 16:9 so thumbnail text isn't cropped; play button over the still */
+.coverVideo .shot {
+  aspect-ratio: 16 / 9;
+}
+
+.coverVideo .shot::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.45), transparent 55%);
+}
+
+.play {
+  position: absolute;
+  z-index: 1;
+  top: 50%;
+  left: 50%;
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(255, 255, 255, 0.92);
+  color: #000;
+  box-shadow: var(--shadow-md);
+  transition: transform var(--transition-base);
+}
+
+.play svg {
+  margin-left: 3px;
+}
+
+.card:hover .play {
+  transform: translate(-50%, -50%) scale(1.1);
+}
+
+/* ── Text ── */
+.body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: 0 var(--space-3) var(--space-3);
+}
+
+.meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-3);
+  min-height: 1.6rem;
+}
+
+.type {
+  font-family: var(--font-display);
+  font-size: 0.65rem;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+/* button version of the stretched title link */
+.titleButton {
+  all: unset;
+  cursor: pointer;
+}
+
+.titleButton:focus-visible {
+  outline: 2px solid var(--color-blue);
+  outline-offset: 4px;
+  border-radius: var(--radius-sm);
+}
+
+/* ── Video lightbox ── */
+.dialog {
+  width: min(960px, 92vw);
+  padding: 0;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  background: #000;
+  color: var(--color-text);
+  overflow: visible;
+}
+
+.dialog::backdrop {
+  background: rgba(0, 0, 0, 0.85);
+}
+
+.dialogClose {
+  position: absolute;
+  top: -2.75rem;
+  right: 0;
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--color-border-strong);
+  background: rgba(0, 0, 0, 0.6);
+  color: var(--color-text);
+  font: inherit;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.player {
+  aspect-ratio: 16 / 9;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.player iframe {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shot img,
+  .play {
+    transition: none;
+  }
+
+  .card:hover .shot img {
+    transform: none;
+  }
+
+  .card:hover .play {
+    transform: translate(-50%, -50%);
+  }
+}

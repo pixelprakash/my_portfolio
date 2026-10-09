@@ -1,5 +1,6 @@
 import cardStyles from './CaseStudyCard.module.css';
 import styles from './Works.module.css';
+import layout from './LiveSites.module.css';
 
 // Interim replacement for <Works />: just the two live sites, linking out
 // to the real thing until the full case studies are written up.
@@ -39,22 +40,14 @@ export default function LiveSites() {
           </h2>
         </div>
 
-        <ul className={styles.grid}>
+        <ul className={layout.grid}>
           {liveSites.map((site) => {
             const isBlue = site.accent === 'blue';
             return (
-              <li key={site.href}>
+              <li key={site.href} className={layout.item}>
                 <article
                   className={`${cardStyles.card} ${isBlue ? cardStyles.cardBlue : cardStyles.cardRed}`}
                 >
-                  {site.inProgress && (
-                    <span
-                      className={`${cardStyles.tag} ${isBlue ? cardStyles.tagBlue : cardStyles.tagRed}`}
-                      style={{ alignSelf: 'flex-start' }}
-                    >
-                      IN PROGRESS
-                    </span>
-                  )}
                   <h3 className={cardStyles.title}>
                     <a
                       className={cardStyles.stretchedLink}
@@ -65,12 +58,21 @@ export default function LiveSites() {
                       {site.title}
                     </a>
                   </h3>
-                  <span
-                    className={`${cardStyles.link} ${isBlue ? cardStyles.linkBlue : cardStyles.linkRed}`}
-                    aria-hidden="true"
-                  >
-                    Visit site ↗
-                  </span>
+                  <div className={layout.footer}>
+                    <span
+                      className={`${cardStyles.link} ${isBlue ? cardStyles.linkBlue : cardStyles.linkRed}`}
+                      aria-hidden="true"
+                    >
+                      Visit site ↗
+                    </span>
+                    {site.inProgress && (
+                      <span
+                        className={`${cardStyles.tag} ${isBlue ? cardStyles.tagBlue : cardStyles.tagRed}`}
+                      >
+                        IN PROGRESS
+                      </span>
+                    )}
+                  </div>
                 </article>
               </li>
             );

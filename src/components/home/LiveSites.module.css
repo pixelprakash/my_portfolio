@@ -1,0 +1,41 @@
+/* 2×2 on tablet/desktop, single column on phones. Cards stretch to the
+   row height so pairs line up; the footer row sits at the bottom of every
+   card so titles share a top edge and links/badges share a bottom edge. */
+.grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-5);
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+@media (min-width: 640px) {
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.item {
+  display: flex;
+}
+
+.item > article {
+  flex: 1;
+  min-height: 11rem;
+}
+
+.footer {
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-3);
+}
+
+/* the shared .link class has margin-top:auto of its own; the footer row
+   handles that now */
+.footer > span:first-child {
+  margin-top: 0;
+}

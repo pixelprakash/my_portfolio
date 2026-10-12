@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { projects, projectTypes } from '../../data/projects';
+import GalleryDialog from './GalleryDialog';
 import cardStyles from './CaseStudyCard.module.css';
 import sectionStyles from './Works.module.css';
 import styles from './ProjectShowcase.module.css';
@@ -70,17 +71,19 @@ function EmbedDialog({ video, onClose }) {
   );
 }
 
-function ProjectCard({ project, onPlay }) {
+function ProjectCard({ project, onOpen }) {
   const isBlue = project.accent === 'blue';
   const type = projectTypes[project.type];
   // video + presentations open in a lightbox; websites link out
   const opensEmbed = Boolean(project.videoId || project.embed);
+  const isGallery = Boolean(project.gallery);
+  const opensLightbox = opensEmbed || isGallery;
 
   return (
     <article
       className={`${cardStyles.card} ${styles.card} ${isBlue ? cardStyles.cardBlue : cardStyles.cardRed}`}
     >
-      <div className={`${styles.cover} ${opensEmbed ? styles.coverVideo : ''}`}>
+      <div className={`${styles.cover} ${opensLightbox ? styles.coverVideo : ''}`}>
         {type.frame === 'browser' && (
           <div className={styles.chrome} aria-hidden="true">
             <span className={styles.dots}>
@@ -92,7 +95,14 @@ function ProjectCard({ project, onPlay }) {
           </div>
         )}
         <div className={styles.shot}>
-          {project.cover ? (
+          {isGallery ? (
+            <div className={styles.mosaic} aria-hidden="true">
+              {project.gallery.slice(0, 6).map((item) => (
+                <img key={item.name} src={item.thumb} alt="" loading="lazy" width="640" height="360" />
+              ))}
+              <span className={styles.mosaicCount}>{project.gallery.length} designs</span>
+            </div>
+          ) : project.cover ? (
             <img
               src={project.cover}
               alt=""
@@ -134,11 +144,11 @@ function ProjectCard({ project, onPlay }) {
         </div>
 
         <h3 className={cardStyles.title}>
-          {opensEmbed ? (
+          {opensLightbox ? (
             <button
               type="button"
               className={`${cardStyles.stretchedLink} ${styles.titleButton}`}
-              onClick={() => onPlay(project)}
+              onClick={() => onOpen(project)}
             >
               {project.title}
             </button>
@@ -168,6 +178,7 @@ function ProjectCard({ project, onPlay }) {
 export default function ProjectShowcase() {
   const [filter, setFilter] = useState('all');
   const [playing, setPlaying] = useState(null);
+  const [gallery, setGallery] = useState(null);
 
   // chips only for types that actually have work in them
   const types = Object.keys(projectTypes).filter((t) => projects.some((p) => p.type === t));
@@ -204,13 +215,17 @@ export default function ProjectShowcase() {
         <ul className={styles.grid}>
           {visible.map((project) => (
             <li key={project.id} className={styles.item}>
-              <ProjectCard project={project} onPlay={setPlaying} />
+              <ProjectCard
+                project={project}
+                onOpen={project.gallery ? setGallery : setPlaying}
+              />
             </li>
           ))}
         </ul>
       </div>
 
       <EmbedDialog video={playing} onClose={() => setPlaying(null)} />
+      <GalleryDialog project={gallery} onClose={() => setGallery(null)} />
     </section>
   );
 }

@@ -1,0 +1,168 @@
+.dialog {
+  width: min(1100px, 94vw);
+  max-height: 90vh;
+  padding: 0;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-elevated);
+  color: var(--color-text);
+  overflow: hidden;
+}
+
+/* showModal() dialogs are display:block only while open */
+.dialog[open] {
+  display: flex;
+  flex-direction: column;
+}
+
+.dialog::backdrop {
+  background: rgba(0, 0, 0, 0.88);
+}
+
+.bar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.heading {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  letter-spacing: 1px;
+}
+
+/* in the large view the back button is first, so the count centres */
+.bar > :first-child:not(.heading) {
+  margin-right: auto;
+}
+
+.count {
+  color: var(--color-text-muted);
+  font-size: 0.8rem;
+  white-space: nowrap;
+}
+
+.barButton {
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--color-border-strong);
+  background: transparent;
+  color: var(--color-text);
+  font: inherit;
+  font-size: 0.85rem;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.barButton:hover {
+  border-color: var(--color-text);
+}
+
+/* ── grid view ── */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3);
+  margin: 0;
+  padding: var(--space-4);
+  list-style: none;
+  overflow-y: auto;
+}
+
+@media (min-width: 720px) {
+  .grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.thumb {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: #000;
+  overflow: hidden;
+  cursor: zoom-in;
+  transition: border-color var(--transition-fast), transform var(--transition-base);
+}
+
+.thumb:hover,
+.thumb:focus-visible {
+  border-color: var(--color-text);
+  transform: translateY(-2px);
+}
+
+.thumb img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+}
+
+/* ── large view ── */
+.stage {
+  position: relative;
+  display: grid;
+  place-items: center;
+  padding: var(--space-4);
+  min-height: 0;
+  background: #000;
+}
+
+.large {
+  display: block;
+  max-width: 100%;
+  max-height: calc(90vh - 7rem);
+  border-radius: var(--radius-sm);
+  object-fit: contain;
+}
+
+.nav {
+  position: absolute;
+  top: 50%;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  transform: translateY(-50%);
+  border-radius: 50%;
+  border: 1px solid var(--color-border-strong);
+  background: rgba(0, 0, 0, 0.65);
+  color: var(--color-text);
+  font-size: 1.6rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.nav:hover {
+  border-color: var(--color-text);
+}
+
+.navPrev {
+  left: var(--space-3);
+}
+
+.navNext {
+  right: var(--space-3);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .thumb {
+    transition: none;
+  }
+
+  .thumb:hover,
+  .thumb:focus-visible {
+    transform: none;
+  }
+}

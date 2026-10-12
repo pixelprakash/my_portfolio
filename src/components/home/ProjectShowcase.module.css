@@ -213,6 +213,41 @@
   color: var(--color-text);
 }
 
+/* gallery cover: 3×2 mosaic of the first six designs */
+.mosaic {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+  gap: 3px;
+  width: 100%;
+  height: 100%;
+  background: #000;
+}
+
+.mosaic img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 700ms var(--transition-slow);
+}
+
+.card:hover .mosaic img {
+  transform: scale(1.06);
+}
+
+.mosaicCount {
+  position: absolute;
+  z-index: 1;
+  right: var(--space-3);
+  bottom: var(--space-3);
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-pill);
+  background: rgba(0, 0, 0, 0.75);
+  color: var(--color-text);
+  font-size: 0.75rem;
+}
+
 /* ── Text ── */
 .body {
   display: flex;
@@ -307,11 +342,13 @@
 
 @media (prefers-reduced-motion: reduce) {
   .shot img,
+  .mosaic img,
   .play {
     transition: none;
   }
 
-  .card:hover .shot img {
+  .card:hover .shot img,
+  .card:hover .mosaic img {
     transform: none;
   }
 

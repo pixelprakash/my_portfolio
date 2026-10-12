@@ -7,6 +7,10 @@
 //              (YouTube) and presentations use `embed` (Figma embed URL);
 //              both open in a lightbox instead. A lightbox project may
 //              also set `href` — shown as an "Open in Figma" link there.
+//   gallery  — list of { name, alt } for image sets (files in
+//              /public/work/visual: `name.jpg` full size, `name-sm.jpg`
+//              640px). The card cover becomes a mosaic of the first six
+//              and the card opens a gallery lightbox.
 //   coverTitle — text for the placeholder cover when `cover` is omitted.
 //   coverPosition — CSS object-position for the cover crop (default is
 //              the top of the image, which suits full-page screenshots).
@@ -18,8 +22,8 @@ export const projectTypes = {
   video: { label: 'Video editing', cta: 'Watch video ▶' },
   photography: { label: 'Photography', cta: 'View gallery ↗' },
   branding: { label: 'Branding', cta: 'View presentation ▶' },
+  visual: { label: 'Visual design', cta: 'Browse designs ▶' },
   // 'app-ui': { label: 'App UI', cta: 'View project →' },
-  // visual: { label: 'Visual design', cta: 'View piece →' },
 };
 
 export const projects = [
@@ -113,4 +117,35 @@ export const projects = [
     href: 'https://www.instagram.com/praklens/',
     accent: 'red',
   },
+  {
+    id: 'thumbnail-designs',
+    type: 'visual',
+    title: 'YouTube Thumbnail Designs',
+    accent: 'blue',
+    gallery: [
+      { name: 'jaswanth-budda', alt: 'Thumbnail: How he got into IISc Bangalore for M.Des in Product Design & Manufacturing' },
+      { name: 'bhaskar-komara', alt: 'Thumbnail: Architect to UX Designer, 4X hike' },
+      { name: 'tina', alt: 'Thumbnail: Gujarati medium to a UX job in the USA' },
+      { name: 'ai-final', alt: 'Thumbnail: AI for India, a designer and a data scientist' },
+      { name: '6', alt: 'Thumbnail: Roadmap to be a successful designer' },
+      { name: 'kirti-trivedi', alt: 'Thumbnail: The Journey, Kirti Trivedi' },
+      { name: 'sai-anjan', alt: 'Thumbnail: Sai Anjan on designing SaaS products' },
+      { name: 'live-thumbnail-2', alt: 'Thumbnail: New Age AI Tools, live with Tezan Sahu' },
+      { name: 'live-thumbnail', alt: 'Thumbnail: AI tools for productivity and efficiency, live demos' },
+      { name: 'shamit-shrivastav', alt: 'Thumbnail: How to get into a PhD in Design, Shamit Shrivastav' },
+      { name: 'susruta', alt: 'Thumbnail: Lessons from 12 years of designing products, Susruta Chakraborty' },
+      { name: 'natalie', alt: 'Thumbnail: M.Sc UX Design, the journey to Germany, Natalie Valsangkar' },
+    ],
+  },
 ];
+
+// Resolve gallery file names to URLs once, so components just use src/thumb.
+for (const project of projects) {
+  if (project.gallery) {
+    project.gallery = project.gallery.map((item) => ({
+      ...item,
+      src: `/work/visual/${item.name}.jpg`,
+      thumb: `/work/visual/${item.name}-sm.jpg`,
+    }));
+  }
+}

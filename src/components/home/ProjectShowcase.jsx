@@ -146,7 +146,7 @@ function ProjectCard({ project, onOpen }) {
           )}
         </div>
 
-        <h3 className={cardStyles.title}>
+        <h3 className={`${cardStyles.title} ${styles.title}`}>
           {opensLightbox ? (
             <button
               type="button"

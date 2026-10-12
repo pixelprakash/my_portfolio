@@ -1,27 +1,32 @@
 .section {
-  padding: var(--space-9) 0;
+  padding: var(--section-space) 0;
   border-top: 1px solid var(--color-border);
 }
 
+/* Kicker → heading → intro each get their own beat of space, and the
+   intro is capped to a comfortable reading measure. */
 .header {
-  max-width: 640px;
-  margin-bottom: var(--space-7);
+  max-width: 44rem;
+  margin-bottom: clamp(var(--space-7), 5vw, var(--space-8));
 }
 
 .heading {
-  font-size: clamp(1.75rem, 4vw, 2.5rem);
+  margin-top: var(--space-3);
+  font-size: clamp(1.75rem, 4vw, 2.75rem);
 }
 
 .description {
-  margin-top: var(--space-3);
+  margin-top: var(--space-5);
+  max-width: 36rem;
   color: var(--color-text-secondary);
-  font-size: 1.05rem;
+  font-size: clamp(1rem, 1.5vw, 1.15rem);
+  line-height: 1.65;
 }
 
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr));
-  gap: var(--space-5);
+  gap: var(--grid-gap);
   list-style: none;
   padding: 0;
   margin: 0;

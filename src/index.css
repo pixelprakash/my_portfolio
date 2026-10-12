@@ -31,6 +31,9 @@
   --nav-height: 76px;
   --container-max: 1280px;
   --container-padding: clamp(1.25rem, 4vw, 3rem);
+  /* Vertical rhythm between page sections, and the gap inside card grids. */
+  --section-space: clamp(5rem, 9vw, 9rem);
+  --grid-gap: clamp(1.5rem, 2.6vw, 2.5rem);
 
   /* Spacing scale */
   --space-1: 0.25rem;
@@ -84,17 +87,23 @@ body {
   text-rendering: optimizeLegibility;
 }
 
+/* Michroma is very wide and has a single weight, so it needs generous
+   leading to stay readable once a heading wraps; `balance` avoids orphaned
+   last words. */
 h1,
 h2,
 h3,
 h4 {
   font-family: var(--font-display);
-  line-height: 1.15;
+  line-height: 1.3;
+  letter-spacing: 0.01em;
+  text-wrap: balance;
   margin: 0;
 }
 
 p {
   margin: 0;
+  text-wrap: pretty;
 }
 
 img {

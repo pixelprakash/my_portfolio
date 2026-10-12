@@ -1,5 +1,5 @@
 .section {
-  padding: 0 0 var(--space-9);
+  padding: 0 0 var(--section-space);
 }
 
 /* Blue glow from one side, red from the other: the two halves of the hero. */
@@ -20,12 +20,12 @@
 }
 
 .heading {
-  margin-top: var(--space-2);
+  margin-top: var(--space-4);
   font-size: clamp(1.9rem, 5vw, 3.25rem);
 }
 
 .text {
-  margin-top: var(--space-4);
+  margin-top: var(--space-5);
   max-width: 34rem;
   font-size: clamp(1rem, 1.6vw, 1.15rem);
   line-height: 1.6;
@@ -37,7 +37,7 @@
   flex-wrap: wrap;
   justify-content: center;
   gap: var(--space-3);
-  margin-top: var(--space-6);
+  margin-top: var(--space-7);
 }
 
 .primary,

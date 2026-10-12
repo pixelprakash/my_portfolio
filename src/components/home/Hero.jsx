@@ -10,6 +10,13 @@ const { design, development } = siteConfig.experience;
 // Both tick rows share one scale, so "2 of 6" vs "6 of 6" is a fair comparison.
 const YEAR_SCALE = Math.max(design.years, development.years);
 
+// "plain **bold** plain" -> plain <strong>bold</strong> plain
+function Emphasis({ text }) {
+  return text
+    .split('**')
+    .map((part, i) => (i % 2 ? <strong key={i}>{part}</strong> : part));
+}
+
 function YearTicks({ filled }) {
   return (
     <span className={styles.ticks} aria-hidden="true">
@@ -25,10 +32,10 @@ export default function Hero() {
     <section className={styles.hero} aria-labelledby="hero-heading">
       <div className={styles.split}>
         <div className={styles.splitBlue}>
-          <MatrixRain color="#00d4ff" opacity={0.5} speed={1.2} />
+          <MatrixRain color="#00d4ff" opacity={0.32} speed={1.2} />
         </div>
         <div className={styles.splitRed}>
-          <MatrixRain color="#ff0033" opacity={0.5} speed={1.2} />
+          <MatrixRain color="#ff0033" opacity={0.32} speed={1.2} />
         </div>
       </div>
 
@@ -53,30 +60,37 @@ export default function Hero() {
 
       <div className={styles.info}>
         <div className={`${styles.stat} ${styles.statBlue}`}>
+          <span className={styles.scrim} aria-hidden="true" />
           <span className={styles.num}>{design.years}</span>
           <div className={styles.statBody}>
             <p className={styles.kickerRow}>
               <span className={styles.kicker}>Years</span>
               <YearTicks filled={design.years} />
             </p>
-            <p className={styles.label}>{design.label}</p>
-            <p className={styles.now}>
-              <span className={styles.nowTag}>Now</span>
-              <span>
-                <strong className={styles.nowRole}>{design.now.role}</strong> @ {design.now.at}
-              </span>
+            <p className={styles.label}>
+              <Emphasis text={design.label} />
             </p>
+            <div className={styles.now}>
+              <p className={styles.nowTop}>
+                <span className={styles.nowTag}>Now</span>
+                <strong className={styles.nowRole}>{design.now.role}</strong>
+              </p>
+              <p className={styles.nowAt}>@ {design.now.at}</p>
+            </div>
           </div>
         </div>
 
         <div className={`${styles.stat} ${styles.statRed}`}>
+          <span className={styles.scrim} aria-hidden="true" />
           <span className={styles.num}>{development.years}</span>
           <div className={styles.statBody}>
             <p className={styles.kickerRow}>
               <span className={styles.kicker}>Years</span>
               <YearTicks filled={development.years} />
             </p>
-            <p className={styles.label}>{development.label}</p>
+            <p className={styles.label}>
+              <Emphasis text={development.label} />
+            </p>
           </div>
         </div>
       </div>

@@ -9,12 +9,13 @@ export const siteConfig = {
   experience: {
     design: {
       years: 2,
-      label: 'Professional experience in design',
+      // **double asterisks** mark the words that get emphasised in the hero.
+      label: 'Professional experience in **design**',
       now: { role: 'UX Engineer', at: 'DIC, Design Dept, IIT Hyderabad' },
     },
     development: {
       years: 6,
-      label: 'Computer science education & hands-on experience',
+      label: '**Computer science** education & **hands-on** experience',
     },
   },
 

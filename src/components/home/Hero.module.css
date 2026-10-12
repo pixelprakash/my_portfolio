@@ -21,6 +21,20 @@
   z-index: 0;
 }
 
+/* Fades the hero into the page below instead of cutting the portrait off
+   at a hard edge. */
+.hero::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 14%;
+  z-index: 4;
+  pointer-events: none;
+  background: linear-gradient(to bottom, transparent, var(--color-bg));
+}
+
 .splitBlue,
 .splitRed {
   flex: 1;
@@ -142,14 +156,22 @@
   --accent-glow: rgba(0, 212, 255, 0.55);
   --accent-fill: rgba(0, 212, 255, 0.4);
   --accent-soft: var(--color-blue-soft);
-  --scrim: rgba(2, 8, 20, 0.6);
+  --scrim: rgba(2, 8, 20, 0.78);
   position: relative;
   pointer-events: auto;
   width: max(190px, min(300px, calc(50vw - var(--portrait-w) * 0.32 - var(--container-padding))));
   padding: var(--space-3) var(--space-4);
-  /* A soft scrim, not a card: keeps text legible over the animated rain. */
-  background: radial-gradient(110% 100% at 0% 0%, var(--scrim), transparent 60%);
   animation: statIn 700ms var(--transition-slow) both;
+}
+
+/* A soft scrim, not a card: keeps text legible over the animated rain. It
+   extends past the block and fades to nothing, so it never has an edge. */
+.scrim {
+  position: absolute;
+  inset: -36px -48px;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(closest-side, var(--scrim) 0 50%, transparent 100%);
 }
 
 .statRed {
@@ -157,7 +179,7 @@
   --accent-glow: rgba(255, 59, 14, 0.55);
   --accent-fill: rgba(255, 59, 14, 0.4);
   --accent-soft: var(--color-red-soft);
-  --scrim: rgba(20, 3, 3, 0.6);
+  --scrim: rgba(20, 3, 3, 0.78);
   animation-delay: 150ms;
 }
 
@@ -189,11 +211,11 @@
 .num {
   display: block;
   font-family: var(--font-display);
-  font-size: clamp(6rem, min(15vw, 22vh), 12rem);
+  font-size: clamp(6rem, min(13vw, 21vh), 12rem);
   line-height: 0.85;
   letter-spacing: -0.02em;
   /* Outline with a fill that fades out downwards. */
-  -webkit-text-stroke: 2px var(--accent);
+  -webkit-text-stroke: 2.5px var(--accent);
   -webkit-text-fill-color: transparent;
   background: linear-gradient(180deg, var(--accent-fill), transparent 80%);
   -webkit-background-clip: text;
@@ -214,28 +236,31 @@
   margin: 0;
 }
 
+/* Small labels use the body face in a heavy weight: Michroma only has one
+   thin, very wide weight, which smears at this size. */
 .kicker {
-  font-family: var(--font-display);
-  font-size: 0.72rem;
-  letter-spacing: 3px;
+  font-family: var(--font-body);
+  font-size: 1rem;
+  font-weight: 800;
+  letter-spacing: 4px;
   text-transform: uppercase;
-  color: var(--accent-soft);
+  color: var(--color-text);
 }
 
 .ticks {
   display: inline-flex;
-  gap: 4px;
+  gap: 5px;
 }
 
 .tick,
 .tickOn {
-  width: 14px;
-  height: 5px;
-  border-radius: 1px;
+  width: 18px;
+  height: 7px;
+  border-radius: 2px;
 }
 
 .tick {
-  background: rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.22);
 }
 
 .tickOn {
@@ -243,35 +268,50 @@
   box-shadow: 0 0 8px var(--accent-glow);
 }
 
+/* Headline-sized, medium weight; the key words are bold and pure white so
+   the line scans in a glance. */
 .label {
-  margin: var(--space-2) 0 0;
-  font-size: clamp(0.9rem, 1.25vw, 1.02rem);
-  line-height: 1.4;
-  color: var(--color-text-secondary);
+  margin: var(--space-3) 0 0;
+  font-size: clamp(1.1rem, 1.6vw, 1.4rem);
+  font-weight: 500;
+  line-height: 1.35;
+  color: rgba(255, 255, 255, 0.82);
 }
 
+.label strong {
+  font-weight: 800;
+  color: #fff;
+}
+
+/* Role first, in bold; the employer line is secondary. */
 .now {
-  display: flex;
-  align-items: baseline;
-  gap: var(--space-3);
   margin: var(--space-3) 0 0;
   padding-top: var(--space-3);
   border-top: 1px dashed var(--color-border-strong);
-  font-size: 0.88rem;
-  line-height: 1.4;
-  color: var(--color-text-secondary);
 }
 
+.nowTop {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin: 0;
+}
+
+/* Solid chip so "Now" reads as a status badge, not more body text. */
 .nowTag {
   flex-shrink: 0;
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  font-family: var(--font-display);
-  font-size: 0.62rem;
+  padding: 3px 10px 3px 8px;
+  border-radius: var(--radius-pill);
+  font-size: 0.78rem;
+  font-weight: 800;
   letter-spacing: 2px;
   text-transform: uppercase;
-  color: var(--accent);
+  color: #04121c;
+  background: var(--accent);
+  box-shadow: 0 0 14px var(--accent-glow);
 }
 
 .nowTag::before {
@@ -279,14 +319,23 @@
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: var(--accent);
-  box-shadow: 0 0 8px var(--accent-glow);
+  background: #04121c;
   animation: pulse 2s ease-in-out infinite;
 }
 
 .nowRole {
-  color: var(--color-text);
-  font-weight: 700;
+  font-size: clamp(1.15rem, 1.7vw, 1.45rem);
+  font-weight: 800;
+  line-height: 1.2;
+  color: #fff;
+}
+
+.nowAt {
+  margin: var(--space-2) 0 0;
+  font-size: clamp(0.95rem, 1.2vw, 1.05rem);
+  font-weight: 500;
+  line-height: 1.4;
+  color: rgba(255, 255, 255, 0.78);
 }
 
 /* ---------------------------------------------------------------------
@@ -298,7 +347,8 @@
   --accent: var(--color-blue);
   --accent-glow: rgba(0, 212, 255, 0.6);
   --accent-soft: var(--color-blue-soft);
-  --ring: 18px;
+  --accent-tint: rgba(0, 212, 255, 0.2);
+  --ring: 26px;
   --leader: calc(var(--frame-w) * 0.16);
   position: absolute;
   z-index: 3;
@@ -315,6 +365,7 @@
   --accent: var(--color-red);
   --accent-glow: rgba(255, 59, 14, 0.6);
   --accent-soft: var(--color-red-soft);
+  --accent-tint: rgba(255, 59, 14, 0.22);
   top: 79.7%;
   left: 77.7%;
 }
@@ -326,9 +377,9 @@
   width: var(--ring);
   height: var(--ring);
   border-radius: 50%;
-  border: 1.5px solid var(--accent);
-  background: radial-gradient(circle, var(--accent) 0 2.5px, transparent 3px);
-  box-shadow: 0 0 14px var(--accent-glow);
+  border: 2px solid var(--accent);
+  background: radial-gradient(circle, var(--accent) 0 3.5px, transparent 4.5px);
+  box-shadow: 0 0 18px var(--accent-glow), inset 0 0 8px var(--accent-glow);
 }
 
 .ring::after {
@@ -342,18 +393,19 @@
 
 .leader {
   position: absolute;
-  top: 0;
-  height: 1px;
+  top: -1px;
+  height: 2px;
   width: var(--leader);
+  filter: drop-shadow(0 0 4px var(--accent-glow));
   animation: leaderIn 800ms 500ms var(--transition-slow) both;
 }
 
 .leader::after {
   content: '';
   position: absolute;
-  top: -2px;
-  width: 5px;
-  height: 5px;
+  top: -3px;
+  width: 8px;
+  height: 8px;
   background: var(--accent);
   box-shadow: 0 0 8px var(--accent-glow);
 }
@@ -361,7 +413,7 @@
 .calloutBlue .leader {
   right: calc(var(--ring) / 2);
   transform-origin: right center;
-  background: linear-gradient(to left, var(--accent), rgba(0, 212, 255, 0.15));
+  background: linear-gradient(to left, var(--accent), rgba(0, 212, 255, 0.5));
 }
 
 .calloutBlue .leader::after {
@@ -371,7 +423,7 @@
 .calloutRed .leader {
   left: calc(var(--ring) / 2);
   transform-origin: left center;
-  background: linear-gradient(to right, var(--accent), rgba(255, 59, 14, 0.15));
+  background: linear-gradient(to right, var(--accent), rgba(255, 59, 14, 0.5));
 }
 
 .calloutRed .leader::after {
@@ -384,9 +436,9 @@
   transform: translateY(-50%);
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 8px;
   white-space: nowrap;
-  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.85);
+  text-shadow: 0 2px 16px rgba(0, 0, 0, 0.9);
 }
 
 .calloutBlue .tag {
@@ -403,17 +455,23 @@
 
 .tagName {
   font-family: var(--font-display);
-  font-size: clamp(0.8rem, 1.6vw, 1.1rem);
+  font-size: clamp(0.95rem, 1.9vw, 1.5rem);
   letter-spacing: 2px;
   text-transform: uppercase;
-  color: var(--color-text);
+  color: #fff;
 }
 
+/* A tinted chip, not loose small caps. */
 .tagSub {
-  font-size: 0.72rem;
-  letter-spacing: 2.5px;
+  padding: 3px 11px;
+  border: 1px solid var(--accent);
+  border-radius: var(--radius-pill);
+  background: var(--accent-tint);
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 2px;
   text-transform: uppercase;
-  color: var(--accent-soft);
+  color: #fff;
 }
 
 @keyframes statIn {
@@ -457,13 +515,13 @@
   }
 }
 
-/* Sizing the portrait by height only works when width is comfortably
-   abundant relative to height (wide desktop/laptop windows). Portrait-
-   oriented tablets (e.g. 768x1024) have less width than that, and a
-   height-driven image gets wide enough to crowd the callouts off-screen —
-   so anything up to a small-laptop width falls back to being
-   width-constrained instead. */
-@media (max-width: 1024px) {
+/* Sizing the portrait by height, with the read-outs floating beside the
+   head, only works when width is comfortably abundant relative to height
+   (wide desktop/laptop windows). Portrait-oriented tablets (e.g.
+   768x1024) and near-square windows don't have that, so up to a small-
+   laptop width — or any window not wider than 7:5 — the portrait is
+   width-constrained and the read-outs stack above it instead. */
+@media (max-width: 1024px), (max-aspect-ratio: 7/5) {
   .hero {
     --frame-w: clamp(220px, 45vw, 460px);
     flex-direction: column;
@@ -507,9 +565,37 @@
    drop their leaders — the label sits just above its ring instead, since
    there's no room beside a 240–340px portrait. */
 @media (max-width: 600px) {
+  .hero {
+    gap: var(--space-4);
+    padding-top: var(--space-4);
+  }
+
   .info {
     flex-direction: column;
-    gap: var(--space-5);
+    gap: var(--space-4);
+  }
+
+  .kicker {
+    font-size: 0.85rem;
+    letter-spacing: 3px;
+  }
+
+  .label {
+    margin-top: var(--space-2);
+    font-size: 1rem;
+  }
+
+  .now {
+    margin-top: var(--space-2);
+    padding-top: var(--space-2);
+  }
+
+  .nowRole {
+    font-size: 1.05rem;
+  }
+
+  .nowAt {
+    font-size: 0.9rem;
   }
 
   .stat {
@@ -526,7 +612,7 @@
   }
 
   .num {
-    font-size: clamp(4.5rem, 22vw, 6rem);
+    font-size: clamp(4rem, 20vw, 5.5rem);
   }
 
   .leader,
@@ -544,7 +630,7 @@
   }
 
   .tagName {
-    font-size: 0.72rem;
+    font-size: 0.82rem;
     letter-spacing: 1.5px;
   }
 }

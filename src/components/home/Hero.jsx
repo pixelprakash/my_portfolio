@@ -5,6 +5,20 @@ import styles from './Hero.module.css';
 
 const PORTRAIT_WIDTH = 1100;
 const PORTRAIT_HEIGHT = 1422;
+const { design, development } = siteConfig.experience;
+
+// Both tick rows share one scale, so "2 of 6" vs "6 of 6" is a fair comparison.
+const YEAR_SCALE = Math.max(design.years, development.years);
+
+function YearTicks({ filled }) {
+  return (
+    <span className={styles.ticks} aria-hidden="true">
+      {Array.from({ length: YEAR_SCALE }, (_, i) => (
+        <span key={i} className={i < filled ? styles.tickOn : styles.tick} />
+      ))}
+    </span>
+  );
+}
 
 export default function Hero() {
   return (
@@ -37,6 +51,36 @@ export default function Hero() {
       </div>
       */}
 
+      <div className={styles.info}>
+        <div className={`${styles.stat} ${styles.statBlue}`}>
+          <span className={styles.num}>{design.years}</span>
+          <div className={styles.statBody}>
+            <p className={styles.kickerRow}>
+              <span className={styles.kicker}>Years</span>
+              <YearTicks filled={design.years} />
+            </p>
+            <p className={styles.label}>{design.label}</p>
+            <p className={styles.now}>
+              <span className={styles.nowTag}>Now</span>
+              <span>
+                <strong className={styles.nowRole}>{design.now.role}</strong> @ {design.now.at}
+              </span>
+            </p>
+          </div>
+        </div>
+
+        <div className={`${styles.stat} ${styles.statRed}`}>
+          <span className={styles.num}>{development.years}</span>
+          <div className={styles.statBody}>
+            <p className={styles.kickerRow}>
+              <span className={styles.kicker}>Years</span>
+              <YearTicks filled={development.years} />
+            </p>
+            <p className={styles.label}>{development.label}</p>
+          </div>
+        </div>
+      </div>
+
       <div className={styles.portraitFrame}>
         <div className={styles.glow} aria-hidden="true" />
         <img
@@ -49,14 +93,25 @@ export default function Hero() {
           fetchPriority="high"
           decoding="async"
         />
-        <span className={`${styles.badge} ${styles.badgeBlue}`}>
-          Designer
-          <span className={styles.badgeDot} aria-hidden="true" />
-        </span>
-        <span className={`${styles.badge} ${styles.badgeRed}`}>
-          <span className={styles.badgeDot} aria-hidden="true" />
-          Developer
-        </span>
+
+        {/* Annotations pinned to the actual pills in the photo (positions are
+            % of the image). Ring + leader are decorative; the label is text. */}
+        <div className={`${styles.callout} ${styles.calloutBlue}`}>
+          <span className={styles.ring} aria-hidden="true" />
+          <span className={styles.leader} aria-hidden="true" />
+          <span className={styles.tag}>
+            <span className={styles.tagName}>Designer</span>
+            <span className={styles.tagSub}>UX / UI</span>
+          </span>
+        </div>
+        <div className={`${styles.callout} ${styles.calloutRed}`}>
+          <span className={styles.ring} aria-hidden="true" />
+          <span className={styles.leader} aria-hidden="true" />
+          <span className={styles.tag}>
+            <span className={styles.tagName}>Developer</span>
+            <span className={styles.tagSub}>Full Stack</span>
+          </span>
+        </div>
       </div>
     </section>
   );

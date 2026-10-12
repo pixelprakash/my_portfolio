@@ -5,6 +5,19 @@ export const siteConfig = {
   shortName: 'Surya Prakash',
   role: 'Designer & Developer',
   tagline: 'Working at DIC, Design Department — IIT Hyderabad',
+  // Shown as the two stat cards on either side of the hero portrait.
+  experience: {
+    design: {
+      years: 2,
+      label: 'Professional experience in design',
+      now: { role: 'UX Engineer', at: 'DIC, Design Dept, IIT Hyderabad' },
+    },
+    development: {
+      years: 6,
+      label: 'Computer science education & hands-on experience',
+    },
+  },
+
   email: 'hello@uxsurya.com',
   location: 'Hyderabad, India',
 

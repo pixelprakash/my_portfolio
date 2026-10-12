@@ -1,4 +1,10 @@
 .hero {
+  /* Rendered width of the height-sized portrait (1100:1422 aspect). */
+  --portrait-w: calc((100vh - var(--nav-height)) * 0.7736);
+  /* Width the portrait frame actually ends up at; the callout leaders and
+     labels scale off it. Overridden below where the portrait is sized by
+     width instead. */
+  --frame-w: var(--portrait-w);
   position: relative;
   width: 100%;
   min-height: calc(100vh - var(--nav-height));
@@ -111,57 +117,376 @@
   filter: drop-shadow(0 24px 48px rgba(0, 0, 0, 0.65));
 }
 
-.badge {
+/* ---------------------------------------------------------------------
+   Experience read-outs: a giant outlined numeral, a year-scale, and
+   viewfinder brackets. On desktop they sit in the open space either side
+   of the head (the silhouette only widens past ~38% of the image height),
+   one per colour half; below 1024px they flow above the portrait.
+   --------------------------------------------------------------------- */
+
+.info {
   position: absolute;
-  z-index: 2;
-  bottom: 20%;
+  z-index: 3;
+  top: var(--space-6);
+  left: 0;
+  right: 0;
+  padding: 0 var(--container-padding);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  pointer-events: none;
+}
+
+.stat {
+  --accent: var(--color-blue);
+  --accent-glow: rgba(0, 212, 255, 0.55);
+  --accent-fill: rgba(0, 212, 255, 0.4);
+  --accent-soft: var(--color-blue-soft);
+  --scrim: rgba(2, 8, 20, 0.6);
+  position: relative;
+  pointer-events: auto;
+  width: max(190px, min(300px, calc(50vw - var(--portrait-w) * 0.32 - var(--container-padding))));
+  padding: var(--space-3) var(--space-4);
+  /* A soft scrim, not a card: keeps text legible over the animated rain. */
+  background: radial-gradient(110% 100% at 0% 0%, var(--scrim), transparent 60%);
+  animation: statIn 700ms var(--transition-slow) both;
+}
+
+.statRed {
+  --accent: var(--color-red);
+  --accent-glow: rgba(255, 59, 14, 0.55);
+  --accent-fill: rgba(255, 59, 14, 0.4);
+  --accent-soft: var(--color-red-soft);
+  --scrim: rgba(20, 3, 3, 0.6);
+  animation-delay: 150ms;
+}
+
+/* Viewfinder corners */
+.stat::before,
+.stat::after {
+  content: '';
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  border: 1.5px solid var(--accent);
+  filter: drop-shadow(0 0 4px var(--accent-glow));
+}
+
+.stat::before {
+  top: 0;
+  left: 0;
+  border-right: 0;
+  border-bottom: 0;
+}
+
+.stat::after {
+  right: 0;
+  bottom: 0;
+  border-left: 0;
+  border-top: 0;
+}
+
+.num {
+  display: block;
+  font-family: var(--font-display);
+  font-size: clamp(6rem, min(15vw, 22vh), 12rem);
+  line-height: 0.85;
+  letter-spacing: -0.02em;
+  /* Outline with a fill that fades out downwards. */
+  -webkit-text-stroke: 2px var(--accent);
+  -webkit-text-fill-color: transparent;
+  background: linear-gradient(180deg, var(--accent-fill), transparent 80%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  filter: drop-shadow(0 0 22px var(--accent-glow));
+}
+
+.statBody {
+  margin-top: var(--space-3);
+  text-shadow: 0 1px 14px rgba(0, 0, 0, 0.75);
+}
+
+.kickerRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-3);
+  margin: 0;
+}
+
+.kicker {
+  font-family: var(--font-display);
+  font-size: 0.72rem;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--accent-soft);
+}
+
+.ticks {
+  display: inline-flex;
+  gap: 4px;
+}
+
+.tick,
+.tickOn {
+  width: 14px;
+  height: 5px;
+  border-radius: 1px;
+}
+
+.tick {
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.tickOn {
+  background: var(--accent);
+  box-shadow: 0 0 8px var(--accent-glow);
+}
+
+.label {
+  margin: var(--space-2) 0 0;
+  font-size: clamp(0.9rem, 1.25vw, 1.02rem);
+  line-height: 1.4;
+  color: var(--color-text-secondary);
+}
+
+.now {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-3);
+  margin: var(--space-3) 0 0;
+  padding-top: var(--space-3);
+  border-top: 1px dashed var(--color-border-strong);
+  font-size: 0.88rem;
+  line-height: 1.4;
+  color: var(--color-text-secondary);
+}
+
+.nowTag {
+  flex-shrink: 0;
   display: inline-flex;
   align-items: center;
-  gap: var(--space-3);
-  padding: var(--space-3) var(--space-6);
-  border-radius: var(--radius-pill);
+  gap: 6px;
   font-family: var(--font-display);
-  font-size: clamp(0.85rem, 2vw, 1.15rem);
-  letter-spacing: 1px;
-  color: var(--color-text);
-  background: rgba(6, 6, 8, 0.75);
-  backdrop-filter: blur(12px);
-  border: 1px solid var(--color-border-strong);
-  white-space: nowrap;
+  font-size: 0.62rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--accent);
 }
 
-.badgeDot {
-  width: 11px;
-  height: 11px;
+.nowTag::before {
+  content: '';
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
-  flex-shrink: 0;
+  background: var(--accent);
+  box-shadow: 0 0 8px var(--accent-glow);
+  animation: pulse 2s ease-in-out infinite;
 }
 
-.badgeBlue {
-  left: -12%;
+.nowRole {
+  color: var(--color-text);
+  font-weight: 700;
 }
 
-.badgeBlue .badgeDot {
-  background: var(--color-blue);
-  box-shadow: 0 0 10px rgba(0, 212, 255, 0.9);
+/* ---------------------------------------------------------------------
+   Pill callouts: a target ring on each pill in the photo, a hairline
+   leader, and a plain label. Positions are % of the image.
+   --------------------------------------------------------------------- */
+
+.callout {
+  --accent: var(--color-blue);
+  --accent-glow: rgba(0, 212, 255, 0.6);
+  --accent-soft: var(--color-blue-soft);
+  --ring: 18px;
+  --leader: calc(var(--frame-w) * 0.16);
+  position: absolute;
+  z-index: 3;
+  width: 0;
+  height: 0;
 }
 
-.badgeRed {
-  right: -12%;
+.calloutBlue {
+  top: 80.4%;
+  left: 22.6%;
 }
 
-.badgeRed .badgeDot {
-  background: var(--color-red);
-  box-shadow: 0 0 10px rgba(255, 59, 14, 0.9);
+.calloutRed {
+  --accent: var(--color-red);
+  --accent-glow: rgba(255, 59, 14, 0.6);
+  --accent-soft: var(--color-red-soft);
+  top: 79.7%;
+  left: 77.7%;
+}
+
+.ring {
+  position: absolute;
+  top: calc(var(--ring) / -2);
+  left: calc(var(--ring) / -2);
+  width: var(--ring);
+  height: var(--ring);
+  border-radius: 50%;
+  border: 1.5px solid var(--accent);
+  background: radial-gradient(circle, var(--accent) 0 2.5px, transparent 3px);
+  box-shadow: 0 0 14px var(--accent-glow);
+}
+
+.ring::after {
+  content: '';
+  position: absolute;
+  inset: -1.5px;
+  border-radius: 50%;
+  border: 1.5px solid var(--accent);
+  animation: ping 2.4s ease-out infinite;
+}
+
+.leader {
+  position: absolute;
+  top: 0;
+  height: 1px;
+  width: var(--leader);
+  animation: leaderIn 800ms 500ms var(--transition-slow) both;
+}
+
+.leader::after {
+  content: '';
+  position: absolute;
+  top: -2px;
+  width: 5px;
+  height: 5px;
+  background: var(--accent);
+  box-shadow: 0 0 8px var(--accent-glow);
+}
+
+.calloutBlue .leader {
+  right: calc(var(--ring) / 2);
+  transform-origin: right center;
+  background: linear-gradient(to left, var(--accent), rgba(0, 212, 255, 0.15));
+}
+
+.calloutBlue .leader::after {
+  left: 0;
+}
+
+.calloutRed .leader {
+  left: calc(var(--ring) / 2);
+  transform-origin: left center;
+  background: linear-gradient(to right, var(--accent), rgba(255, 59, 14, 0.15));
+}
+
+.calloutRed .leader::after {
+  right: 0;
+}
+
+.tag {
+  position: absolute;
+  top: 0;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  white-space: nowrap;
+  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.85);
+}
+
+.calloutBlue .tag {
+  right: calc(var(--ring) / 2 + var(--leader) + 10px);
+  align-items: flex-end;
+  text-align: right;
+}
+
+.calloutRed .tag {
+  left: calc(var(--ring) / 2 + var(--leader) + 10px);
+  align-items: flex-start;
+  text-align: left;
+}
+
+.tagName {
+  font-family: var(--font-display);
+  font-size: clamp(0.8rem, 1.6vw, 1.1rem);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--color-text);
+}
+
+.tagSub {
+  font-size: 0.72rem;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: var(--accent-soft);
+}
+
+@keyframes statIn {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}
+
+@keyframes ping {
+  from {
+    opacity: 0.8;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(2.4);
+  }
+}
+
+@keyframes leaderIn {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
 }
 
 /* Sizing the portrait by height only works when width is comfortably
    abundant relative to height (wide desktop/laptop windows). Portrait-
-   oriented tablets (e.g. 768x1024) have less width than that, and with
-   the badges' side offsets on top, a height-driven image gets wide enough
-   to push them off-screen — so anything up to a small-laptop width also
-   falls back to being width-constrained instead. */
+   oriented tablets (e.g. 768x1024) have less width than that, and a
+   height-driven image gets wide enough to crowd the callouts off-screen —
+   so anything up to a small-laptop width falls back to being
+   width-constrained instead. */
 @media (max-width: 1024px) {
+  .hero {
+    --frame-w: clamp(220px, 45vw, 460px);
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-6);
+    padding-top: var(--space-6);
+  }
+
+  .info {
+    position: static;
+    width: 100%;
+    max-width: 760px;
+    gap: var(--space-5);
+    align-items: stretch;
+  }
+
+  .stat {
+    flex: 1 1 0;
+    width: auto;
+    min-width: 0;
+  }
+
   .intro {
     padding: var(--space-4) var(--space-5);
   }
@@ -169,71 +494,65 @@
   .portraitFrame {
     height: auto;
     max-height: none;
-    width: clamp(220px, 45vw, 460px);
+    width: var(--frame-w);
   }
 
   .portraitImg {
     height: auto;
     width: 100%;
   }
+}
 
-  .badge {
-    bottom: 18%;
+/* Phones: stacked read-outs (numeral beside its text), and the callouts
+   drop their leaders — the label sits just above its ring instead, since
+   there's no room beside a 240–340px portrait. */
+@media (max-width: 600px) {
+  .info {
+    flex-direction: column;
+    gap: var(--space-5);
   }
 
-  .badgeBlue {
-    left: -8%;
+  .stat {
+    /* The row's flex: 1 1 0 would zero out their height in a column. */
+    flex: 0 0 auto;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    column-gap: var(--space-4);
+    align-items: center;
   }
 
-  .badgeRed {
-    right: -8%;
+  .statBody {
+    margin-top: 0;
+  }
+
+  .num {
+    font-size: clamp(4.5rem, 22vw, 6rem);
+  }
+
+  .leader,
+  .tagSub {
+    display: none;
+  }
+
+  .callout .tag {
+    left: 0;
+    right: auto;
+    top: calc(var(--ring) / -2 - 8px);
+    transform: translate(-50%, -100%);
+    align-items: center;
+    text-align: center;
+  }
+
+  .tagName {
+    font-size: 0.72rem;
+    letter-spacing: 1.5px;
   }
 }
 
-/* Phones: the tablet sizing above still leaves badges cramped/small on a
-   narrow phone, so shrink them further here. */
 @media (max-width: 480px) {
-  .badge {
-    bottom: 16%;
-    padding: var(--space-2) var(--space-4);
-    gap: var(--space-2);
-  }
-
-  .badgeDot {
-    width: 9px;
-    height: 9px;
-  }
-
-  .badgeBlue {
-    left: -6%;
-  }
-
-  .badgeRed {
-    right: -6%;
-  }
-}
-
-/* Below ~360px, the portrait frame has already hit its width floor
-   (clamp min above), so each badge is wider than half the image — at any
-   offset they'd collide. Shrink them further and pull them in almost
-   flush with the image edges so they sit side by side without touching. */
-@media (max-width: 360px) {
-  .badge {
-    padding: var(--space-1) var(--space-3);
-    gap: 6px;
-    font-size: 0.7rem;
-  }
-
-  .badgeDot {
-    width: 7px;
-    height: 7px;
-  }
-
-  .badgeBlue {
-    left: -4%;
-  }
-
-  .badgeRed {
-    right: -4%;
+  /* At the tablet 45vw the frame would sit on its 220px floor across the
+     whole phone range. */
+  .hero {
+    --frame-w: clamp(240px, 70vw, 340px);
   }
 }

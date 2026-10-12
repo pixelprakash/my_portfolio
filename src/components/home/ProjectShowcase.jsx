@@ -12,7 +12,12 @@ function hostOf(href) {
   }
 }
 
-function VideoDialog({ video, onClose }) {
+// Opens a project's embed (YouTube video or Figma presentation) in a lightbox.
+function embedSrc(project) {
+  return project.embed ?? `https://www.youtube.com/embed/${project.videoId}?autoplay=1&rel=0`;
+}
+
+function EmbedDialog({ video, onClose }) {
   const ref = useRef(null);
 
   useEffect(() => {
@@ -26,7 +31,7 @@ function VideoDialog({ video, onClose }) {
     <dialog
       ref={ref}
       className={styles.dialog}
-      aria-label={video ? video.title : 'Video'}
+      aria-label={video ? video.title : 'Project'}
       onClose={onClose}
       onClick={(e) => {
         // a click on the backdrop lands on the <dialog> itself
@@ -35,12 +40,24 @@ function VideoDialog({ video, onClose }) {
     >
       {video && (
         <>
-          <button type="button" className={styles.dialogClose} onClick={onClose}>
-            Close ✕
-          </button>
+          <div className={styles.dialogBar}>
+            {video.href && (
+              <a
+                className={styles.dialogLink}
+                href={video.href}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Open in Figma ↗
+              </a>
+            )}
+            <button type="button" className={styles.dialogClose} onClick={onClose}>
+              Close ✕
+            </button>
+          </div>
           <div className={styles.player}>
             <iframe
-              src={`https://www.youtube.com/embed/${video.videoId}?autoplay=1&rel=0`}
+              src={embedSrc(video)}
               title={video.title}
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
               referrerPolicy="strict-origin-when-cross-origin"
@@ -56,13 +73,14 @@ function VideoDialog({ video, onClose }) {
 function ProjectCard({ project, onPlay }) {
   const isBlue = project.accent === 'blue';
   const type = projectTypes[project.type];
-  const isVideo = project.type === 'video';
+  // video + presentations open in a lightbox; websites link out
+  const opensEmbed = Boolean(project.videoId || project.embed);
 
   return (
     <article
       className={`${cardStyles.card} ${styles.card} ${isBlue ? cardStyles.cardBlue : cardStyles.cardRed}`}
     >
-      <div className={`${styles.cover} ${isVideo ? styles.coverVideo : ''}`}>
+      <div className={`${styles.cover} ${opensEmbed ? styles.coverVideo : ''}`}>
         {type.frame === 'browser' && (
           <div className={styles.chrome} aria-hidden="true">
             <span className={styles.dots}>
@@ -74,8 +92,19 @@ function ProjectCard({ project, onPlay }) {
           </div>
         )}
         <div className={styles.shot}>
-          <img src={project.cover} alt="" loading="lazy" width="1200" height="750" />
-          {isVideo && (
+          {project.cover ? (
+            <img src={project.cover} alt="" loading="lazy" width="1200" height="750" />
+          ) : (
+            // no exported cover yet: title-slide style placeholder
+            <div
+              className={`${styles.slide} ${isBlue ? styles.slideBlue : styles.slideRed}`}
+              aria-hidden="true"
+            >
+              <span className={styles.slideKicker}>{type.label}</span>
+              <span className={styles.slideTitle}>{project.coverTitle ?? project.title}</span>
+            </div>
+          )}
+          {opensEmbed && (
             <span className={styles.play} aria-hidden="true">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
                 <polygon points="7,4 20,12 7,20" />
@@ -98,7 +127,7 @@ function ProjectCard({ project, onPlay }) {
         </div>
 
         <h3 className={cardStyles.title}>
-          {isVideo ? (
+          {opensEmbed ? (
             <button
               type="button"
               className={`${cardStyles.stretchedLink} ${styles.titleButton}`}
@@ -174,7 +203,7 @@ export default function ProjectShowcase() {
         </ul>
       </div>
 
-      <VideoDialog video={playing} onClose={() => setPlaying(null)} />
+      <EmbedDialog video={playing} onClose={() => setPlaying(null)} />
     </section>
   );
 }

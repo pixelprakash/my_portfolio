@@ -140,7 +140,7 @@
   transform: scale(1.05);
 }
 
-/* video: native 16:9 so thumbnail text isn't cropped; play button over the still */
+/* video / presentation: native 16:9 so slide + thumbnail text isn't cropped; play button over the still */
 .coverVideo .shot {
   aspect-ratio: 16 / 9;
 }
@@ -175,6 +175,42 @@
 
 .card:hover .play {
   transform: translate(-50%, -50%) scale(1.1);
+}
+
+/* placeholder cover for presentations without an exported slide image */
+.slide {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: var(--space-2);
+  width: 100%;
+  height: 100%;
+  padding: var(--space-5);
+}
+
+.slideBlue {
+  background: radial-gradient(120% 140% at 0% 0%, rgba(0, 212, 255, 0.45), transparent 60%),
+    linear-gradient(135deg, #06243a, #0a0a0d);
+}
+
+.slideRed {
+  background: radial-gradient(120% 140% at 0% 0%, rgba(255, 59, 14, 0.45), transparent 60%),
+    linear-gradient(135deg, #3a0e06, #0a0a0d);
+}
+
+.slideKicker {
+  font-family: var(--font-display);
+  font-size: 0.6rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+}
+
+.slideTitle {
+  font-family: var(--font-display);
+  font-size: clamp(1.2rem, 3vw, 1.7rem);
+  line-height: 1.15;
+  color: var(--color-text);
 }
 
 /* ── Text ── */
@@ -230,10 +266,16 @@
   background: rgba(0, 0, 0, 0.85);
 }
 
-.dialogClose {
+.dialogBar {
   position: absolute;
   top: -2.75rem;
   right: 0;
+  display: flex;
+  gap: var(--space-2);
+}
+
+.dialogLink,
+.dialogClose {
   padding: var(--space-2) var(--space-4);
   border-radius: var(--radius-pill);
   border: 1px solid var(--color-border-strong);
@@ -241,7 +283,13 @@
   color: var(--color-text);
   font: inherit;
   font-size: 0.85rem;
+  text-decoration: none;
   cursor: pointer;
+}
+
+.dialogLink:hover,
+.dialogClose:hover {
+  border-color: var(--color-text);
 }
 
 .player {

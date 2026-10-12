@@ -4,7 +4,10 @@
 //              photography = full-bleed photo).
 //   cover    — image in /public/work (a 16:10 crop works best).
 //   href     — external link for websites; video projects use `videoId`
-//              (YouTube) and open in a lightbox instead.
+//              (YouTube) and presentations use `embed` (Figma embed URL);
+//              both open in a lightbox instead. A lightbox project may
+//              also set `href` — shown as an "Open in Figma" link there.
+//   coverTitle — text for the placeholder cover when `cover` is omitted.
 //   inProgress — shows the IN PROGRESS badge.
 // Add new types (branding, app-ui, visual) to projectTypes below and give
 // their projects a `type` — the filter chips only show types that have work.
@@ -12,7 +15,7 @@ export const projectTypes = {
   website: { label: 'Websites', cta: 'Visit site ↗', frame: 'browser' },
   video: { label: 'Video editing', cta: 'Watch video ▶' },
   photography: { label: 'Photography', cta: 'View gallery ↗' },
-  // branding: { label: 'Branding', cta: 'View project →' },
+  branding: { label: 'Branding', cta: 'View presentation ▶' },
   // 'app-ui': { label: 'App UI', cta: 'View project →' },
   // visual: { label: 'Visual design', cta: 'View piece →' },
 };
@@ -76,6 +79,26 @@ export const projects = [
     title: 'Golden Age of Industrial Design with Kirti Trivedi — Documentary, Part 1',
     videoId: 'mQL6lPXuuZs',
     cover: '/work/video-golden-age.jpg',
+    accent: 'blue',
+  },
+  {
+    id: 'grinitian-branding',
+    type: 'branding',
+    title: '5 Concepts — Grinitian Branding',
+    coverTitle: 'Grinitian — 5 Concepts',
+    embed:
+      'https://embed.figma.com/slides/UJKFqmkVlLAi3mb6jeqUkl/5-Concepts---Grinitian-Branding?node-id=1-256&embed-host=share',
+    href: 'https://www.figma.com/deck/UJKFqmkVlLAi3mb6jeqUkl',
+    accent: 'red',
+  },
+  {
+    id: 'akshara-sanjeevani-branding',
+    type: 'branding',
+    title: 'Akshara Sanjeevani — Branding',
+    coverTitle: 'Akshara Sanjeevani',
+    embed:
+      'https://embed.figma.com/slides/29x48D4vNTvdqSDQTXRQNZ/Akshara-Sanjeevani---Branding?node-id=1-37&embed-host=share',
+    href: 'https://www.figma.com/deck/29x48D4vNTvdqSDQTXRQNZ',
     accent: 'blue',
   },
 ];

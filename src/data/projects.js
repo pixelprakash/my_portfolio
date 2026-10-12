@@ -157,6 +157,15 @@ export const projects = [
     embedAspect: '4 / 3',
     accent: 'blue',
   },
+  {
+    id: 'sahaaya-salesforce-design-challenge',
+    type: 'ux',
+    title: 'Sahaaya — Salesforce Design Challenge',
+    coverTitle: 'Sahaaya',
+    embed: 'https://www.behance.net/embed/project/225913447?ilo0=1',
+    embedAspect: '4 / 3',
+    accent: 'red',
+  },
 ];
 
 // Resolve gallery file names to URLs once, so components just use src/thumb.

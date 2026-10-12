@@ -101,14 +101,14 @@ export const projects = [
     href: 'https://www.figma.com/deck/29x48D4vNTvdqSDQTXRQNZ',
     accent: 'blue',
   },
+  {
+    id: 'praklens-photography',
+    type: 'photography',
+    title: 'Photography — @praklens',
+    coverTitle: '@praklens',
+    // no `cover` yet: add a photo at /public/work/praklens.jpg and set
+    // cover: '/work/praklens.jpg' to replace the placeholder.
+    href: 'https://www.instagram.com/praklens/',
+    accent: 'red',
+  },
 ];
-
-// Photography example — add real photos to /public/work and uncomment:
-// {
-//   id: 'photo-series-name',
-//   type: 'photography',
-//   title: 'Series title',
-//   href: 'https://… (gallery / Instagram / Flickr)',
-//   cover: '/work/photo-series-name.jpg',
-//   accent: 'red',
-// },

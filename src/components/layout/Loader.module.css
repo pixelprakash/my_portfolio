@@ -1,0 +1,689 @@
+.root {
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace;
+  /* 0–1 bass energy, written every frame by the Loader; the glow of the
+     seam, the pill and the title follow it. */
+  --pulse: 0;
+  --expo: cubic-bezier(0.76, 0, 0.24, 1);
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  overflow: hidden;
+  color: var(--color-text);
+}
+
+/* ── The hero's two halves. On exit they slide apart as flat doors on one
+   expo in-out curve, a thin line of light riding each inner edge. ── */
+.panel {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 50%;
+  overflow: hidden;
+  will-change: transform;
+  transition: transform 1100ms var(--expo) 250ms;
+}
+
+.panelBlue {
+  left: 0;
+  background: linear-gradient(135deg, #000a14 0%, #001a33 100%);
+}
+
+.panelRed {
+  right: 0;
+  background: linear-gradient(225deg, #1a0000 0%, #3a0000 100%);
+}
+
+.exit .panelBlue {
+  transform: translateX(-100%);
+}
+
+.exit .panelRed {
+  transform: translateX(100%);
+}
+
+/* The join between the halves: one hairline per door. Together they read as a
+   single seam at rest; they breathe with the bass and part on exit. */
+.panel::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  z-index: 3;
+  opacity: calc(0.6 + var(--pulse) * 0.4);
+  transform-origin: center;
+  animation: seamIn 900ms 100ms cubic-bezier(0.16, 1, 0.3, 1) backwards;
+  transition: opacity 500ms ease 700ms;
+}
+
+.panelBlue::before {
+  right: 0;
+  background: linear-gradient(to bottom, transparent, #bff3ff 50%, transparent);
+  box-shadow: -2px 0 calc(10px + var(--pulse) * 30px) rgba(0, 212, 255, 0.75);
+}
+
+.panelRed::before {
+  left: 0;
+  background: linear-gradient(to bottom, transparent, #ffd2c4 50%, transparent);
+  box-shadow: 2px 0 calc(10px + var(--pulse) * 30px) rgba(255, 59, 14, 0.75);
+}
+
+.exit .panel::before {
+  opacity: 0;
+}
+
+/* ── Atmosphere ── */
+.scanlines {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0.04) 0 1px,
+    transparent 1px 3px
+  );
+}
+
+.vignette {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  pointer-events: none;
+  background: radial-gradient(ellipse at center, transparent 35%, rgba(0, 0, 0, 0.7) 100%);
+  transition: opacity 600ms ease 400ms;
+}
+
+.exit .vignette {
+  opacity: 0;
+}
+
+/* ── Centre stack. Rendered once per half; each copy is a full screen wide
+   and centred on the seam, so the halves clip it down the middle. ── */
+.splitLayer {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 200%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-5);
+  padding: 0 var(--container-padding);
+  text-align: center;
+}
+
+.layerL {
+  left: 0;
+}
+
+.layerR {
+  right: 0;
+}
+
+.capsule {
+  width: clamp(76px, 9vw, 112px);
+  height: auto;
+  overflow: visible;
+  animation: capsuleIn 900ms 150ms cubic-bezier(0.16, 1, 0.3, 1) backwards;
+  filter: drop-shadow(calc(var(--pulse) * -8px - 6px) 0 calc(12px + var(--pulse) * 18px) rgba(0, 212, 255, 0.55))
+    drop-shadow(calc(var(--pulse) * 8px + 6px) 0 calc(12px + var(--pulse) * 18px) rgba(255, 59, 14, 0.55));
+  transition: opacity 400ms ease;
+}
+
+.exit .capsule {
+  opacity: 0;
+  transition-delay: 200ms;
+}
+
+.name {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-family: var(--font-display);
+  font-size: clamp(1.15rem, 5.2vw, 2.75rem);
+  line-height: 1.1;
+  color: #fff;
+  text-shadow: 0 0 calc(22px + var(--pulse) * 24px) rgba(255, 255, 255, calc(0.18 + var(--pulse) * 0.25));
+}
+
+/* Each title line sits in a mask: it rises in from below it, and on exit
+   slides up and out through the top. */
+.line {
+  display: block;
+  overflow: hidden;
+  /* generous padding so the title's glow isn't clipped by the mask; the
+     negative margin cancels it out of the layout */
+  padding: 0.4em 0.6em;
+  margin: -0.4em -0.6em;
+}
+
+.lineInner {
+  display: flex;
+  justify-content: center;
+  transition: transform 700ms var(--expo);
+  animation: rise 900ms cubic-bezier(0.16, 1, 0.3, 1) backwards;
+}
+
+.line:nth-child(1) .lineInner {
+  animation-delay: 350ms;
+}
+
+.line:nth-child(2) .lineInner {
+  animation-delay: 470ms;
+}
+
+.exit .lineInner {
+  transform: translateY(-170%);
+}
+
+.exit .line:nth-child(2) .lineInner {
+  transition-delay: 90ms;
+}
+
+.cell {
+  display: inline-block;
+  width: 0.98em;
+  text-align: center;
+}
+
+.space {
+  width: 0.5em;
+}
+
+.role {
+  display: flex;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-size: clamp(0.66rem, 2.3vw, 1rem);
+  color: var(--color-text-secondary);
+  animation: fadeUp 800ms 900ms cubic-bezier(0.16, 1, 0.3, 1) backwards;
+  transition: opacity 350ms ease, transform 500ms var(--expo);
+}
+
+.exit .role {
+  opacity: 0;
+  transform: translateY(-10px);
+  transition-delay: 120ms;
+}
+
+.role .cell {
+  width: 1.08em;
+}
+
+.blueText {
+  color: var(--color-blue);
+  text-shadow: 0 0 16px rgba(0, 212, 255, 0.6);
+}
+
+.redText {
+  color: var(--color-red);
+  text-shadow: 0 0 16px rgba(255, 59, 14, 0.6);
+}
+
+/* ── Progress: an oscilloscope. The track fills outward from the centre
+   (blue left, red right) with the live waveform riding on it. ── */
+.progress {
+  width: min(440px, 72vw);
+  margin-top: var(--space-4);
+  animation: fadeUp 800ms 1100ms cubic-bezier(0.16, 1, 0.3, 1) backwards;
+  transition: transform 600ms var(--expo), opacity 300ms ease 300ms;
+}
+
+.exit .progress {
+  transform: scaleX(0);
+  opacity: 0;
+}
+
+.scope {
+  display: block;
+  width: 100%;
+  height: 44px;
+}
+
+.barLabels {
+  display: flex;
+  justify-content: space-between;
+  margin-top: var(--space-2);
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+
+/* ── Interactive layer: the gate and the skip control ── */
+.controls {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+  transition: opacity 300ms ease;
+}
+
+.controls > * {
+  pointer-events: auto;
+}
+
+.exit .controls {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.exit .controls > * {
+  pointer-events: none;
+}
+
+.gate {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-5);
+  padding: 0 var(--container-padding);
+  text-align: center;
+  animation: fadeUp 900ms 250ms cubic-bezier(0.16, 1, 0.3, 1) backwards;
+}
+
+.gateKicker {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.66);
+  text-wrap: balance;
+}
+
+.gateTitle {
+  font-size: clamp(1.3rem, 4.4vw, 2.5rem);
+  color: #fff;
+}
+
+.choices {
+  display: flex;
+  gap: var(--space-4);
+  margin-top: var(--space-3);
+}
+
+.choice {
+  --tone: 255, 255, 255;
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  min-width: 15rem;
+  padding: var(--space-4) var(--space-6) var(--space-4) var(--space-5);
+  border: 1px solid rgba(var(--tone), 0.4);
+  border-radius: var(--radius-pill);
+  background: rgba(var(--tone), 0.05);
+  text-align: left;
+  cursor: pointer;
+  transition: border-color var(--transition-base), background var(--transition-base),
+    box-shadow var(--transition-base), transform var(--transition-base);
+}
+
+.choiceBlue {
+  --tone: 0, 212, 255;
+}
+
+.choiceRed {
+  --tone: 255, 59, 14;
+}
+
+.choice:hover {
+  border-color: rgb(var(--tone));
+  background: rgba(var(--tone), 0.12);
+  box-shadow: 0 0 36px rgba(var(--tone), 0.3);
+  transform: translateY(-2px);
+}
+
+.choiceDot {
+  flex: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: rgb(var(--tone));
+  box-shadow: 0 0 14px rgba(var(--tone), 0.9);
+}
+
+.choiceText {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.choiceName {
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  letter-spacing: 0.04em;
+  color: #fff;
+}
+
+.choiceSub {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.gateNote {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.skip,
+.skipFloat {
+  padding: var(--space-2) var(--space-3);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 0;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.8);
+  cursor: pointer;
+  transition: border-color var(--transition-fast), color var(--transition-fast);
+}
+
+.skip:hover,
+.skipFloat:hover {
+  border-color: #fff;
+  color: #fff;
+}
+
+.skipFloat {
+  position: absolute;
+  bottom: clamp(18px, 3vw, 38px);
+  left: 50%;
+  translate: -50% 0;
+  animation: fadeIn 600ms 1200ms backwards;
+}
+
+/* ── HUD in the corners (inside each half) ── */
+.hud {
+  position: absolute;
+  top: clamp(18px, 3vw, 38px);
+  bottom: clamp(18px, 3vw, 38px);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto 1fr auto;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.16em;
+  line-height: 1.7;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.72);
+  pointer-events: none;
+  /* `backwards`, not `both`: a forwards fill would pin opacity at 1 and
+     override the fade-out the exit class applies. */
+  animation: fadeIn 600ms 200ms backwards;
+  transition: opacity 300ms ease;
+}
+
+.hudLeft {
+  left: clamp(18px, 3vw, 38px);
+  right: 12px;
+}
+
+.hudRight {
+  right: clamp(18px, 3vw, 38px);
+  left: 12px;
+  justify-items: end;
+}
+
+.exit .hud {
+  opacity: 0;
+}
+
+.hud p {
+  margin: 0;
+}
+
+.alignRight {
+  text-align: right;
+}
+
+.corner {
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  border: 1.5px solid rgba(255, 255, 255, 0.45);
+}
+
+.cTL {
+  top: -10px;
+  left: -10px;
+  border-right: 0;
+  border-bottom: 0;
+}
+
+.cTR {
+  top: -10px;
+  right: -10px;
+  border-left: 0;
+  border-bottom: 0;
+}
+
+.cBL {
+  bottom: -10px;
+  left: -10px;
+  border-right: 0;
+  border-top: 0;
+}
+
+.cBR {
+  bottom: -10px;
+  right: -10px;
+  border-left: 0;
+  border-top: 0;
+}
+
+.log {
+  grid-row: 3;
+  align-self: end;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  text-align: left;
+  letter-spacing: 0.04em;
+  text-transform: none;
+  font-size: 0.74rem;
+}
+
+.logLine {
+  display: flex;
+  gap: 0.5ch;
+  width: min(34ch, 100%);
+  white-space: nowrap;
+  animation: logIn 300ms ease both;
+}
+
+.dots {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  color: rgba(255, 255, 255, 0.28);
+}
+
+.ok {
+  font-weight: 700;
+}
+
+.okBlue {
+  color: var(--color-blue);
+}
+
+.okRed {
+  color: var(--color-red);
+}
+
+.okWhite {
+  color: #fff;
+}
+
+.caret::after {
+  content: '▍';
+  margin-left: 0.4ch;
+  animation: blink 1s steps(2, start) infinite;
+}
+
+.br {
+  grid-row: 3;
+  align-self: end;
+  justify-self: end;
+  text-align: right;
+}
+
+.loadingLabel {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.counterRow {
+  display: flex;
+  align-items: baseline;
+  justify-content: flex-end;
+  gap: 0.15em;
+  margin: 0;
+  line-height: 0.9;
+}
+
+/* Outlined numerals with a blue→red fill: the same language as the hero. */
+.counter {
+  display: inline-block;
+  min-width: 3ch;
+  font-family: var(--font-display);
+  font-size: clamp(2.2rem, 8vw, 5.5rem);
+  letter-spacing: -0.02em;
+  text-align: right;
+  -webkit-text-stroke: 1.5px rgba(255, 255, 255, 0.92);
+  -webkit-text-fill-color: transparent;
+  background: linear-gradient(90deg, rgba(0, 212, 255, 0.6), rgba(255, 59, 14, 0.6));
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+
+.pct {
+  font-family: var(--font-display);
+  font-size: clamp(0.9rem, 2.4vw, 1.6rem);
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* ── Small screens ── */
+@media (max-width: 640px) {
+  .choices {
+    flex-direction: column;
+  }
+
+  .choice {
+    min-width: min(17rem, 78vw);
+  }
+
+  .hudLeft {
+    right: 6px;
+  }
+
+  .log {
+    font-size: 0.64rem;
+    letter-spacing: 0;
+  }
+
+  /* the bottom corners are busy on a phone: move the floating skip up top,
+     just under the corner read-outs */
+  .skipFloat {
+    bottom: auto;
+    top: calc(clamp(18px, 3vw, 38px) + 3.4rem);
+  }
+}
+
+/* Short landscape screens: drop the capsule to make room */
+@media (max-height: 480px) {
+  .capsule {
+    display: none;
+  }
+
+  .splitLayer {
+    gap: var(--space-3);
+  }
+
+  .gate {
+    gap: var(--space-3);
+  }
+
+  .gateNote {
+    display: none;
+  }
+
+  .skipFloat {
+    bottom: clamp(10px, 2vw, 20px);
+    top: auto;
+  }
+}
+
+@keyframes seamIn {
+  from {
+    transform: scaleY(0);
+  }
+  to {
+    transform: scaleY(1);
+  }
+}
+
+@keyframes capsuleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes rise {
+  from {
+    transform: translateY(170%);
+  }
+  to {
+    transform: none;
+  }
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes logIn {
+  from {
+    opacity: 0;
+    transform: translateX(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes blink {
+  to {
+    visibility: hidden;
+  }
+}

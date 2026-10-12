@@ -205,3 +205,30 @@ input:focus-visible,
     scroll-behavior: auto !important;
   }
 }
+
+/* ── Opening-sequence hooks (toggled on <html> by the Loader) ──
+   While the intro is playing, hold every entrance animation on the page at
+   frame zero; they run as the doors part. The page itself settles in with a
+   soft focus-pull. The Loader is skipped entirely for reduced motion, so
+   neither class is ever added there. */
+html.intro-playing #main *,
+html.intro-playing #main *::before,
+html.intro-playing #main *::after {
+  animation-play-state: paused !important;
+}
+
+html.intro-reveal #main {
+  transform-origin: 50% 0;
+  animation: introDolly 1300ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes introDolly {
+  from {
+    transform: scale(1.06);
+    filter: blur(8px) brightness(1.2);
+  }
+  to {
+    transform: none;
+    filter: none;
+  }
+}

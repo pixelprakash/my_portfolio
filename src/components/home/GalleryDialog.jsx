@@ -66,7 +66,12 @@ export default function GalleryDialog({ project, onClose }) {
             <span className={styles.count}>
               {current ? `${index + 1} / ${items.length}` : `${items.length} designs`}
             </span>
-            <button type="button" className={styles.barButton} onClick={handleClose}>
+            <button
+              type="button"
+              className={styles.barButton}
+              data-sound="none"
+              onClick={handleClose}
+            >
               Close ✕
             </button>
           </header>

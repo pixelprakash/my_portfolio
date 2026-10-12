@@ -2,6 +2,7 @@ import { useCallback, useEffect, useId, useLayoutEffect, useRef, useState } from
 import MatrixRain from '../home/MatrixRain';
 import { useScramble } from '../../hooks/useScramble';
 import { createIntroSound } from '../../audio/introSound';
+import { setSoundEnabled } from '../../audio/uiSound';
 import styles from './Loader.module.css';
 
 // Timeline (ms). After the visitor picks a pill the progress bar runs for
@@ -252,6 +253,9 @@ export default function Loader({ onDone }) {
   // The visitor picks a pill: blue is a quiet entrance, red turns sound on.
   // The click itself is the user gesture browsers require to start audio.
   const enter = useCallback((withSound) => {
+    // The choice carries on into the site's interface sounds (the intro has
+    // its own score playing, so no announcement jingle here).
+    setSoundEnabled(withSound, { announce: false });
     if (withSound) {
       try {
         const AudioContextClass = window.AudioContext || window.webkitAudioContext;
@@ -381,6 +385,7 @@ export default function Loader({ onDone }) {
       className={`${styles.root} ${exiting ? styles.exit : ''}`}
       role="dialog"
       aria-modal="true"
+      data-sound-mute
       aria-label={stage === 'gate' ? 'Choose how to enter' : 'Loading portfolio'}
     >
       <span className="visually-hidden" role="status">

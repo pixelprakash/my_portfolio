@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import SoundToggle from '../common/SoundToggle';
 import { siteConfig } from '../../data/siteConfig';
 import { useScrollSpy } from '../../hooks/useScrollSpy';
 import { NAV_HEIGHT } from '../../constants';
@@ -71,6 +72,7 @@ export default function Navbar() {
           </nav>
 
           <div className={styles.navActions}>
+            <SoundToggle />
             <a className={styles.cta} href={`mailto:${siteConfig.email}`}>
               Let's talk
             </a>

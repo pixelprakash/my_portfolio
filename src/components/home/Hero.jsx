@@ -59,7 +59,11 @@ export default function Hero() {
       */}
 
       <div className={styles.info}>
-        <div className={`${styles.stat} ${styles.statBlue}`}>
+        <div
+          className={`${styles.stat} ${styles.statBlue}`}
+          data-sound-hover="scan"
+          data-sound-tone="blue"
+        >
           <span className={styles.scrim} aria-hidden="true" />
           <span className={styles.num}>{design.years}</span>
           <div className={styles.statBody}>
@@ -80,7 +84,11 @@ export default function Hero() {
           </div>
         </div>
 
-        <div className={`${styles.stat} ${styles.statRed}`}>
+        <div
+          className={`${styles.stat} ${styles.statRed}`}
+          data-sound-hover="scan"
+          data-sound-tone="red"
+        >
           <span className={styles.scrim} aria-hidden="true" />
           <span className={styles.num}>{development.years}</span>
           <div className={styles.statBody}>

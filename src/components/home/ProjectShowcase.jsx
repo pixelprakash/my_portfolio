@@ -52,7 +52,12 @@ function EmbedDialog({ video, onClose }) {
                 {video.hrefLabel ?? 'Open ↗'}
               </a>
             )}
-            <button type="button" className={styles.dialogClose} onClick={onClose}>
+            <button
+              type="button"
+              className={styles.dialogClose}
+              data-sound="none"
+              onClick={onClose}
+            >
               Close ✕
             </button>
           </div>
@@ -151,6 +156,7 @@ function ProjectCard({ project, onOpen }) {
             <button
               type="button"
               className={`${cardStyles.stretchedLink} ${styles.titleButton}`}
+              data-sound="open"
               onClick={() => onOpen(project)}
             >
               {project.title}

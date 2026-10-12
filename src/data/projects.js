@@ -6,7 +6,9 @@
 //   href     — external link for websites; video projects use `videoId`
 //              (YouTube) and presentations use `embed` (Figma embed URL);
 //              both open in a lightbox instead. A lightbox project may
-//              also set `href` — shown as an "Open in Figma" link there.
+//              also set `href` + `hrefLabel` — shown as a link in the
+//              lightbox header (e.g. "Open in Figma ↗").
+//   cta      — overrides the type's default card call-to-action text.
 //   gallery  — list of { name, alt } for image sets (files in
 //              /public/work/visual: `name.jpg` full size, `name-sm.jpg`
 //              640px). The card cover becomes a mosaic of the first six
@@ -97,6 +99,7 @@ export const projects = [
     embed:
       'https://embed.figma.com/slides/UJKFqmkVlLAi3mb6jeqUkl/5-Concepts---Grinitian-Branding?node-id=1-256&embed-host=share',
     href: 'https://www.figma.com/deck/UJKFqmkVlLAi3mb6jeqUkl',
+    hrefLabel: 'Open in Figma ↗',
     accent: 'red',
   },
   {
@@ -107,12 +110,14 @@ export const projects = [
     embed:
       'https://embed.figma.com/slides/29x48D4vNTvdqSDQTXRQNZ/Akshara-Sanjeevani---Branding?node-id=1-37&embed-host=share',
     href: 'https://www.figma.com/deck/29x48D4vNTvdqSDQTXRQNZ',
+    hrefLabel: 'Open in Figma ↗',
     accent: 'blue',
   },
   {
     id: 'praklens-photography',
     type: 'photography',
-    title: 'Photography — @praklens',
+    title: 'See all my photography @praklens',
+    cta: 'Follow on Instagram ↗',
     // logo for now — swap `cover` for a photo when you have one
     cover: '/work/praklens-logo.jpg',
     coverPosition: 'center',
@@ -165,6 +170,18 @@ export const projects = [
     embed: 'https://www.behance.net/embed/project/225913447?ilo0=1',
     embedAspect: '4 / 3',
     accent: 'red',
+  },
+  {
+    id: 'village-stories-sangameswaram',
+    type: 'photography',
+    title: 'Village Stories — Sangameswaram',
+    coverTitle: 'Village Stories',
+    cta: 'View project ▶',
+    embed: 'https://www.behance.net/embed/project/246038191?ilo0=1',
+    embedAspect: '4 / 3',
+    href: 'https://www.instagram.com/praklens/',
+    hrefLabel: 'See all work @praklens ↗',
+    accent: 'blue',
   },
 ];
 

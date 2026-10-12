@@ -49,7 +49,7 @@ function EmbedDialog({ video, onClose }) {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                Open in Figma ↗
+                {video.hrefLabel ?? 'Open ↗'}
               </a>
             )}
             <button type="button" className={styles.dialogClose} onClick={onClose}>
@@ -171,7 +171,7 @@ function ProjectCard({ project, onOpen }) {
           className={`${cardStyles.link} ${isBlue ? cardStyles.linkBlue : cardStyles.linkRed}`}
           aria-hidden="true"
         >
-          {type.cta}
+          {project.cta ?? type.cta}
         </span>
       </div>
     </article>

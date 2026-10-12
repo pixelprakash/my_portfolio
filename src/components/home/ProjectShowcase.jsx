@@ -56,7 +56,10 @@ function EmbedDialog({ video, onClose }) {
               Close ✕
             </button>
           </div>
-          <div className={styles.player}>
+          <div
+            className={styles.player}
+            style={video.embedAspect ? { aspectRatio: video.embedAspect } : undefined}
+          >
             <iframe
               src={embedSrc(video)}
               title={video.title}

@@ -11,11 +11,13 @@
 //              /public/work/visual: `name.jpg` full size, `name-sm.jpg`
 //              640px). The card cover becomes a mosaic of the first six
 //              and the card opens a gallery lightbox.
+//   embedAspect — CSS aspect-ratio for the lightbox player (default 16 / 9);
+//              e.g. '4 / 3' for taller Behance embeds.
 //   coverTitle — text for the placeholder cover when `cover` is omitted.
 //   coverPosition — CSS object-position for the cover crop (default is
 //              the top of the image, which suits full-page screenshots).
 //   inProgress — shows the IN PROGRESS badge.
-// Add new types (branding, app-ui, visual) to projectTypes below and give
+// Add new types to projectTypes below and give
 // their projects a `type` — the filter chips only show types that have work.
 export const projectTypes = {
   website: { label: 'Websites', cta: 'Visit site ↗', frame: 'browser' },
@@ -23,7 +25,7 @@ export const projectTypes = {
   photography: { label: 'Photography', cta: 'View gallery ↗' },
   branding: { label: 'Branding', cta: 'View presentation ▶' },
   visual: { label: 'Visual design', cta: 'Browse designs ▶' },
-  // 'app-ui': { label: 'App UI', cta: 'View project →' },
+  ux: { label: 'App & UX', cta: 'View case study ▶' },
 };
 
 export const projects = [
@@ -136,6 +138,24 @@ export const projects = [
       { name: 'susruta', alt: 'Thumbnail: Lessons from 12 years of designing products, Susruta Chakraborty' },
       { name: 'natalie', alt: 'Thumbnail: M.Sc UX Design, the journey to Germany, Natalie Valsangkar' },
     ],
+  },
+  {
+    id: 'online-course-brochure',
+    type: 'visual',
+    title: 'Online Course Brochure Design — Freelance Work',
+    coverTitle: 'Online Course Brochure',
+    embed: 'https://www.behance.net/embed/project/200337053?ilo0=1',
+    embedAspect: '4 / 3',
+    accent: 'red',
+  },
+  {
+    id: 'penny-wise-expense-tracker',
+    type: 'ux',
+    title: 'Penny Wise — Expense Tracking App UX Case Study',
+    coverTitle: 'Penny Wise',
+    embed: 'https://www.behance.net/embed/project/197476263?ilo0=1',
+    embedAspect: '4 / 3',
+    accent: 'blue',
   },
 ];
 

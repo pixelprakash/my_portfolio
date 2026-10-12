@@ -8,6 +8,8 @@
 //              both open in a lightbox instead. A lightbox project may
 //              also set `href` — shown as an "Open in Figma" link there.
 //   coverTitle — text for the placeholder cover when `cover` is omitted.
+//   coverPosition — CSS object-position for the cover crop (default is
+//              the top of the image, which suits full-page screenshots).
 //   inProgress — shows the IN PROGRESS badge.
 // Add new types (branding, app-ui, visual) to projectTypes below and give
 // their projects a `type` — the filter chips only show types that have work.
@@ -105,9 +107,9 @@ export const projects = [
     id: 'praklens-photography',
     type: 'photography',
     title: 'Photography — @praklens',
-    coverTitle: '@praklens',
-    // no `cover` yet: add a photo at /public/work/praklens.jpg and set
-    // cover: '/work/praklens.jpg' to replace the placeholder.
+    // logo for now — swap `cover` for a photo when you have one
+    cover: '/work/praklens-logo.jpg',
+    coverPosition: 'center',
     href: 'https://www.instagram.com/praklens/',
     accent: 'red',
   },

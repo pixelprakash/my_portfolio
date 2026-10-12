@@ -93,7 +93,14 @@ function ProjectCard({ project, onPlay }) {
         )}
         <div className={styles.shot}>
           {project.cover ? (
-            <img src={project.cover} alt="" loading="lazy" width="1200" height="750" />
+            <img
+              src={project.cover}
+              alt=""
+              loading="lazy"
+              width="1200"
+              height="750"
+              style={project.coverPosition ? { objectPosition: project.coverPosition } : undefined}
+            />
           ) : (
             // no exported cover yet: title-slide style placeholder
             <div

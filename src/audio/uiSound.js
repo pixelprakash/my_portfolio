@@ -27,6 +27,7 @@ let noiseBuffer = null;
 let hiddenSuspend = false;
 let activeVoices = 0;
 let hoverStep = 0;
+let hoverAt = 0;
 const lastPlayed = {};
 
 function readStored() {
@@ -69,12 +70,35 @@ function buildGraph() {
   ctx = new AudioContextClass({ latencyHint: 'interactive' });
 
   const compressor = ctx.createDynamicsCompressor();
-  compressor.threshold.value = -16;
+  compressor.threshold.value = -14;
   compressor.knee.value = 12;
-  compressor.ratio.value = 4;
+  compressor.ratio.value = 6;
   compressor.attack.value = 0.003;
   compressor.release.value = 0.18;
-  compressor.connect(ctx.destination);
+
+  // a brick-wall ceiling after the compressor, so stacked cues can't clip
+  const limiter = ctx.createDynamicsCompressor();
+  limiter.threshold.value = -4;
+  limiter.knee.value = 0;
+  limiter.ratio.value = 20;
+  limiter.attack.value = 0.001;
+  limiter.release.value = 0.08;
+  compressor.connect(limiter);
+
+  // ...and a gentle tanh soft-clip as the last stage: whatever lands on the
+  // same instant, the output can never exceed full scale. (The shaper sees
+  // -1..1, so the signal is halved going in and the curve is tanh over -2..2:
+  // transparent for small signals, rounding off only the peaks.)
+  const preClip = ctx.createGain();
+  preClip.gain.value = 0.5;
+  const clipper = ctx.createWaveShaper();
+  const curve = new Float32Array(2048);
+  for (let i = 0; i < curve.length; i++) curve[i] = Math.tanh((i / (curve.length - 1)) * 4 - 2);
+  clipper.curve = curve;
+  clipper.oversample = '2x';
+  limiter.connect(preClip);
+  preClip.connect(clipper);
+  clipper.connect(ctx.destination);
 
   master = ctx.createGain();
   master.gain.value = 4.5; // cue peaks below are written small; this sets the level
@@ -90,7 +114,10 @@ function buildGraph() {
   for (let c = 0; c < 2; c++) {
     const data = impulse.getChannelData(c);
     for (let i = 0; i < length; i++) {
-      data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / length, 3.2);
+      // fade the first ~12ms in: an impulse that starts at full level turns
+      // every note attack into a sharp early reflection
+      const onset = Math.min(1, i / (ctx.sampleRate * 0.012));
+      data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / length, 3.2) * onset;
     }
   }
   reverb = ctx.createConvolver();
@@ -169,6 +196,9 @@ function connectOut(node, { pan = 0, panEnd = pan, t, dur, wet = 0, echoSend = 0
 }
 
 function envelope(param, t, dur, peak, attack) {
+  // A fresh GainNode sits at 1 until its first scheduled event; without this,
+  // the first few samples of every voice leak through as a click.
+  param.value = 0.0001;
   param.setValueAtTime(0.0001, t);
   param.exponentialRampToValueAtTime(peak, t + attack);
   param.exponentialRampToValueAtTime(0.0001, t + dur);
@@ -257,84 +287,262 @@ function hiss({
   track(source, start + dur + 0.05, start);
 }
 
+// An FM bell / pluck: a sine carrier whose frequency is shaken by a second
+// oscillator, with the shaking dying away faster than the note. That gives
+// the bright metallic strike of a glass or tine instrument that a plain
+// oscillator can't: `ratio` picks the colour (2 = warm bell, 3.5 = glassy,
+// 1 = hollow), `index` how hard the strike is.
+function fm({
+  f,
+  ratio = 2,
+  index = 2,
+  t = 0,
+  dur = 0.25,
+  peak = 0.05,
+  attack = 0.002,
+  ...routing
+}) {
+  const start = ctx.currentTime + t;
+  const carrier = ctx.createOscillator();
+  carrier.frequency.value = f;
+  const modulator = ctx.createOscillator();
+  modulator.frequency.value = f * ratio;
+
+  const depth = ctx.createGain();
+  depth.gain.setValueAtTime(f * index, start);
+  depth.gain.exponentialRampToValueAtTime(Math.max(1, f * index * 0.01), start + dur * 0.45);
+  modulator.connect(depth);
+  depth.connect(carrier.frequency);
+
+  const gain = ctx.createGain();
+  envelope(gain.gain, start, dur, peak, attack);
+  carrier.connect(gain);
+  connectOut(gain, { ...routing, t: start, dur });
+
+  carrier.start(start);
+  modulator.start(start);
+  track(carrier, start + dur + 0.05, start);
+  track(modulator, start + dur + 0.05, start);
+}
+
+// ── The sci-fi palette ──
+// Ring modulation (carrier x modulator at an inharmonic ratio) is the classic
+// "robot" timbre: metallic sidebands with no natural harmonic series.
+function ring({
+  f,
+  ratio = 1.41,
+  t = 0,
+  dur = 0.12,
+  peak = 0.05,
+  attack = 0.004,
+  glide = 0,
+  ...routing
+}) {
+  const start = ctx.currentTime + t;
+  const carrier = ctx.createOscillator();
+  carrier.frequency.setValueAtTime(f * (1 + glide), start);
+  if (glide) carrier.frequency.exponentialRampToValueAtTime(f, start + Math.min(dur, 0.05));
+  const modulator = ctx.createOscillator();
+  modulator.frequency.value = f * ratio;
+
+  // the modulator drives the gain of a node whose own gain is 0: a ring mod
+  const product = ctx.createGain();
+  product.gain.value = 0;
+  modulator.connect(product.gain);
+  carrier.connect(product);
+
+  const gain = ctx.createGain();
+  envelope(gain.gain, start, dur, peak, attack);
+  product.connect(gain);
+  connectOut(gain, { ...routing, t: start, dur });
+
+  carrier.start(start);
+  modulator.start(start);
+  track(carrier, start + dur + 0.05, start);
+  track(modulator, start + dur + 0.05, start);
+}
+
+// A sonar ping: a clean sine strike with a metallic inharmonic partial, long
+// decay, thrown into the echo and the room.
+function ping({ f, t = 0, dur = 0.9, peak = 0.06, ...routing }) {
+  tone({ f0: f * 1.012, f1: f, t, dur, peak, attack: 0.003, wet: 0.5, echoSend: 0.4, ...routing });
+  fm({ f: f * 2.01, ratio: 2.76, index: 0.7, t, dur: dur * 0.4, peak: peak * 0.35, wet: 0.5, ...routing });
+}
+
+// A servo / actuator: a low sawtooth through a narrow resonant filter that
+// sweeps, the "whirr" of something small and precise moving.
+function servo({
+  f0 = 900,
+  f1 = 2400,
+  q = 8,
+  pitch = 100,
+  t = 0,
+  dur = 0.1,
+  peak = 0.03,
+  attack = 0.012,
+  ...routing
+}) {
+  const start = ctx.currentTime + t;
+  const osc = ctx.createOscillator();
+  osc.type = 'sawtooth';
+  osc.frequency.value = pitch;
+  const biquad = ctx.createBiquadFilter();
+  biquad.type = 'bandpass';
+  biquad.Q.value = q;
+  biquad.frequency.setValueAtTime(f0, start);
+  biquad.frequency.exponentialRampToValueAtTime(f1, start + dur);
+  const gain = ctx.createGain();
+  envelope(gain.gain, start, dur, peak * 6, attack); // the narrow filter eats level
+  osc.connect(biquad);
+  biquad.connect(gain);
+  connectOut(gain, { ...routing, t: start, dur });
+  osc.start(start);
+  track(osc, start + dur + 0.05, start);
+}
+
+// A synthetic voice syllable: a buzzing "glottal" sawtooth through two
+// formant filters that glide between vowels. Not words, just the sense of
+// something intelligent acknowledging you.
+const VOWELS = {
+  ah: [800, 1150],
+  ee: [290, 2250],
+  oo: [320, 800],
+  oh: [520, 900],
+  eh: [530, 1840],
+};
+function vowel({
+  pitch = 110,
+  from = 'ah',
+  to = from,
+  t = 0,
+  dur = 0.25,
+  peak = 0.04,
+  attack = 0.03,
+  ...routing
+}) {
+  const start = ctx.currentTime + t;
+  const source = ctx.createOscillator();
+  source.type = 'sawtooth';
+  source.frequency.setValueAtTime(pitch, start);
+  source.frequency.linearRampToValueAtTime(pitch * 0.96, start + dur);
+
+  const mix = ctx.createGain();
+  mix.gain.value = 5; // bandpassed saw is quiet; make it up here
+  [0, 1].forEach((k) => {
+    const formant = ctx.createBiquadFilter();
+    formant.type = 'bandpass';
+    formant.Q.value = k ? 9 : 6;
+    formant.frequency.setValueAtTime(VOWELS[from][k], start);
+    formant.frequency.linearRampToValueAtTime(VOWELS[to][k], start + dur * 0.8);
+    const level = ctx.createGain();
+    level.gain.value = k ? 0.7 : 1;
+    source.connect(formant);
+    formant.connect(level);
+    level.connect(mix);
+  });
+
+  const gain = ctx.createGain();
+  envelope(gain.gain, start, dur, peak, attack);
+  mix.connect(gain);
+  connectOut(gain, { ...routing, t: start, dur });
+  source.start(start);
+  track(source, start + dur + 0.05, start);
+}
+
+// A burst of fast, quantised data blips, rising or falling through the
+// pentatonic scale, sweeping across the stereo field: "computing".
+const DATA_NOTES = [76, 79, 81, 84, 86, 88, 91, 93, 96];
+function flutter({ count = 9, step = 0.024, t = 0, dir = 1, peak = 0.02, from = -0.7, to = 0.7 }) {
+  for (let i = 0; i < count; i++) {
+    const k = dir >= 0 ? i / (count - 1) : 1 - i / (count - 1);
+    const index = Math.min(
+      DATA_NOTES.length - 1,
+      Math.max(0, Math.round(k * (DATA_NOTES.length - 1)) + Math.floor(rand(-1, 2)))
+    );
+    tone({
+      type: 'square',
+      f0: midi(DATA_NOTES[index]),
+      t: t + i * step,
+      dur: 0.035,
+      peak,
+      attack: 0.004,
+      filter: { f0: 3800, q: 0.6 },
+      pan: from + ((to - from) * i) / (count - 1),
+      echoSend: 0.3,
+    });
+  }
+}
+
 // ── The cues ──
 // Pitch pools, A minor pentatonic. Blue (design) sits high and glassy, red
 // (development) lower and heavier; unlabelled things sit between.
 const POOLS = {
-  blue: [88, 91, 93, 96, 100],
-  red: [69, 72, 74, 76, 79],
-  neutral: [81, 84, 86, 88, 91],
+  blue: [81, 84, 86, 88, 91, 93, 96, 98],
+  red: [57, 60, 62, 64, 67, 69, 72, 74],
+  neutral: [74, 76, 79, 81, 84, 86, 88, 91],
 };
 
 const CUES = {
-  // the faintest "keycap" tick under a pointer or keyboard focus
-  hover({ tone: persona }) {
+  // A sensor ping. Sweeping across several items plays a rising then
+  // falling pentatonic run (it restarts after a pause), so moving the pointer
+  // feels like playing an instrument; the pan follows the pointer. Each ping
+  // has a ring-modulated robot overtone and a tiny servo whirr: blue is high
+  // and bright, red low and heavy.
+  hover({ tone: persona, pan = 0 }) {
+    const now = performance.now();
+    hoverStep = now - hoverAt > 1100 ? 0 : hoverStep + 1;
+    hoverAt = now;
+
     const pool = POOLS[persona] ?? POOLS.neutral;
-    hoverStep = (hoverStep + 1 + Math.floor(Math.random() * 2)) % pool.length;
-    const note = pool[hoverStep];
-    tone({
-      type: 'square',
-      f0: midi(note),
-      dur: 0.05,
-      peak: 0.06,
-      filter: { f0: 3200, q: 0.5 },
-      pan: rand(-0.25, 0.25),
-    });
-    tone({ f0: midi(note + 12), dur: 0.09, peak: 0.025, wet: 0.35 });
-    hiss({ type: 'highpass', f0: 6500, dur: 0.012, peak: 0.035 });
-  },
+    const cycle = pool.length * 2 - 2;
+    const k = hoverStep % cycle;
+    const f = midi(pool[k < pool.length ? k : cycle - k]);
+    const red = persona === 'red';
+    const blue = persona === 'blue';
 
-  // a confirm: tactile thump plus a rising two-note chirp
-  click() {
-    tone({ f0: 150, f1: 55, dur: 0.1, peak: 0.15, attack: 0.001 });
-    tone({ type: 'square', f0: midi(88), dur: 0.05, peak: 0.036, filter: { f0: 3600 } });
-    tone({
-      type: 'square',
-      f0: midi(93),
-      t: 0.055,
+    tone({ f0: f * 1.02, f1: f, dur: 0.15, peak: 0.2, attack: 0.003, pan, wet: 0.35, echoSend: 0.12 });
+    ring({ f: f * 2, ratio: 1.5, dur: 0.08, peak: 0.085, glide: 0.03, pan, wet: 0.25 });
+    servo({
+      f0: blue ? 1500 : red ? 600 : 1000,
+      f1: blue ? 3400 : red ? 1400 : 2200,
+      pitch: red ? 70 : 110,
       dur: 0.07,
-      peak: 0.036,
-      filter: { f0: 3600 },
-      wet: 0.2,
-      echoSend: 0.3,
+      peak: 0.032,
+      pan: -pan * 0.5,
     });
+    hiss({ type: 'highpass', f0: 8500, dur: 0.012, peak: 0.03, attack: 0.003, pan });
   },
 
-  // a new page: a sweep across the stereo field that resolves in a chord
+  // a confirm: a robotic two-tone acknowledgement over a tactile thump
+  click() {
+    tone({ f0: 150, f1: 55, dur: 0.1, peak: 0.12, attack: 0.004 });
+    ring({ f: midi(88), ratio: 1.5, dur: 0.06, peak: 0.04, glide: 0.04 });
+    ring({ f: midi(95), ratio: 1.5, t: 0.06, dur: 0.09, peak: 0.04, glide: 0.04, wet: 0.25, echoSend: 0.3 });
+  },
+
+  // a new page: a rising stereo sweep, a synthetic "ooh-ah", and a chord of
+  // sonar pings
   page() {
-    hiss({ f0: 280, f1: 4200, q: 1.1, dur: 0.55, peak: 0.08, attack: 0.12, pan: -0.7, panEnd: 0.7, wet: 0.3 });
-    tone({ f0: 110, f1: 220, dur: 0.42, peak: 0.09, attack: 0.04 });
-    [69, 76, 81].forEach((note, i) =>
-      tone({
-        type: 'triangle',
-        f0: midi(note),
-        t: 0.2 + i * 0.1,
-        dur: 0.55,
-        peak: 0.04,
-        wet: 0.5,
-        echoSend: 0.25,
-      })
-    );
+    hiss({ f0: 280, f1: 4200, q: 1.1, dur: 0.55, peak: 0.05, attack: 0.12, pan: -0.7, panEnd: 0.7, wet: 0.3 });
+    tone({ f0: 110, f1: 220, dur: 0.42, peak: 0.07, attack: 0.04 });
+    vowel({ pitch: 82, from: 'oo', to: 'ah', t: 0.05, dur: 0.4, peak: 0.05, wet: 0.35 });
+    [69, 76, 81].forEach((note, i) => ping({ f: midi(note), t: 0.22 + i * 0.1, dur: 0.8, peak: 0.04 }));
   },
 
-  // an in-page jump (anchor links, the contents list)
+  // an in-page jump: a short servo glide and a ping
   jump() {
-    hiss({ f0: 600, f1: 2600, q: 1, dur: 0.24, peak: 0.05, attack: 0.05, pan: -0.3, panEnd: 0.3 });
-    tone({ f0: 880, f1: 1320, dur: 0.18, peak: 0.036, wet: 0.3 });
+    servo({ f0: 500, f1: 2800, pitch: 90, dur: 0.2, peak: 0.03, pan: -0.3 });
+    ping({ f: midi(88), t: 0.12, dur: 0.5, peak: 0.04, pan: 0.2 });
   },
 
-  // the hamburger menu: a quick four-note run up / down
+  // the hamburger menu: a data burst up / down, landing on a ping
   menuOpen() {
-    [69, 76, 81, 88].forEach((note, i) =>
-      tone({ type: 'triangle', f0: midi(note), t: i * 0.045, dur: 0.14, peak: 0.04, wet: 0.3 })
-    );
-    hiss({ f0: 500, f1: 3200, dur: 0.24, peak: 0.032, attack: 0.06 });
+    flutter({ count: 8, dir: 1, peak: 0.02 });
+    ping({ f: midi(88), t: 0.2, dur: 0.5, peak: 0.045 });
   },
   menuClose() {
-    [88, 81, 76, 69].forEach((note, i) =>
-      tone({ type: 'triangle', f0: midi(note), t: i * 0.04, dur: 0.12, peak: 0.032, wet: 0.25 })
-    );
-    hiss({ f0: 3000, f1: 400, dur: 0.2, peak: 0.026, attack: 0.03 });
+    flutter({ count: 7, dir: -1, peak: 0.016, from: 0.5, to: -0.5 });
+    tone({ f0: 120, f1: 60, t: 0.16, dur: 0.14, peak: 0.05, attack: 0.01 });
   },
 
   // a window powering up / down (lightbox)
@@ -358,10 +566,54 @@ const CUES = {
     hiss({ f0: 3600, f1: 300, dur: 0.26, peak: 0.034, attack: 0.02 });
   },
 
-  // the reader moves into a new section: a soft scanner lock
-  section() {
-    tone({ f0: 740, f1: 1480, dur: 0.22, peak: 0.034, attack: 0.04, wet: 0.5 });
-    tone({ type: 'square', f0: midi(96), t: 0.2, dur: 0.03, peak: 0.018, filter: { f0: 4000 } });
+  // The AI locks onto a new section. A burst of data blips sweeps through the
+  // stereo field (left to right as you scroll down, back again as you scroll
+  // up) while a synthetic voice syllable rises "ah-ee" or falls "ee-ah" with
+  // it; then a sonar ping lands and two robotic tones acknowledge it. Each
+  // section has its own key. `index` is the section (0 = top of the page),
+  // `dir` is +1 / -1.
+  section({ index = 0, dir = 1 }) {
+    const chords = [
+      [64, 71, 76], // top of the page
+      [69, 76, 81], // work
+      [74, 81, 86], // testimonials
+      [76, 83, 88], // contact
+    ];
+    const chord = chords[index] ?? chords[1];
+    const down = dir >= 0;
+    const lock = 0.3;
+
+    flutter({
+      count: 10,
+      dir,
+      peak: 0.016,
+      from: down ? -0.7 : 0.7,
+      to: down ? 0.7 : -0.7,
+    });
+    vowel({
+      pitch: midi(chord[0] - 24),
+      from: down ? 'ah' : 'ee',
+      to: down ? 'ee' : 'ah',
+      t: 0.06,
+      dur: 0.26,
+      peak: 0.03,
+      pan: down ? -0.2 : 0.2,
+      wet: 0.3,
+    });
+
+    ping({ f: midi(chord[2]), t: lock, dur: 1.1, peak: 0.03 });
+    ring({ f: midi(chord[0] + 12), ratio: 1.5, t: lock, dur: 0.1, peak: 0.02, glide: 0.04, wet: 0.3 });
+    ring({
+      f: midi(chord[1] + 12),
+      ratio: 1.5,
+      t: lock + 0.11,
+      dur: 0.14,
+      peak: 0.02,
+      glide: 0.04,
+      wet: 0.4,
+      echoSend: 0.3,
+    });
+    tone({ f0: 55, f1: 46, t: lock, dur: 0.22, peak: 0.025, attack: 0.012 });
   },
 
   // a mechanical detent every so often while scrolling; the pitch climbs
@@ -369,8 +621,8 @@ const CUES = {
   detent({ progress = 0 }) {
     const pool = [81, 84, 86, 88, 91, 93, 96];
     const note = pool[Math.min(pool.length - 1, Math.floor(progress * pool.length))];
-    tone({ type: 'triangle', f0: midi(note), dur: 0.035, peak: 0.04, pan: rand(-0.2, 0.2) });
-    hiss({ type: 'highpass', f0: 7000, dur: 0.01, peak: 0.025 });
+    tone({ type: 'triangle', f0: midi(note), dur: 0.035, peak: 0.14, attack: 0.003, pan: rand(-0.2, 0.2) });
+    hiss({ type: 'highpass', f0: 7000, dur: 0.012, peak: 0.07, attack: 0.003 });
   },
 
   // going back
@@ -425,7 +677,7 @@ const CUES = {
 };
 
 // Minimum gap between two plays of the same cue, in ms.
-const MIN_GAP = { hover: 60, detent: 90, section: 450, scan: 250, click: 40, page: 300 };
+const MIN_GAP = { hover: 60, detent: 90, section: 700, scan: 250, click: 40, page: 300 };
 const MAX_VOICES = 16;
 
 export function playSound(name, options = {}) {

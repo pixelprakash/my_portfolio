@@ -61,7 +61,11 @@ export default function SoundFX() {
       lastHover = el;
       if (!el) return;
       const cue = el.dataset.soundHover ?? 'hover';
-      if (cue !== 'none') playSound(cue, { tone: el.dataset.soundTone });
+      if (cue !== 'none') {
+        // pan with the pointer: left of the screen sounds left, right sounds right
+        const pan = Math.max(-1, Math.min(1, (event.clientX / window.innerWidth) * 2 - 1)) * 0.6;
+        playSound(cue, { tone: el.dataset.soundTone, pan });
+      }
     }
 
     function onFocusIn(event) {
@@ -124,7 +128,11 @@ export default function SoundFX() {
     // `at` is stamped whenever the spy reports "above the first section"
     // (load, or arriving on the page); ignore it settling just after that.
     if (last.at && now - last.at > 1500 && last.id !== activeSection) {
-      playSound('section');
+      // 0 = top of the page, then 1.. for each section; the sweep follows
+      // the direction of travel
+      const index = activeSection === null ? 0 : HOME_SECTIONS.indexOf(activeSection) + 1;
+      const previous = last.id === null ? 0 : HOME_SECTIONS.indexOf(last.id) + 1;
+      playSound('section', { index, dir: index >= previous ? 1 : -1 });
     }
     last.id = activeSection;
     if (activeSection === null) last.at = now;

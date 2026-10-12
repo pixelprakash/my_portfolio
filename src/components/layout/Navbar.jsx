@@ -1,12 +1,31 @@
 import { useEffect, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { siteConfig } from '../../data/siteConfig';
+import { useScrollSpy } from '../../hooks/useScrollSpy';
+import { NAV_HEIGHT } from '../../constants';
 import styles from './Navbar.module.css';
+
+// Stable references: the spy hook re-subscribes whenever the array changes.
+const HOME_SECTIONS = ['work', 'testimonials', 'contact'];
+const NO_SECTIONS = [];
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const toggleRef = useRef(null);
   const menuRef = useRef(null);
+  const { pathname } = useLocation();
+
+  // On the home page, mark the nav item for the section being read ("Home"
+  // while still above the first one). Other pages have no in-page sections.
+  const onHome = pathname === '/';
+  const activeSection = useScrollSpy(onHome ? HOME_SECTIONS : NO_SECTIONS, {
+    offset: NAV_HEIGHT,
+  });
+  const isActive = (item) => {
+    if (!onHome) return false;
+    const id = item.href.split('#')[1] ?? null;
+    return id === activeSection;
+  };
 
   useEffect(() => {
     if (!isOpen) return undefined;
@@ -41,7 +60,11 @@ export default function Navbar() {
 
           <nav className={styles.desktopNav} aria-label="Primary">
             {siteConfig.navItems.map((item) => (
-              <Link key={item.href} to={item.href}>
+              <Link
+                key={item.href}
+                to={item.href}
+                aria-current={isActive(item) ? 'true' : undefined}
+              >
                 {item.label}
               </Link>
             ))}
@@ -77,7 +100,12 @@ export default function Navbar() {
           aria-label="Mobile"
         >
           {siteConfig.navItems.map((item) => (
-            <Link key={item.href} to={item.href} onClick={() => setIsOpen(false)}>
+            <Link
+              key={item.href}
+              to={item.href}
+              aria-current={isActive(item) ? 'true' : undefined}
+              onClick={() => setIsOpen(false)}
+            >
               {item.label}
             </Link>
           ))}

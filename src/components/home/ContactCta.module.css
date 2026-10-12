@@ -1,0 +1,89 @@
+.section {
+  padding: 0 0 var(--space-9);
+}
+
+/* Blue glow from one side, red from the other: the two halves of the hero. */
+.panel {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: clamp(var(--space-7), 8vw, var(--space-9)) var(--space-5);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border-strong);
+  background:
+    radial-gradient(60% 130% at 0% 50%, rgba(0, 212, 255, 0.2), transparent 70%),
+    radial-gradient(60% 130% at 100% 50%, rgba(255, 59, 14, 0.2), transparent 70%),
+    var(--color-bg-elevated);
+}
+
+.heading {
+  margin-top: var(--space-2);
+  font-size: clamp(1.9rem, 5vw, 3.25rem);
+}
+
+.text {
+  margin-top: var(--space-4);
+  max-width: 34rem;
+  font-size: clamp(1rem, 1.6vw, 1.15rem);
+  line-height: 1.6;
+  color: var(--color-text-secondary);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-3);
+  margin-top: var(--space-6);
+}
+
+.primary,
+.secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-6);
+  border-radius: var(--radius-pill);
+  font-weight: 700;
+  transition: transform var(--transition-fast), background var(--transition-fast),
+    border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.primary {
+  background: var(--color-text);
+  color: var(--color-bg);
+  border: 1px solid var(--color-text);
+}
+
+.primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(255, 255, 255, 0.2);
+}
+
+.secondary {
+  border: 1px solid var(--color-border-strong);
+  color: var(--color-text);
+  background: rgba(6, 6, 8, 0.4);
+}
+
+.secondary:hover {
+  transform: translateY(-2px);
+  border-color: var(--color-text);
+}
+
+.email {
+  margin-top: var(--space-5);
+  font-size: 0.9rem;
+  letter-spacing: 0.5px;
+  color: var(--color-text-muted);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .primary:hover,
+  .secondary:hover {
+    transform: none;
+  }
+}

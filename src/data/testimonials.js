@@ -1,35 +1,46 @@
-// Placeholder testimonials — swap in real quotes and names when available.
+// Placeholder testimonials (lorem ipsum, deliberately generic names) — swap in
+// real quotes and people when you have them. `featured: true` makes a card
+// span wider and use larger type; keep it to one, ideally the first.
 export const testimonials = [
   {
     quote:
-      'Surya moved between design and engineering conversations without missing a beat — a rare mix of taste and technical judgment.',
-    name: 'Ananya Rao',
-    role: 'Design Lead',
-    company: 'DIC, IIT Hyderabad',
+      'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
+    name: 'Client Name',
+    role: 'Job Title',
+    company: 'Company',
     accent: 'blue',
+    featured: true,
   },
   {
     quote:
-      'The fastest ramp-up I’ve seen on our team. Shipped a real feature in week one and kept that pace up for the whole internship.',
-    name: 'Rahul Verma',
-    role: 'Engineering Manager',
-    company: 'Product Team',
+      'Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident.',
+    name: 'Colleague Name',
+    role: 'Job Title',
+    company: 'Company',
     accent: 'red',
   },
   {
     quote:
-      'Great at asking the "why" before jumping to solutions. Every design review got sharper once Surya was in the room.',
-    name: 'Priya Nair',
-    role: 'Senior Product Designer',
-    company: 'DIC, IIT Hyderabad',
+      'Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam.',
+    name: 'Collaborator Name',
+    role: 'Job Title',
+    company: 'Company',
+    accent: 'red',
+  },
+  {
+    quote:
+      'Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione.',
+    name: 'Teammate Name',
+    role: 'Job Title',
+    company: 'Company',
     accent: 'blue',
   },
   {
     quote:
-      'Solid engineering instincts — clean code, sensible tests, and always thinking about the person who has to maintain it next.',
-    name: 'Karthik Iyer',
-    role: 'Staff Engineer',
-    company: 'Product Team',
+      'Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur.',
+    name: 'Mentor Name',
+    role: 'Job Title',
+    company: 'Company',
     accent: 'red',
   },
 ];

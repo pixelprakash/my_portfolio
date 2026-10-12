@@ -109,7 +109,8 @@
     transition: color var(--transition-fast), border-color var(--transition-fast);
   }
 
-  .desktopNav a:hover {
+  .desktopNav a:hover,
+  .desktopNav a[aria-current='true'] {
     color: var(--color-text);
     border-color: var(--color-blue);
   }
@@ -161,7 +162,8 @@
   border-bottom: 1px solid var(--color-border);
 }
 
-.mobileMenu a:hover {
+.mobileMenu a:hover,
+.mobileMenu a[aria-current='true'] {
   color: var(--color-blue);
 }
 

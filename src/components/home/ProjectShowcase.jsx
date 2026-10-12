@@ -196,6 +196,9 @@ export default function ProjectShowcase() {
           <h2 id="work-heading" className={sectionStyles.heading}>
             Live projects
           </h2>
+          <p className={sectionStyles.description}>
+            Websites, films, branding, visual design and apps — open any card to see it.
+          </p>
         </div>
 
         {types.length > 1 && (

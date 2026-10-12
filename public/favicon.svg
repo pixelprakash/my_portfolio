@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <title>Surya Prakash Musunuri</title>
+  <rect width="64" height="64" rx="14" fill="#050507"/>
+  <defs>
+    <clipPath id="pill"><rect x="6" y="23" width="52" height="18" rx="9"/></clipPath>
+  </defs>
+  <g transform="rotate(-35 32 32)">
+    <g clip-path="url(#pill)">
+      <rect x="6" y="23" width="26" height="18" fill="#00d4ff"/>
+      <rect x="32" y="23" width="26" height="18" fill="#ff3b0e"/>
+    </g>
+  </g>
+</svg>

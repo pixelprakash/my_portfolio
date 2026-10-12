@@ -12,73 +12,146 @@
   font-size: clamp(1.75rem, 4vw, 2.5rem);
 }
 
+/* 1 column on phones, 2 on tablets, 3 on desktop; the featured card spans
+   the full row on tablets and two columns on desktop. */
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr));
+  grid-template-columns: 1fr;
   gap: var(--space-5);
   list-style: none;
   padding: 0;
   margin: 0;
 }
 
+@media (min-width: 640px) {
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .itemFeatured {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (min-width: 1100px) {
+  .grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .itemFeatured {
+    grid-column: span 2;
+  }
+}
+
+.item {
+  display: flex;
+}
+
 .card {
+  --accent: var(--color-blue);
+  --accent-glow: rgba(0, 212, 255, 0.35);
+  --accent-tint: rgba(0, 212, 255, 0.16);
+  position: relative;
+  flex: 1;
   display: flex;
   flex-direction: column;
   gap: var(--space-5);
+  margin: 0;
   padding: var(--space-6);
+  overflow: hidden;
   border-radius: var(--radius-lg);
   border: 1px solid var(--color-border);
-  background: var(--color-surface);
+  background: linear-gradient(160deg, var(--color-surface-strong), var(--color-surface) 60%);
+  transition: transform var(--transition-base), border-color var(--transition-base),
+    box-shadow var(--transition-base);
+}
+
+.cardRed {
+  --accent: var(--color-red);
+  --accent-glow: rgba(255, 59, 14, 0.35);
+  --accent-tint: rgba(255, 59, 14, 0.16);
+}
+
+/* accent line along the top edge */
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--accent), transparent 80%);
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  border-color: var(--accent);
+  box-shadow: 0 12px 40px var(--accent-glow);
+}
+
+.mark {
+  color: var(--accent);
+  opacity: 0.9;
+  filter: drop-shadow(0 0 12px var(--accent-glow));
 }
 
 .quote {
+  flex: 1;
+  margin: 0;
+}
+
+.quote p {
   font-size: 1.05rem;
-  line-height: 1.6;
+  line-height: 1.65;
   color: var(--color-text);
 }
 
-.quote::before {
-  content: '\201C';
-}
-
-.quote::after {
-  content: '\201D';
+.cardFeatured .quote p {
+  font-size: clamp(1.2rem, 2.2vw, 1.55rem);
+  line-height: 1.55;
 }
 
 .person {
   display: flex;
   align-items: center;
   gap: var(--space-3);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--color-border);
 }
 
 .avatar {
-  width: 44px;
-  height: 44px;
   flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
   border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  border: 2px solid var(--accent);
+  background: var(--accent-tint);
   font-family: var(--font-display);
-  font-size: 0.85rem;
-  color: var(--color-bg);
+  font-size: 0.8rem;
+  color: var(--color-text);
 }
 
-.avatarBlue {
-  background: linear-gradient(135deg, var(--color-blue), var(--color-blue-deep));
-}
-
-.avatarRed {
-  background: linear-gradient(135deg, var(--color-red), var(--color-red-deep));
+.who {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
 }
 
 .name {
   font-weight: 700;
-  font-size: 0.95rem;
+  font-size: 0.98rem;
   color: var(--color-text);
 }
 
 .role {
-  font-size: 0.8rem;
-  color: var(--color-text-faint);
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card:hover {
+    transform: none;
+  }
 }

@@ -1,6 +1,7 @@
 import { siteConfig } from '../../data/siteConfig';
 import MatrixRain from './MatrixRain';
 import portrait from '../../assets/portrait-cutout.webp';
+import portraitSmall from '../../assets/portrait-cutout-700.webp';
 import styles from './Hero.module.css';
 
 const PORTRAIT_WIDTH = 1100;
@@ -108,6 +109,8 @@ export default function Hero() {
         <img
           className={styles.portraitImg}
           src={portrait}
+          srcSet={`${portraitSmall} 700w, ${portrait} 1100w`}
+          sizes="(min-width: 900px) 668px, 100vw"
           alt="Portrait of Surya Prakash Musunuri holding a blue pill in one hand and a red pill in the other"
           width={PORTRAIT_WIDTH}
           height={PORTRAIT_HEIGHT}

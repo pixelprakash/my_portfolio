@@ -1,5 +1,6 @@
 import Hero from '../components/home/Hero';
 import ProjectShowcase from '../components/home/ProjectShowcase';
+import About from '../components/home/About';
 import Testimonials from '../components/home/Testimonials';
 import ContactCta from '../components/home/ContactCta';
 // import Works from '../components/home/Works';
@@ -18,6 +19,8 @@ export default function HomePage() {
       <Hero />
 
       <ProjectShowcase />
+
+      <About />
 
       <Testimonials />
 

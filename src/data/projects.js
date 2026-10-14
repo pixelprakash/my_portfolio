@@ -241,7 +241,7 @@ for (const project of projects) {
     project.gallery = project.gallery.map((item) => ({
       ...item,
       src: `/work/visual/${item.name}.jpg`,
-      thumb: `/work/visual/${item.name}-sm.jpg`,
+      thumb: `/work/visual/${item.name}-sm.webp`,
     }));
   }
 }

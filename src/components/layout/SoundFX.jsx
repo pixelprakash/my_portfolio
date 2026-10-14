@@ -17,7 +17,7 @@ import { NAV_HEIGHT } from '../../constants';
 
 const INTERACTIVE =
   'a[href], button:not([disabled]), [role="button"], summary, [data-sound-hover]';
-const HOME_SECTIONS = ['work', 'testimonials', 'contact'];
+const HOME_SECTIONS = ['work', 'about', 'testimonials', 'contact'];
 const NO_SECTIONS = [];
 const DETENT_PX = 520;
 // A hover only counts once the pointer has rested on something this long, so

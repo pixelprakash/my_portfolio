@@ -31,12 +31,14 @@ export const siteConfig = {
   navItems: [
     { label: 'Home', href: '/' },
     { label: 'Work', href: '/#work' },
+    { label: 'About', href: '/#about' },
     { label: 'Testimonials', href: '/#testimonials' },
     { label: 'Contact', href: '/#contact' },
   ],
 
   footerLinks: [
     { label: 'Work', href: '/#work' },
+    { label: 'About', href: '/#about' },
     { label: 'GitHub', href: 'https://github.com/pixelprakash' },
     { label: 'Testimonials', href: '/#testimonials' },
   ],

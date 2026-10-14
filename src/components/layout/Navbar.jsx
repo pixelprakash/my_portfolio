@@ -7,7 +7,7 @@ import { NAV_HEIGHT } from '../../constants';
 import styles from './Navbar.module.css';
 
 // Stable references: the spy hook re-subscribes whenever the array changes.
-const HOME_SECTIONS = ['work', 'testimonials', 'contact'];
+const HOME_SECTIONS = ['work', 'about', 'testimonials', 'contact'];
 const NO_SECTIONS = [];
 
 export default function Navbar() {

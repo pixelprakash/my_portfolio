@@ -14,6 +14,14 @@ const ACCENT = {
 
 const TYPE_ORDER = Object.keys(projectTypes);
 
+// Each cover has a 600w and a 1200w WebP next to the JPG (see public/work):
+// phones get the small one, and the JPG stays as the plain `src` fallback.
+function coverSrcSet(cover) {
+  const base = cover.replace(/\.jpg$/, '');
+  return `${base}-600.webp 600w, ${base}.webp 1200w`;
+}
+const COVER_SIZES = '(min-width: 1100px) 380px, (min-width: 640px) 46vw, 92vw';
+
 function hostOf(href) {
   try {
     return new URL(href).host.replace(/^www\./, '');
@@ -122,6 +130,8 @@ function ProjectCard({ project, onOpen }) {
           ) : project.cover ? (
             <img
               src={project.cover}
+              srcSet={coverSrcSet(project.cover)}
+              sizes={COVER_SIZES}
               alt=""
               loading="lazy"
               width="1200"

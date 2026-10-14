@@ -583,6 +583,7 @@ const CUES = {
     const chords = [
       [64, 71, 76], // top of the page
       [69, 76, 81], // work
+      [72, 79, 84], // about
       [74, 81, 86], // testimonials
       [76, 83, 88], // contact
     ];

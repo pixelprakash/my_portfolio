@@ -1,0 +1,248 @@
+.section {
+  padding: var(--section-space) 0;
+  border-top: 1px solid var(--color-border);
+}
+
+.header {
+  max-width: 44rem;
+  margin-bottom: clamp(var(--space-7), 5vw, var(--space-8));
+}
+
+.heading {
+  margin-top: var(--space-3);
+  font-size: clamp(1.75rem, 4vw, 2.75rem);
+}
+
+/* story on the left, the two sides of the practice on the right */
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: clamp(var(--space-7), 5vw, var(--space-8));
+}
+
+@media (min-width: 960px) {
+  .layout {
+    grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+    align-items: start;
+  }
+
+  /* the cards stay in view while the longer story scrolls */
+  .personas {
+    position: sticky;
+    top: calc(var(--nav-height) + var(--space-6));
+  }
+}
+
+/* min-width: 0 lets the column shrink instead of stretching the grid */
+.story {
+  min-width: 0;
+}
+
+.intro {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  max-width: 40rem;
+  color: var(--color-text-secondary);
+  font-size: clamp(1rem, 1.5vw, 1.15rem);
+  line-height: 1.7;
+}
+
+.intro p:first-child {
+  color: var(--color-text);
+}
+
+/* ── Principles: outlined numerals, the same language as the hero ── */
+.principles {
+  display: flex;
+  flex-direction: column;
+  margin-top: var(--space-7);
+  max-width: 40rem;
+  border-top: 1px solid var(--color-border);
+}
+
+.principle {
+  display: grid;
+  grid-template-columns: 3.5rem minmax(0, 1fr);
+  gap: var(--space-4);
+  padding: var(--space-5) 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.number {
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  line-height: 1;
+  -webkit-text-stroke: 1.2px var(--color-text-muted);
+  -webkit-text-fill-color: transparent;
+}
+
+.principleTitle {
+  font-size: 1rem;
+}
+
+.principleText {
+  margin-top: var(--space-2);
+  color: var(--color-text-secondary);
+  font-size: 0.95rem;
+  line-height: 1.65;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin-top: var(--space-7);
+}
+
+.primary,
+.secondary {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--space-3) var(--space-5);
+  border-radius: var(--radius-pill);
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: background var(--transition-fast), border-color var(--transition-fast),
+    transform var(--transition-fast);
+}
+
+.primary {
+  background: var(--color-text);
+  color: var(--color-bg);
+}
+
+.secondary {
+  border: 1px solid var(--color-border-strong);
+  color: var(--color-text);
+}
+
+.primary:hover,
+.secondary:hover {
+  transform: translateY(-1px);
+}
+
+.secondary:hover {
+  border-color: var(--color-text);
+}
+
+/* ── The two sides of the practice ── */
+.personas {
+  display: flex;
+  flex-direction: column;
+  gap: var(--grid-gap);
+}
+
+.persona {
+  --accent: var(--color-blue);
+  --accent-tint: var(--color-blue-tint);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: clamp(var(--space-5), 2.6vw, var(--space-6));
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border);
+  background: linear-gradient(160deg, var(--accent-tint), var(--color-surface) 60%);
+}
+
+.personaRed {
+  --accent: var(--color-red);
+  --accent-tint: var(--color-red-tint);
+}
+
+/* accent line along the top edge */
+.persona::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--accent);
+}
+
+.personaTop {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.personaTitle {
+  font-size: 1.1rem;
+  color: var(--accent);
+}
+
+.years {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  margin: 0;
+}
+
+.yearsNum {
+  font-family: var(--font-display);
+  font-size: 2.4rem;
+  line-height: 1;
+  -webkit-text-stroke: 1.4px var(--accent);
+  -webkit-text-fill-color: transparent;
+}
+
+.yearsUnit {
+  font-size: 0.7rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.personaLabel {
+  color: var(--color-text-secondary);
+  font-size: 0.95rem;
+}
+
+.personaLabel strong {
+  color: var(--color-text);
+}
+
+.now {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-3);
+  padding-top: var(--space-4);
+  border-top: 1px dashed var(--color-border-strong);
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
+}
+
+.now strong {
+  color: var(--color-text);
+}
+
+.nowTag {
+  padding: 2px var(--space-3);
+  border-radius: var(--radius-pill);
+  background: var(--accent);
+  color: #000;
+  font-family: var(--font-display);
+  font-size: 0.6rem;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+
+.tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-top: var(--space-1);
+}
+
+.tools li {
+  padding: 2px var(--space-3);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-pill);
+  font-size: 0.75rem;
+  color: var(--color-text-secondary);
+}

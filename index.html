@@ -38,8 +38,21 @@
     <meta name="twitter:image" content="https://uxsurya.com/og-image.jpg" />
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Elms+Sans:ital,wght@0,100..900;1,100..900&family=Michroma&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- The font stylesheet loads without blocking first paint (media="print"
+         until it arrives); text shows in the fallback face, then swaps. -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Elms+Sans:ital,wght@0,100..900;1,100..900&family=Michroma&display=swap"
+      rel="stylesheet"
+      media="print"
+      onload="this.media='all'"
+    />
+    <noscript>
+      <link
+        href="https://fonts.googleapis.com/css2?family=Elms+Sans:ital,wght@0,100..900;1,100..900&family=Michroma&display=swap"
+        rel="stylesheet"
+      />
+    </noscript>
     <title>Surya Prakash Musunuri — Designer & Developer</title>
 
     <script type="application/ld+json">

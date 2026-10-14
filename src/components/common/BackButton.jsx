@@ -12,7 +12,7 @@ export default function BackButton({ fallbackTo = '/', label = 'Back' }) {
     <button
       type="button"
       className={styles.back}
-      data-sound="back"
+      data-sound="none"
       onClick={() => (canGoBack ? navigate(-1) : navigate(fallbackTo))}
     >
       <span className={styles.arrow} aria-hidden="true">

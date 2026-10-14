@@ -21,6 +21,8 @@ const listeners = new Set();
 let ctx = null;
 let master = null;
 let wetBus = null; // reverb + echo return
+let ambient = null; // the quiet cues (hover, scroll ticks) share a bus so they can be ducked
+let bus = null; // where the cue being scheduled right now sends its dry signal
 let reverb = null;
 let echo = null;
 let noiseBuffer = null;
@@ -104,6 +106,10 @@ function buildGraph() {
   master.gain.value = 4.5; // cue peaks below are written small; this sets the level
   master.connect(compressor);
 
+  ambient = ctx.createGain();
+  ambient.connect(master);
+  bus = master;
+
   // a short, bright room, so the blips feel like they're inside a machine
   wetBus = ctx.createGain();
   wetBus.gain.value = 0.7;
@@ -180,7 +186,7 @@ function connectOut(node, { pan = 0, panEnd = pan, t, dur, wet = 0, echoSend = 0
     tail.connect(panner);
     tail = panner;
   }
-  tail.connect(master);
+  tail.connect(bus);
   if (wet > 0) {
     const send = ctx.createGain();
     send.gain.value = wet;
@@ -529,10 +535,11 @@ const CUES = {
     [69, 76, 81].forEach((note, i) => ping({ f: midi(note), t: 0.22 + i * 0.1, dur: 0.8, peak: 0.04 }));
   },
 
-  // an in-page jump: a short servo glide and a ping
+  // an in-page jump: a brief servo glide and a soft ping. (The section scan
+  // lands separately when the scroll arrives, so this stays small.)
   jump() {
-    servo({ f0: 500, f1: 2800, pitch: 90, dur: 0.2, peak: 0.03, pan: -0.3 });
-    ping({ f: midi(88), t: 0.12, dur: 0.5, peak: 0.04, pan: 0.2 });
+    servo({ f0: 500, f1: 2600, pitch: 90, dur: 0.16, peak: 0.024, pan: -0.3 });
+    ping({ f: midi(88), t: 0.1, dur: 0.35, peak: 0.028, pan: 0.2 });
   },
 
   // the hamburger menu: a data burst up / down, landing on a ping
@@ -676,9 +683,51 @@ const CUES = {
   },
 };
 
+// ── The director ──
+// Several cues firing at once is what makes interface sound annoying, so
+// nothing plays without the director's say-so. Cues come in four kinds:
+//   ambient     hover, scroll ticks, read-out scans: the quiet texture. Dropped
+//               whenever something bigger is sounding, and ducked if already on.
+//   feedback    a direct answer to the visitor's action (click, menu, lightbox,
+//               toggles). Always plays, and quiets the ambient layer.
+//   transition  a new page. Same as feedback, but longer.
+//   event       the section scan, which fires on its own as you scroll. It
+//               yields to a feedback cue that has only just played.
+const KIND = { hover: 'ambient', detent: 'ambient', scan: 'ambient', section: 'event', page: 'transition' };
+
+// How long each cue keeps the ambient layer quiet after it starts (ms).
+const QUIET = {
+  page: 1100,
+  section: 1200,
+  open: 600,
+  close: 500,
+  menuOpen: 500,
+  menuClose: 400,
+  click: 300,
+  back: 300,
+  jump: 1100, // the smooth scroll that follows takes about this long
+  toggle: 250,
+  on: 800,
+  off: 700,
+};
+
 // Minimum gap between two plays of the same cue, in ms.
-const MIN_GAP = { hover: 60, detent: 90, section: 700, scan: 250, click: 40, page: 300 };
-const MAX_VOICES = 16;
+const MIN_GAP = { hover: 150, detent: 450, section: 900, scan: 400, click: 60, page: 400 };
+const MAX_VOICES = 48; // a runaway guard only: one section scan alone uses ~20
+const HOVER_BURST = { window: 1600, max: 3 }; // at most 3 hover pings per 1.6s
+
+let quietUntil = 0;
+let lastFeedbackAt = -Infinity;
+let hoverTimes = [];
+
+// Pull the ambient layer down under a bigger cue, and bring it back after.
+function duck(holdMs) {
+  if (!ambient) return;
+  const now = ctx.currentTime;
+  ambient.gain.cancelScheduledValues(now);
+  ambient.gain.setTargetAtTime(0.12, now, 0.02);
+  ambient.gain.setTargetAtTime(1, now + holdMs / 1000, 0.2);
+}
 
 export function playSound(name, options = {}) {
   if (state !== 'on' && !options.force) return;
@@ -688,16 +737,35 @@ export function playSound(name, options = {}) {
   const now = performance.now();
   if (now - (lastPlayed[name] ?? -Infinity) < (MIN_GAP[name] ?? 40)) return;
 
+  const kind = KIND[name] ?? 'feedback';
+  if (kind === 'ambient' && now < quietUntil) return;
+  if (kind === 'event' && now - lastFeedbackAt < 500) return;
+  if (name === 'hover') {
+    hoverTimes = hoverTimes.filter((at) => now - at < HOVER_BURST.window);
+    // sweeping across a row of items shouldn't machine-gun
+    if (hoverTimes.length >= HOVER_BURST.max) return;
+  }
+
   const context = ensureContext();
   if (!context || activeVoices > MAX_VOICES) return;
 
   const run = () => {
-    lastPlayed[name] = performance.now();
+    const at = performance.now();
+    lastPlayed[name] = at;
+    if (name === 'hover') hoverTimes.push(at);
+    if (kind !== 'ambient') {
+      const hold = QUIET[name] ?? 300;
+      quietUntil = Math.max(quietUntil, at + hold);
+      if (kind !== 'event') lastFeedbackAt = at;
+      duck(hold);
+    }
+    bus = kind === 'ambient' ? ambient : master;
     try {
       cue(options);
     } catch {
       // audio is decoration: never let it break an interaction
     }
+    bus = master;
   };
 
   if (context.state === 'running') {

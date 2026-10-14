@@ -85,6 +85,14 @@
   }
 }
 
+/* very narrow phones: the bars already show on / off (animated vs flat), so
+   the word goes too, keeping the navbar inside the screen */
+@media (max-width: 380px) {
+  .state {
+    display: none;
+  }
+}
+
 @keyframes eq {
   from {
     height: 3px;

@@ -42,6 +42,91 @@
   opacity: 0.65;
 }
 
+/* ── Discipline groups ──
+   Each group is a header (name, count, one line on what it covers) over its
+   own grid. The accent line under the header carries the group's colour. */
+.group {
+  --accent: var(--color-blue);
+  --accent-line: var(--color-blue);
+}
+
+.group + .group {
+  margin-top: var(--section-space);
+}
+
+.group_red {
+  --accent: var(--color-red);
+  --accent-line: var(--color-red);
+}
+
+/* craft sits between the two sides, so it takes both colours */
+.group_mix {
+  --accent: var(--color-text);
+  --accent-line: linear-gradient(90deg, var(--color-blue), var(--color-red));
+}
+
+.groupHeader {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: baseline;
+  gap: var(--space-3) var(--space-5);
+  margin-bottom: var(--space-7);
+  padding-bottom: var(--space-5);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.groupHeader::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -1px;
+  width: 5rem;
+  height: 2px;
+  background: var(--accent-line);
+}
+
+.groupTitle {
+  font-size: clamp(1.25rem, 1rem + 1vw, 1.75rem);
+  color: var(--accent);
+}
+
+.groupCount {
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  letter-spacing: 2px;
+  color: var(--color-text-muted);
+}
+
+.groupBlurb {
+  grid-column: 1 / -1;
+  max-width: 40rem;
+  color: var(--color-text-secondary);
+  font-size: 0.95rem;
+}
+
+/* colour dot on the filter chips */
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex: none;
+}
+
+.dot_blue {
+  background: var(--color-blue);
+  box-shadow: 0 0 8px rgba(0, 212, 255, 0.7);
+}
+
+.dot_red {
+  background: var(--color-red);
+  box-shadow: 0 0 8px rgba(255, 59, 14, 0.7);
+}
+
+.dot_mix {
+  background: linear-gradient(90deg, var(--color-blue), var(--color-red));
+}
+
 /* ── Grid: 1 col phone, 2 col tablet, 3 col desktop ── */
 .grid {
   display: grid;
@@ -251,6 +336,26 @@
   font-size: 0.75rem;
 }
 
+/* craft cards take both colours (design blue, development red) */
+.card.cardMix:hover {
+  box-shadow: 0 0 32px rgba(0, 212, 255, 0.22), 0 0 32px rgba(255, 59, 14, 0.22);
+}
+
+.tagMix {
+  color: var(--color-text);
+  border-color: var(--color-border-strong);
+}
+
+.linkMix {
+  color: var(--color-text);
+}
+
+.slideMix {
+  background: radial-gradient(90% 120% at 0% 0%, rgba(0, 212, 255, 0.4), transparent 60%),
+    radial-gradient(90% 120% at 100% 100%, rgba(255, 59, 14, 0.4), transparent 60%),
+    linear-gradient(135deg, #0a1a24, #1a0d0a);
+}
+
 /* ── Text ── */
 /* 24 / 32 / 32px: label → title → link each sit on the 8pt grid. */
 .body {
@@ -290,7 +395,50 @@
 /* Keeps the link visibly separate from the title even on short titles
    (the card's .link already pins itself to the bottom). */
 .body > span:last-child {
-  padding-top: var(--space-3);
+  margin-top: 0; /* the facts row above is what pins to the bottom */
+  padding-top: var(--space-1);
+}
+
+/* the same facts on every card: a one-line summary, then role and tools */
+.summary {
+  color: var(--color-text-secondary);
+  font-size: 0.92rem;
+  line-height: 1.6;
+}
+
+.facts {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-top: auto;
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--color-border);
+}
+
+.role {
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--color-text);
+}
+
+.year {
+  font-weight: 400;
+  color: var(--color-text-muted);
+}
+
+.tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.tools li {
+  padding: 2px var(--space-3);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-pill);
+  font-size: 0.72rem;
+  color: var(--color-text-secondary);
 }
 
 /* button version of the stretched title link */

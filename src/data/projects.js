@@ -19,15 +19,44 @@
 //   coverPosition — CSS object-position for the cover crop (default is
 //              the top of the image, which suits full-page screenshots).
 //   inProgress — shows the IN PROGRESS badge.
+//   role     — what you did on it ("Solo Designer & Developer"), shown on
+//              every card so work from different sources reads the same.
+//   year     — optional; shown after the role.
+//   summary  — one factual line about the project.
+//   tools    — optional list; the card shows the first three.
+// A project's colour and group come from its type: each type belongs to a
+// discipline (see `disciplines`), and the discipline sets the accent.
 // Add new types to projectTypes below and give
 // their projects a `type` — the filter chips only show types that have work.
+// The work is grouped by the two sides of the practice (the same blue /
+// red split as the hero), plus the craft that sits between them.
+export const disciplines = {
+  design: {
+    label: 'Design',
+    accent: 'blue',
+    blurb: 'Brand identities, app UX and visual design: the thinking and the look.',
+  },
+  development: {
+    label: 'Development',
+    accent: 'red',
+    blurb: 'Websites designed and built end to end, from first sketch to deploy.',
+  },
+  craft: {
+    label: 'Craft',
+    accent: 'mix',
+    blurb: 'Film and photography: storytelling beyond the screen.',
+  },
+};
+
+// The order here is the order cards appear within a group: App & UX first,
+// then branding, then visual design.
 export const projectTypes = {
-  website: { label: 'Websites', cta: 'Visit site ↗', frame: 'browser' },
-  video: { label: 'Video editing', cta: 'Watch video ▶' },
-  photography: { label: 'Photography', cta: 'View gallery ↗' },
-  branding: { label: 'Branding', cta: 'View presentation ▶' },
-  visual: { label: 'Visual design', cta: 'Browse designs ▶' },
-  ux: { label: 'App & UX', cta: 'View case study ▶' },
+  website: { label: 'Websites', cta: 'Visit site ↗', frame: 'browser', discipline: 'development' },
+  ux: { label: 'App & UX', cta: 'View case study ▶', discipline: 'design' },
+  branding: { label: 'Branding', cta: 'View presentation ▶', discipline: 'design' },
+  visual: { label: 'Visual design', cta: 'Browse designs ▶', discipline: 'design' },
+  video: { label: 'Video editing', cta: 'Watch video ▶', discipline: 'craft' },
+  photography: { label: 'Photography', cta: 'View gallery ↗', discipline: 'craft' },
 };
 
 export const projects = [
@@ -37,7 +66,10 @@ export const projects = [
     title: '6th Mobile Studies Congress',
     href: 'https://www.6thmobilestudiescongress.org/',
     cover: '/work/congress.jpg',
-    accent: 'blue',
+    role: 'Solo Designer & Developer',
+    year: '2026',
+    summary: 'The official site for a live international academic congress at IIT Hyderabad: registration, schedule and speakers.',
+    tools: ['React', 'Vite', 'Spline'],
   },
   {
     id: 'deepak-john-mathew',
@@ -45,7 +77,10 @@ export const projects = [
     title: 'Prof. Deepak John Mathew Portfolio Site',
     href: 'https://djn.vercel.app/',
     cover: '/work/djn.jpg',
-    accent: 'red',
+    role: 'Solo Designer & Developer',
+    year: '2026',
+    summary: 'A personal site for a Professor of Design at IIT Hyderabad, with a CMS his team updates without code.',
+    tools: ['React', 'GSAP', 'Sanity'],
   },
   {
     id: 'ganesh-kumar-malthurkar',
@@ -53,8 +88,9 @@ export const projects = [
     title: 'Ganesh Kumar Malthurkar Portfolio Site',
     href: 'https://ganeshmalthurkar.com/',
     cover: '/work/ganesh.jpg',
-    accent: 'blue',
     inProgress: true,
+    role: 'Designer & Developer',
+    summary: 'A personal portfolio website, currently in progress.',
   },
   {
     id: 'dic-iith',
@@ -62,8 +98,9 @@ export const projects = [
     title: 'DIC · IITH — Design Innovation Centre Website',
     href: 'https://dic-site.vercel.app/',
     cover: '/work/dic.jpg',
-    accent: 'red',
     inProgress: true,
+    role: 'Designer & Developer',
+    summary: 'The website for the Design Innovation Centre at IIT Hyderabad, currently in progress.',
   },
   {
     id: 'pedagogy-playcards',
@@ -71,8 +108,9 @@ export const projects = [
     title: 'Pedagogy Playcards',
     href: 'https://cards-omega-topaz.vercel.app/',
     cover: '/work/cards.jpg',
-    accent: 'blue',
     inProgress: true,
+    role: 'Designer & Developer',
+    summary: 'An interactive web app for the Pedagogy Playcards, currently in progress.',
   },
   {
     id: 'sricharan-reddy',
@@ -80,8 +118,9 @@ export const projects = [
     title: 'Sricharan Reddy Portfolio Site',
     href: 'https://sricharan-port.vercel.app/',
     cover: '/work/sricharan.jpg',
-    accent: 'red',
     inProgress: true,
+    role: 'Designer & Developer',
+    summary: 'A personal portfolio website, currently in progress.',
   },
   {
     id: 'golden-age-industrial-design',
@@ -89,7 +128,8 @@ export const projects = [
     title: 'Golden Age of Industrial Design with Kirti Trivedi — Documentary, Part 1',
     videoId: 'mQL6lPXuuZs',
     cover: '/work/video-golden-age.jpg',
-    accent: 'blue',
+    role: 'Video editor',
+    summary: 'Part 1 of a documentary conversation with Kirti Trivedi on the golden age of industrial design.',
   },
   {
     id: 'grinitian-branding',
@@ -100,7 +140,9 @@ export const projects = [
       'https://embed.figma.com/slides/UJKFqmkVlLAi3mb6jeqUkl/5-Concepts---Grinitian-Branding?node-id=1-256&embed-host=share',
     href: 'https://www.figma.com/deck/UJKFqmkVlLAi3mb6jeqUkl',
     hrefLabel: 'Open in Figma ↗',
-    accent: 'red',
+    role: 'Brand designer',
+    summary: 'Five brand identity concepts for Grinitian, presented as a deck.',
+    tools: ['Figma'],
   },
   {
     id: 'akshara-sanjeevani-branding',
@@ -111,7 +153,9 @@ export const projects = [
       'https://embed.figma.com/slides/29x48D4vNTvdqSDQTXRQNZ/Akshara-Sanjeevani---Branding?node-id=1-37&embed-host=share',
     href: 'https://www.figma.com/deck/29x48D4vNTvdqSDQTXRQNZ',
     hrefLabel: 'Open in Figma ↗',
-    accent: 'blue',
+    role: 'Brand designer',
+    summary: 'A brand identity for Akshara Sanjeevani, presented as a deck.',
+    tools: ['Figma'],
   },
   {
     id: 'praklens-photography',
@@ -122,13 +166,13 @@ export const projects = [
     cover: '/work/praklens-logo.jpg',
     coverPosition: 'center',
     href: 'https://www.instagram.com/praklens/',
-    accent: 'red',
+    role: 'Photographer',
+    summary: 'Photography shared on Instagram as @praklens.',
   },
   {
     id: 'thumbnail-designs',
     type: 'visual',
     title: 'YouTube Thumbnail Designs',
-    accent: 'blue',
     gallery: [
       { name: 'jaswanth-budda', alt: 'Thumbnail: How he got into IISc Bangalore for M.Des in Product Design & Manufacturing' },
       { name: 'bhaskar-komara', alt: 'Thumbnail: Architect to UX Designer, 4X hike' },
@@ -143,6 +187,8 @@ export const projects = [
       { name: 'susruta', alt: 'Thumbnail: Lessons from 12 years of designing products, Susruta Chakraborty' },
       { name: 'natalie', alt: 'Thumbnail: M.Sc UX Design, the journey to Germany, Natalie Valsangkar' },
     ],
+    role: 'Visual designer',
+    summary: 'Twelve YouTube thumbnails for design-career interviews and live sessions.',
   },
   {
     id: 'online-course-brochure',
@@ -151,7 +197,8 @@ export const projects = [
     coverTitle: 'Online Course Brochure',
     embed: 'https://www.behance.net/embed/project/200337053?ilo0=1',
     embedAspect: '4 / 3',
-    accent: 'red',
+    role: 'Visual designer (freelance)',
+    summary: 'A brochure for an online course, designed as freelance work.',
   },
   {
     id: 'penny-wise-expense-tracker',
@@ -160,7 +207,8 @@ export const projects = [
     coverTitle: 'Penny Wise',
     embed: 'https://www.behance.net/embed/project/197476263?ilo0=1',
     embedAspect: '4 / 3',
-    accent: 'blue',
+    role: 'UX designer',
+    summary: 'A UX case study for an expense-tracking app.',
   },
   {
     id: 'sahaaya-salesforce-design-challenge',
@@ -169,7 +217,8 @@ export const projects = [
     coverTitle: 'Sahaaya',
     embed: 'https://www.behance.net/embed/project/225913447?ilo0=1',
     embedAspect: '4 / 3',
-    accent: 'red',
+    role: 'UX designer',
+    summary: 'A response to the Salesforce Design Challenge.',
   },
   {
     id: 'village-stories-sangameswaram',
@@ -181,7 +230,8 @@ export const projects = [
     embedAspect: '4 / 3',
     href: 'https://www.instagram.com/praklens/',
     hrefLabel: 'See all work @praklens ↗',
-    accent: 'blue',
+    role: 'Photographer',
+    summary: 'A photo story from the village of Sangameswaram.',
   },
 ];
 

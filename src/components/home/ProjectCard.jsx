@@ -5,10 +5,19 @@ import styles from './ProjectShowcase.module.css';
 
 // blue / red / mix (craft sits between the two): one class per accent
 const ACCENT = {
-  blue: { card: cardStyles.cardBlue, tag: cardStyles.tagBlue, link: cardStyles.linkBlue, slide: styles.slideBlue },
-  red: { card: cardStyles.cardRed, tag: cardStyles.tagRed, link: cardStyles.linkRed, slide: styles.slideRed },
-  mix: { card: styles.cardMix, tag: styles.tagMix, link: styles.linkMix, slide: styles.slideMix },
+  blue: { card: `${cardStyles.cardBlue} ${styles.toneBlue}`, tag: cardStyles.tagBlue, link: cardStyles.linkBlue, slide: styles.slideBlue },
+  red: { card: `${cardStyles.cardRed} ${styles.toneRed}`, tag: cardStyles.tagRed, link: cardStyles.linkRed, slide: styles.slideRed },
+  mix: { card: `${styles.cardMix} ${styles.toneMix}`, tag: styles.tagMix, link: styles.linkMix, slide: styles.slideMix },
 };
+
+// A soft light follows the pointer across the card (mouse only). The position
+// goes straight into CSS variables, so moving the mouse never re-renders.
+function trackPointer(event) {
+  if (event.pointerType === 'touch') return;
+  const rect = event.currentTarget.getBoundingClientRect();
+  event.currentTarget.style.setProperty('--mx', `${event.clientX - rect.left}px`);
+  event.currentTarget.style.setProperty('--my', `${event.clientY - rect.top}px`);
+}
 
 // Each cover has a 600w and a 1200w WebP next to the JPG (see public/work):
 // phones get the small one, and the JPG stays as the plain `src` fallback.
@@ -102,6 +111,7 @@ export function ProjectCard({ project, onOpen, index, sizes = COVER_SIZES }) {
 
   return (
     <article
+      onPointerMove={trackPointer}
       className={`${cardStyles.card} ${styles.card} ${accent.card}`}
     >
       <div className={`${styles.cover} ${opensLightbox ? styles.coverVideo : ''}`}>

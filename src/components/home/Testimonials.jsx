@@ -37,7 +37,7 @@ export default function Testimonials() {
         <Reveal className={styles.header}>
           <span className="kicker">Testimonials</span>
           <h2 id="testimonials-heading" className={styles.heading}>
-            What people say about working together
+            What people say about <span className="text-gradient">working together</span>
           </h2>
         </Reveal>
 

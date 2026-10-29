@@ -9,7 +9,7 @@ export default function ContactCta() {
         <Reveal className={styles.panel}>
           <span className="kicker">Let's work together</span>
           <h2 id="cta-heading" className={styles.heading}>
-            Have a project in mind?
+            Have a project <span className="text-gradient">in mind?</span>
           </h2>
           <p className={styles.text}>
             A product to design, a site to build, or both — I'd love to hear about it.

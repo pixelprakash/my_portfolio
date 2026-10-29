@@ -49,7 +49,7 @@ export default function About() {
         <Reveal className={styles.header}>
           <span className="kicker">About</span>
           <h2 id="about-heading" className={styles.heading}>
-            {about.heading}
+            {about.heading} <span className="text-gradient">{about.headingAccent}</span>
           </h2>
         </Reveal>
 

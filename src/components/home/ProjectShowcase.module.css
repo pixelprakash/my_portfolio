@@ -149,6 +149,38 @@
   }
 }
 
+/* the section header with a quiet "all projects" link on its right */
+.sectionTop {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-6);
+}
+
+.topLink {
+  display: none;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: clamp(var(--space-7), 5vw, var(--space-8));
+  padding: var(--space-2) 0;
+  border-bottom: 1px solid var(--color-border-strong);
+  color: var(--color-text-secondary);
+  font-size: 0.9rem;
+  white-space: nowrap;
+  transition: color var(--transition-fast), border-color var(--transition-fast);
+}
+
+.topLink:hover {
+  color: var(--color-text);
+  border-color: var(--color-text);
+}
+
+@media (min-width: 700px) {
+  .topLink {
+    display: inline-flex;
+  }
+}
+
 /* Featured work on the home page: bigger cards, two across (never three) */
 @media (min-width: 700px) {
   .gridFeatured {
@@ -172,6 +204,55 @@
   padding: 0;
   gap: 0;
   overflow: hidden;
+  /* glass: a lit top edge fading to nearly clear, over the page's glow */
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.065), rgba(255, 255, 255, 0.015) 60%);
+  border-color: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 28px 50px -32px rgba(0, 0, 0, 0.95);
+}
+
+/* per-colour tokens: the edge gradient, the pointer light, the numerals */
+.toneBlue {
+  --tone: var(--color-blue);
+  --ring: linear-gradient(150deg, rgba(0, 212, 255, 0.9), rgba(0, 212, 255, 0.1) 42%, transparent 70%);
+  --spot: rgba(0, 212, 255, 0.13);
+}
+
+.toneRed {
+  --tone: var(--color-red);
+  --ring: linear-gradient(150deg, rgba(255, 59, 14, 0.9), rgba(255, 59, 14, 0.1) 42%, transparent 70%);
+  --spot: rgba(255, 59, 14, 0.13);
+}
+
+.toneMix {
+  --tone: #ffffff;
+  --ring: linear-gradient(150deg, rgba(0, 212, 255, 0.85), rgba(255, 255, 255, 0.08) 50%, rgba(255, 59, 14, 0.85));
+  --spot: rgba(255, 255, 255, 0.1);
+}
+
+/* a gradient edge, drawn as a masked 1px ring so it follows the rounded corners */
+.card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  padding: 1px;
+  border-radius: inherit;
+  background: var(--ring);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0.5;
+  pointer-events: none;
+  transition: opacity var(--transition-base);
+}
+
+.card:hover::before {
+  opacity: 1;
+}
+
+.card:hover {
+  background: radial-gradient(520px circle at var(--mx, 50%) var(--my, 0%), var(--spot), transparent 55%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.075), rgba(255, 255, 255, 0.02) 60%);
 }
 
 .cover {
@@ -394,13 +475,16 @@
   font-size: 0.9rem;
 }
 
-/* featured cards are numbered: 01 to 04 */
+/* featured cards are numbered: 01 to 04, outlined in the card's colour */
 .index {
   margin-right: var(--space-3);
-  font-size: 0.95rem;
+  font-size: 1.6rem;
+  line-height: 1;
   letter-spacing: 0;
-  -webkit-text-stroke: 1px var(--color-text-secondary);
+  vertical-align: middle;
+  -webkit-text-stroke: 1px var(--tone, var(--color-text-secondary));
   -webkit-text-fill-color: transparent;
+  text-shadow: none;
 }
 
 /* ── Text ── */

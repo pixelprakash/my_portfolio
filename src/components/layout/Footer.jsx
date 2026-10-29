@@ -14,7 +14,7 @@ export default function Footer() {
   return (
     <footer id="contact" className={styles.footer}>
       <div className="section-container">
-        <h2 className={styles.heading}>Contact</h2>
+        <h2 className={`${styles.heading} text-gradient`}>Contact</h2>
 
         <div className={styles.rows}>
           {contactRows.map((row) => {

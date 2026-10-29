@@ -182,13 +182,93 @@ input:focus-visible,
 }
 
 .kicker {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
   font-family: var(--font-display);
   font-size: 0.7rem;
-  letter-spacing: 2px;
+  letter-spacing: 2.5px;
   text-transform: uppercase;
-  color: var(--color-text-faint);
+  color: var(--color-text-muted);
   margin-bottom: var(--space-2);
+}
+
+/* the blue-to-red lead-in line: the hero's two halves, in miniature */
+.kicker::before {
+  content: '';
+  width: 2rem;
+  height: 1px;
+  background: linear-gradient(90deg, var(--color-blue), var(--color-red));
+  box-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
+}
+
+/* ── Atmosphere ──
+   The hero is rich blue and red; the rest of the page used to be flat black.
+   Two fixed layers carry the hero's light down the whole page: soft blue and
+   red glows at the edges, and a faint dot grid that fades out toward the
+   middle so it never sits behind text. */
+body::before,
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+}
+
+body::before {
+  background: radial-gradient(64vmax 56vmax at -14% 20%, rgba(0, 150, 220, 0.24), transparent 62%),
+    radial-gradient(64vmax 56vmax at 114% 74%, rgba(230, 45, 20, 0.22), transparent 62%),
+    radial-gradient(40vmax 30vmax at 50% -12%, rgba(120, 90, 255, 0.07), transparent 70%);
+}
+
+body::after {
+  background: radial-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1.6px) 0 0 / 30px 30px;
+  -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 50%, transparent 25%, #000 95%);
+  mask-image: radial-gradient(ellipse 70% 60% at 50% 50%, transparent 25%, #000 95%);
+}
+
+/* A blue-to-red accent for the key words of a heading (the logo's gradient). */
+.text-gradient {
+  background: linear-gradient(90deg, var(--color-blue), #ffffff 55%, var(--color-red));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+
+::selection {
+  background: rgba(0, 212, 255, 0.35);
+  color: #fff;
+}
+
+html {
+  scrollbar-color: rgba(255, 255, 255, 0.22) transparent;
+}
+
+/* Section dividers: a hairline that glows blue on the left and red on the
+   right, replacing each section's flat grey top border. */
+main > section[id] {
+  position: relative;
+  border-top: 0;
+}
+
+main > section[id]::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: var(--container-padding);
+  right: var(--container-padding);
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    var(--color-blue),
+    rgba(255, 255, 255, 0.14) 35%,
+    rgba(255, 255, 255, 0.14) 65%,
+    var(--color-red)
+  );
+  opacity: 0.55;
 }
 
 /* Respect users who've asked the OS for reduced motion: collapse all

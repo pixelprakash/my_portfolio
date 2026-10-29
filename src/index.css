@@ -29,7 +29,9 @@
 
   /* Layout */
   --nav-height: 76px;
-  --container-max: 1280px;
+  /* No cap: the hero runs edge to edge with this same side padding, so the
+     navbar and every section line up with it at any screen width. */
+  --container-max: none;
   --container-padding: clamp(1.25rem, 4vw, 3rem);
   /* Vertical rhythm between page sections, and the gap inside card grids. */
   --section-space: clamp(5rem, 9vw, 9rem);

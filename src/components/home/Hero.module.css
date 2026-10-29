@@ -534,7 +534,6 @@
   .info {
     position: static;
     width: 100%;
-    max-width: 760px;
     gap: var(--space-5);
     align-items: stretch;
   }

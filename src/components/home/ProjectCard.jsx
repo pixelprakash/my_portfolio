@@ -1,8 +1,6 @@
-import { useEffect, useRef, useState } from 'react';
-import { disciplines, projects, projectTypes } from '../../data/projects';
-import GalleryDialog from './GalleryDialog';
+import { useEffect, useRef } from 'react';
+import { disciplines, projectTypes } from '../../data/projects';
 import cardStyles from './CaseStudyCard.module.css';
-import sectionStyles from './Works.module.css';
 import styles from './ProjectShowcase.module.css';
 
 // blue / red / mix (craft sits between the two): one class per accent
@@ -11,8 +9,6 @@ const ACCENT = {
   red: { card: cardStyles.cardRed, tag: cardStyles.tagRed, link: cardStyles.linkRed, slide: styles.slideRed },
   mix: { card: styles.cardMix, tag: styles.tagMix, link: styles.linkMix, slide: styles.slideMix },
 };
-
-const TYPE_ORDER = Object.keys(projectTypes);
 
 // Each cover has a 600w and a 1200w WebP next to the JPG (see public/work):
 // phones get the small one, and the JPG stays as the plain `src` fallback.
@@ -35,7 +31,7 @@ function embedSrc(project) {
   return project.embed ?? `https://www.youtube.com/embed/${project.videoId}?autoplay=1&rel=0`;
 }
 
-function EmbedDialog({ video, onClose }) {
+export function EmbedDialog({ video, onClose }) {
   const ref = useRef(null);
 
   useEffect(() => {
@@ -96,7 +92,7 @@ function EmbedDialog({ video, onClose }) {
   );
 }
 
-function ProjectCard({ project, onOpen }) {
+export function ProjectCard({ project, onOpen, index, sizes = COVER_SIZES }) {
   const type = projectTypes[project.type];
   const accent = ACCENT[disciplines[type.discipline].accent];
   // video + presentations open in a lightbox; websites link out
@@ -131,7 +127,7 @@ function ProjectCard({ project, onOpen }) {
             <img
               src={project.cover}
               srcSet={coverSrcSet(project.cover)}
-              sizes={COVER_SIZES}
+              sizes={sizes}
               alt=""
               loading="lazy"
               width="1200"
@@ -160,13 +156,20 @@ function ProjectCard({ project, onOpen }) {
 
       <div className={styles.body}>
         <div className={styles.meta}>
-          <span className={styles.type}>{type.label}</span>
+          <span className={styles.type}>
+            {index !== undefined && (
+              <span className={styles.index} aria-hidden="true">
+                {String(index + 1).padStart(2, '0')}
+              </span>
+            )}
+            {type.label}
+          </span>
           {project.inProgress && (
             <span className={`${cardStyles.tag} ${accent.tag}`}>IN PROGRESS</span>
           )}
         </div>
 
-        <h4 className={`${cardStyles.title} ${styles.title}`}>
+        <h3 className={`${cardStyles.title} ${styles.title}`}>
           {opensLightbox ? (
             <button
               type="button"
@@ -186,7 +189,7 @@ function ProjectCard({ project, onOpen }) {
               {project.title}
             </a>
           )}
-        </h4>
+        </h3>
 
         {project.summary && <p className={styles.summary}>{project.summary}</p>}
 
@@ -210,91 +213,5 @@ function ProjectCard({ project, onOpen }) {
         </span>
       </div>
     </article>
-  );
-}
-
-export default function ProjectShowcase() {
-  const [filter, setFilter] = useState('all');
-  const [playing, setPlaying] = useState(null);
-  const [gallery, setGallery] = useState(null);
-
-  // one group per discipline that actually has work in it
-  const groups = Object.entries(disciplines)
-    .map(([key, discipline]) => ({
-      key,
-      ...discipline,
-      // cards follow the order of the types in projectTypes (a stable sort,
-      // so projects of one type keep the order they have in the data file)
-      items: projects
-        .filter((p) => projectTypes[p.type].discipline === key)
-        .sort((a, b) => TYPE_ORDER.indexOf(a.type) - TYPE_ORDER.indexOf(b.type)),
-    }))
-    .filter((group) => group.items.length);
-  const visibleGroups = filter === 'all' ? groups : groups.filter((group) => group.key === filter);
-
-  return (
-    <section id="work" className={sectionStyles.section} aria-labelledby="work-heading">
-      <div className="section-container">
-        <div className={sectionStyles.header}>
-          <span className="kicker">Selected work</span>
-          <h2 id="work-heading" className={sectionStyles.heading}>
-            Where design meets code
-          </h2>
-          <p className={sectionStyles.description}>
-            Brand, UX and visual design on one side, websites built end to end on the other, and
-            film and photography in between. Open any card to see it.
-          </p>
-        </div>
-
-        <div className={styles.filters} role="group" aria-label="Filter work by discipline">
-          {[{ key: 'all', label: 'All', count: projects.length }, ...groups].map((group) => (
-            <button
-              key={group.key}
-              type="button"
-              className={`${styles.chip} ${filter === group.key ? styles.chipActive : ''}`}
-              aria-pressed={filter === group.key}
-              onClick={() => setFilter(group.key)}
-            >
-              {group.key !== 'all' && (
-                <span className={`${styles.dot} ${styles[`dot_${group.accent}`]}`} aria-hidden="true" />
-              )}
-              {group.label}
-              <span className={styles.count}>{group.count ?? group.items.length}</span>
-            </button>
-          ))}
-        </div>
-
-        {visibleGroups.map((group) => (
-          <div
-            key={group.key}
-            className={`${styles.group} ${styles[`group_${group.accent}`]}`}
-            role="group"
-            aria-labelledby={`work-group-${group.key}`}
-          >
-            <div className={styles.groupHeader}>
-              <h3 id={`work-group-${group.key}`} className={styles.groupTitle}>
-                {group.label}
-              </h3>
-              <span className={styles.groupCount}>{String(group.items.length).padStart(2, '0')}</span>
-              <p className={styles.groupBlurb}>{group.blurb}</p>
-            </div>
-
-            <ul className={styles.grid}>
-              {group.items.map((project) => (
-                <li key={project.id} className={styles.item}>
-                  <ProjectCard
-                    project={project}
-                    onOpen={project.gallery ? setGallery : setPlaying}
-                  />
-                </li>
-              ))}
-            </ul>
-          </div>
-        ))}
-      </div>
-
-      <EmbedDialog video={playing} onClose={() => setPlaying(null)} />
-      <GalleryDialog project={gallery} onClose={() => setGallery(null)} />
-    </section>
   );
 }

@@ -1,5 +1,5 @@
 import Hero from '../components/home/Hero';
-import ProjectShowcase from '../components/home/ProjectShowcase';
+import FeaturedWork from '../components/home/FeaturedWork';
 import About from '../components/home/About';
 import Testimonials from '../components/home/Testimonials';
 import ContactCta from '../components/home/ContactCta';
@@ -18,7 +18,7 @@ export default function HomePage() {
     <>
       <Hero />
 
-      <ProjectShowcase />
+      <FeaturedWork />
 
       <About />
 

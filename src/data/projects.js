@@ -90,7 +90,7 @@ export const projects = [
     cover: '/work/ganesh.jpg',
     inProgress: true,
     role: 'Designer & Developer',
-    summary: 'A personal portfolio website, currently in progress.',
+    summary: 'A personal portfolio website.',
   },
   {
     id: 'dic-iith',
@@ -100,7 +100,7 @@ export const projects = [
     cover: '/work/dic.jpg',
     inProgress: true,
     role: 'Designer & Developer',
-    summary: 'The website for the Design Innovation Centre at IIT Hyderabad, currently in progress.',
+    summary: 'The website for the Design Innovation Centre at IIT Hyderabad.',
   },
   {
     id: 'pedagogy-playcards',
@@ -110,7 +110,7 @@ export const projects = [
     cover: '/work/cards.jpg',
     inProgress: true,
     role: 'Designer & Developer',
-    summary: 'An interactive web app for the Pedagogy Playcards, currently in progress.',
+    summary: 'An interactive web app for the Pedagogy Playcards.',
   },
   {
     id: 'sricharan-reddy',
@@ -120,7 +120,7 @@ export const projects = [
     cover: '/work/sricharan.jpg',
     inProgress: true,
     role: 'Designer & Developer',
-    summary: 'A personal portfolio website, currently in progress.',
+    summary: 'A personal portfolio website.',
   },
   {
     id: 'golden-age-industrial-design',
@@ -234,6 +234,16 @@ export const projects = [
     summary: 'A photo story from the village of Sangameswaram.',
   },
 ];
+
+// The home page shows only these, in this order (the full list lives on the
+// all-projects page). Use ids from `projects` above.
+export const featuredIds = [
+  '6th-mobile-studies-congress',
+  'deepak-john-mathew',
+  'pedagogy-playcards',
+  'dic-iith',
+];
+export const featuredProjects = featuredIds.map((id) => projects.find((p) => p.id === id));
 
 // Resolve gallery file names to URLs once, so components just use src/thumb.
 for (const project of projects) {

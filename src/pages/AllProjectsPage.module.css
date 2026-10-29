@@ -1,0 +1,30 @@
+.page {
+  padding: var(--space-6) 0 var(--section-space);
+}
+
+.topRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  margin-bottom: var(--space-7);
+}
+
+.header {
+  max-width: 44rem;
+  margin-bottom: clamp(var(--space-7), 5vw, var(--space-8));
+}
+
+.title {
+  margin-top: var(--space-3);
+  font-size: clamp(2rem, 5vw, 3.25rem);
+}
+
+.description {
+  margin-top: var(--space-5);
+  max-width: 36rem;
+  color: var(--color-text-secondary);
+  font-size: clamp(1rem, 1.5vw, 1.15rem);
+  line-height: 1.65;
+}

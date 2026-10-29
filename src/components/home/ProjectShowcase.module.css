@@ -149,6 +149,13 @@
   }
 }
 
+/* Featured work on the home page: bigger cards, two across (never three) */
+@media (min-width: 700px) {
+  .gridFeatured {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
 .item {
   display: flex;
 }
@@ -354,6 +361,46 @@
   background: radial-gradient(90% 120% at 0% 0%, rgba(0, 212, 255, 0.4), transparent 60%),
     radial-gradient(90% 120% at 100% 100%, rgba(255, 59, 14, 0.4), transparent 60%),
     linear-gradient(135deg, #0a1a24, #1a0d0a);
+}
+
+/* the "view all" link under the featured grid */
+.allRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-4) var(--space-6);
+  margin-top: var(--space-8);
+}
+
+.allLink {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-6);
+  border-radius: var(--radius-pill);
+  background: var(--color-text);
+  color: var(--color-bg);
+  font-weight: 600;
+  transition: transform var(--transition-fast), box-shadow var(--transition-base);
+}
+
+.allLink:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 32px rgba(0, 212, 255, 0.25), 0 0 32px rgba(255, 59, 14, 0.25);
+}
+
+.allNote {
+  color: var(--color-text-muted);
+  font-size: 0.9rem;
+}
+
+/* featured cards are numbered: 01 to 04 */
+.index {
+  margin-right: var(--space-3);
+  font-size: 0.95rem;
+  letter-spacing: 0;
+  -webkit-text-stroke: 1px var(--color-text-secondary);
+  -webkit-text-fill-color: transparent;
 }
 
 /* ── Text ── */

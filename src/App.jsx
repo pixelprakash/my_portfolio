@@ -4,6 +4,7 @@ import Layout from './components/layout/Layout';
 import Loader from './components/layout/Loader';
 import HomePage from './pages/HomePage';
 import CaseStudyPage from './pages/CaseStudyPage';
+import AllProjectsPage from './pages/AllProjectsPage';
 import NotFoundPage from './pages/NotFoundPage';
 
 const SEEN_KEY = 'sp-intro-seen';
@@ -63,6 +64,7 @@ export default function App() {
         <Routes>
           <Route element={<Layout />}>
             <Route index element={<HomePage />} />
+            <Route path="work" element={<AllProjectsPage />} />
             <Route path="work/:slug" element={<CaseStudyPage />} />
             <Route path="*" element={<NotFoundPage />} />
           </Route>

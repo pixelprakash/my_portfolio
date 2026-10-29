@@ -23,6 +23,8 @@ export default function Navbar() {
     offset: NAV_HEIGHT,
   });
   const isActive = (item) => {
+    // the all-projects page and the case studies belong to "Work"
+    if (pathname.startsWith('/work')) return item.href === '/#work';
     if (!onHome) return false;
     const id = item.href.split('#')[1] ?? null;
     return id === activeSection;

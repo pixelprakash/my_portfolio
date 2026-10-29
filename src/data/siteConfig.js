@@ -38,6 +38,7 @@ export const siteConfig = {
 
   footerLinks: [
     { label: 'Work', href: '/#work' },
+    { label: 'All projects', href: '/work' },
     { label: 'About', href: '/#about' },
     { label: 'GitHub', href: 'https://github.com/pixelprakash' },
     { label: 'Testimonials', href: '/#testimonials' },

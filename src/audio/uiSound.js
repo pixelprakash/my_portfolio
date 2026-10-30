@@ -26,6 +26,10 @@ let bus = null; // where the cue being scheduled right now sends its dry signal
 let reverb = null;
 let echo = null;
 let noiseBuffer = null;
+let bakedOut = null; // where pre-rendered cues enter the live chain
+let bakedAmbient = null; // ...and the quiet ones, so they can be ducked too
+let levelScale = 1; // multiplies every voice's peak while a cue is scheduled
+let counting = true; // false while a cue is scheduled for offline rendering
 let hiddenSuspend = false;
 let activeVoices = 0;
 let hoverStep = 0;
@@ -65,13 +69,45 @@ function emit() {
 }
 
 // ── Audio graph ──
-function buildGraph() {
-  const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-  if (!AudioContextClass) return false;
+// The same chain is built twice: once on the live context, and once on each
+// offline context used to pre-render a cue (see "Pre-rendered cues" below), so
+// a pre-rendered cue has exactly the level and character of a live one.
+const impulseCache = new Map(); // sample rate -> reverb impulse
+const noiseCache = new Map(); // sample rate -> white noise
+let clipCurve = null;
 
-  ctx = new AudioContextClass({ latencyHint: 'interactive' });
+function impulseFor(context) {
+  const rate = context.sampleRate;
+  if (!impulseCache.has(rate)) {
+    const length = Math.floor(rate * 1.3);
+    const impulse = context.createBuffer(2, length, rate);
+    for (let c = 0; c < 2; c++) {
+      const data = impulse.getChannelData(c);
+      for (let i = 0; i < length; i++) {
+        // fade the first ~12ms in: an impulse that starts at full level turns
+        // every note attack into a sharp early reflection
+        const onset = Math.min(1, i / (rate * 0.012));
+        data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / length, 3.2) * onset;
+      }
+    }
+    impulseCache.set(rate, impulse);
+  }
+  return impulseCache.get(rate);
+}
 
-  const compressor = ctx.createDynamicsCompressor();
+function noiseFor(context) {
+  const rate = context.sampleRate;
+  if (!noiseCache.has(rate)) {
+    const noise = context.createBuffer(1, rate, rate);
+    const data = noise.getChannelData(0);
+    for (let i = 0; i < rate; i++) data[i] = Math.random() * 2 - 1;
+    noiseCache.set(rate, noise);
+  }
+  return noiseCache.get(rate);
+}
+
+function createGraph(context) {
+  const compressor = context.createDynamicsCompressor();
   compressor.threshold.value = -14;
   compressor.knee.value = 12;
   compressor.ratio.value = 6;
@@ -79,7 +115,7 @@ function buildGraph() {
   compressor.release.value = 0.18;
 
   // a brick-wall ceiling after the compressor, so stacked cues can't clip
-  const limiter = ctx.createDynamicsCompressor();
+  const limiter = context.createDynamicsCompressor();
   limiter.threshold.value = -4;
   limiter.knee.value = 0;
   limiter.ratio.value = 20;
@@ -91,75 +127,113 @@ function buildGraph() {
   // same instant, the output can never exceed full scale. (The shaper sees
   // -1..1, so the signal is halved going in and the curve is tanh over -2..2:
   // transparent for small signals, rounding off only the peaks.)
-  const preClip = ctx.createGain();
-  preClip.gain.value = 0.5;
-  const clipper = ctx.createWaveShaper();
-  const curve = new Float32Array(2048);
-  for (let i = 0; i < curve.length; i++) curve[i] = Math.tanh((i / (curve.length - 1)) * 4 - 2);
-  clipper.curve = curve;
-  clipper.oversample = '2x';
-  limiter.connect(preClip);
-  preClip.connect(clipper);
-  clipper.connect(ctx.destination);
-
-  master = ctx.createGain();
-  master.gain.value = 4.5; // cue peaks below are written small; this sets the level
-  master.connect(compressor);
-
-  ambient = ctx.createGain();
-  ambient.connect(master);
-  bus = master;
-
-  // a short, bright room, so the blips feel like they're inside a machine
-  wetBus = ctx.createGain();
-  wetBus.gain.value = 0.7;
-  wetBus.connect(compressor);
-
-  const length = Math.floor(ctx.sampleRate * 1.3);
-  const impulse = ctx.createBuffer(2, length, ctx.sampleRate);
-  for (let c = 0; c < 2; c++) {
-    const data = impulse.getChannelData(c);
-    for (let i = 0; i < length; i++) {
-      // fade the first ~12ms in: an impulse that starts at full level turns
-      // every note attack into a sharp early reflection
-      const onset = Math.min(1, i / (ctx.sampleRate * 0.012));
-      data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / length, 3.2) * onset;
+  const entry = context.createGain(); // the clipper's input; pre-rendered cues join here
+  entry.gain.value = 0.5;
+  const clipper = context.createWaveShaper();
+  if (!clipCurve) {
+    clipCurve = new Float32Array(2048);
+    for (let i = 0; i < clipCurve.length; i++) {
+      clipCurve[i] = Math.tanh((i / (clipCurve.length - 1)) * 4 - 2);
     }
   }
-  reverb = ctx.createConvolver();
-  reverb.buffer = impulse;
-  reverb.connect(wetBus);
+  clipper.curve = clipCurve;
+  clipper.oversample = '2x';
+  limiter.connect(entry);
+  entry.connect(clipper);
+  clipper.connect(context.destination);
 
-  echo = ctx.createDelay(1);
-  echo.delayTime.value = 0.17;
-  const feedback = ctx.createGain();
+  const masterGain = context.createGain();
+  masterGain.gain.value = 4.5; // cue peaks below are written small; this sets the level
+  masterGain.connect(compressor);
+
+  const ambientGain = context.createGain();
+  ambientGain.connect(masterGain);
+
+  // a short, bright room, so the blips feel like they're inside a machine
+  const wet = context.createGain();
+  wet.gain.value = 0.7;
+  wet.connect(compressor);
+
+  const room = context.createConvolver();
+  room.buffer = impulseFor(context);
+  room.connect(wet);
+
+  const delay = context.createDelay(1);
+  delay.delayTime.value = 0.17;
+  const feedback = context.createGain();
   feedback.gain.value = 0.32;
-  const echoTone = ctx.createBiquadFilter();
-  echoTone.type = 'lowpass';
-  echoTone.frequency.value = 2400;
-  echo.connect(echoTone);
-  echoTone.connect(feedback);
-  feedback.connect(echo);
-  echoTone.connect(wetBus);
+  const delayTone = context.createBiquadFilter();
+  delayTone.type = 'lowpass';
+  delayTone.frequency.value = 2400;
+  delay.connect(delayTone);
+  delayTone.connect(feedback);
+  feedback.connect(delay);
+  delayTone.connect(wet);
 
-  const noiseLength = ctx.sampleRate;
-  noiseBuffer = ctx.createBuffer(1, noiseLength, ctx.sampleRate);
-  const noiseData = noiseBuffer.getChannelData(0);
-  for (let i = 0; i < noiseLength; i++) noiseData[i] = Math.random() * 2 - 1;
+  return {
+    master: masterGain,
+    ambient: ambientGain,
+    wetBus: wet,
+    reverb: room,
+    echo: delay,
+    noise: noiseFor(context),
+    entry,
+  };
+}
+
+function buildGraph() {
+  const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+  if (!AudioContextClass) return false;
+
+  ctx = new AudioContextClass({ latencyHint: 'interactive' });
+  const graph = createGraph(ctx);
+  master = graph.master;
+  ambient = graph.ambient;
+  wetBus = graph.wetBus;
+  reverb = graph.reverb;
+  echo = graph.echo;
+  noiseBuffer = graph.noise;
+  bus = master;
+
+  // the entrance for pre-rendered cues: they skip the compressors (already
+  // applied when rendered) and join just before the soft clip
+  bakedOut = ctx.createGain();
+  bakedOut.connect(graph.entry);
+  bakedAmbient = ctx.createGain();
+  bakedAmbient.connect(bakedOut);
 
   return true;
 }
 
+// iOS keeps audio locked until something has been played inside a touch
+// gesture: a one-sample silent buffer is enough to open it for good.
+function openOutput() {
+  try {
+    const source = ctx.createBufferSource();
+    source.buffer = ctx.createBuffer(1, 1, ctx.sampleRate);
+    source.connect(ctx.destination);
+    source.start(0);
+  } catch {
+    // not worth failing over
+  }
+}
+
 function ensureContext() {
-  if (!ctx && !buildGraph()) return null;
-  if (ctx.state === 'suspended' && !hiddenSuspend) ctx.resume().catch(() => {});
+  if (!ctx) {
+    if (!buildGraph()) return null;
+    openOutput();
+  }
+  // 'interrupted' is iOS's word for "something else took the audio"
+  if (ctx.state !== 'running' && !hiddenSuspend) ctx.resume().catch(() => {});
   return ctx;
 }
 
 // Call from a user gesture (the global listener in <SoundFX /> does): it
 // creates / wakes the audio context if the visitor has sound switched on.
 export function unlockSound() {
-  if (state === 'on') ensureContext();
+  if (state !== 'on') return;
+  ensureContext();
+  warmUpSound();
 }
 
 if (typeof document !== 'undefined') {
@@ -206,16 +280,19 @@ function envelope(param, t, dur, peak, attack) {
   // the first few samples of every voice leak through as a click.
   param.value = 0.0001;
   param.setValueAtTime(0.0001, t);
-  param.exponentialRampToValueAtTime(peak, t + attack);
+  param.exponentialRampToValueAtTime(Math.max(0.0002, peak * levelScale), t + attack);
   param.exponentialRampToValueAtTime(0.0001, t + dur);
 }
 
 function track(source, stopAt, t) {
-  activeVoices += 1;
   source.stop(stopAt);
-  source.onended = () => {
-    activeVoices -= 1;
-  };
+  // offline renders aren't "live voices": they must not count toward the cap
+  if (counting) {
+    activeVoices += 1;
+    source.onended = () => {
+      activeVoices -= 1;
+    };
+  }
   return t;
 }
 
@@ -489,20 +566,14 @@ const POOLS = {
 };
 
 const CUES = {
-  // A sensor ping. Sweeping across several items plays a rising then
-  // falling pentatonic run (it restarts after a pause), so moving the pointer
-  // feels like playing an instrument; the pan follows the pointer. Each ping
-  // has a ring-modulated robot overtone and a tiny servo whirr: blue is high
-  // and bright, red low and heavy.
-  hover({ tone: persona, pan = 0 }) {
-    const now = performance.now();
-    hoverStep = now - hoverAt > 1100 ? 0 : hoverStep + 1;
-    hoverAt = now;
-
+  // A sensor ping. `idx` picks the note from the persona's pentatonic pool
+  // (playSound walks it up and down as the pointer sweeps across items, so
+  // moving the mouse feels like playing an instrument); the pan follows the
+  // pointer. Each ping has a ring-modulated robot overtone and a tiny servo
+  // whirr: blue is high and bright, red low and heavy.
+  hover({ tone: persona, pan = 0, idx = 0 }) {
     const pool = POOLS[persona] ?? POOLS.neutral;
-    const cycle = pool.length * 2 - 2;
-    const k = hoverStep % cycle;
-    const f = midi(pool[k < pool.length ? k : cycle - k]);
+    const f = midi(pool[idx % pool.length]);
     const red = persona === 'red';
     const blue = persona === 'blue';
 
@@ -527,12 +598,13 @@ const CUES = {
   },
 
   // a new page: a rising stereo sweep, a synthetic "ooh-ah", and a chord of
-  // sonar pings
+  // sonar pings. The biggest cue, but it only plays when the page itself
+  // changes, so it's kept well below a shout.
   page() {
-    hiss({ f0: 280, f1: 4200, q: 1.1, dur: 0.55, peak: 0.05, attack: 0.12, pan: -0.7, panEnd: 0.7, wet: 0.3 });
-    tone({ f0: 110, f1: 220, dur: 0.42, peak: 0.07, attack: 0.04 });
-    vowel({ pitch: 82, from: 'oo', to: 'ah', t: 0.05, dur: 0.4, peak: 0.05, wet: 0.35 });
-    [69, 76, 81].forEach((note, i) => ping({ f: midi(note), t: 0.22 + i * 0.1, dur: 0.8, peak: 0.04 }));
+    hiss({ f0: 280, f1: 4200, q: 1.1, dur: 0.5, peak: 0.032, attack: 0.12, pan: -0.7, panEnd: 0.7, wet: 0.3 });
+    tone({ f0: 110, f1: 220, dur: 0.4, peak: 0.045, attack: 0.04 });
+    vowel({ pitch: 82, from: 'oo', to: 'ah', t: 0.05, dur: 0.36, peak: 0.03, wet: 0.35 });
+    [69, 76, 81].forEach((note, i) => ping({ f: midi(note), t: 0.2 + i * 0.09, dur: 0.65, peak: 0.028 }));
   },
 
   // an in-page jump: a brief servo glide and a soft ping. (The section scan
@@ -573,12 +645,12 @@ const CUES = {
     hiss({ f0: 3600, f1: 300, dur: 0.26, peak: 0.034, attack: 0.02 });
   },
 
-  // The AI locks onto a new section. A burst of data blips sweeps through the
-  // stereo field (left to right as you scroll down, back again as you scroll
-  // up) while a synthetic voice syllable rises "ah-ee" or falls "ee-ah" with
-  // it; then a sonar ping lands and two robotic tones acknowledge it. Each
-  // section has its own key. `index` is the section (0 = top of the page),
-  // `dir` is +1 / -1.
+  // The AI settles on a new section. A short burst of data blips sweeps the
+  // stereo field (left to right as you scroll down, back as you scroll up),
+  // then a sonar ping lands with two soft robotic tones. Each section has its
+  // own key. Kept short and light on purpose: it plays every time you move
+  // into a new section, so it must never wear on you. `index` is the section
+  // (0 = top of the page), `dir` is +1 / -1.
   section({ index = 0, dir = 1 }) {
     const chords = [
       [64, 71, 76], // top of the page
@@ -589,48 +661,41 @@ const CUES = {
     ];
     const chord = chords[index] ?? chords[1];
     const down = dir >= 0;
-    const lock = 0.3;
+    const lock = 0.2;
+
+    hiss({
+      f0: down ? 400 : 4200,
+      f1: down ? 4200 : 400,
+      q: 1.4,
+      dur: 0.22,
+      peak: 0.024,
+      attack: 0.08,
+      pan: down ? -0.5 : 0.5,
+      panEnd: down ? 0.5 : -0.5,
+      wet: 0.2,
+    });
 
     flutter({
-      count: 10,
+      count: 5,
+      step: 0.032,
       dir,
-      peak: 0.016,
-      from: down ? -0.7 : 0.7,
-      to: down ? 0.7 : -0.7,
-    });
-    vowel({
-      pitch: midi(chord[0] - 24),
-      from: down ? 'ah' : 'ee',
-      to: down ? 'ee' : 'ah',
-      t: 0.06,
-      dur: 0.26,
-      peak: 0.03,
-      pan: down ? -0.2 : 0.2,
-      wet: 0.3,
+      peak: 0.012,
+      from: down ? -0.5 : 0.5,
+      to: down ? 0.5 : -0.5,
     });
 
-    ping({ f: midi(chord[2]), t: lock, dur: 1.1, peak: 0.03 });
-    ring({ f: midi(chord[0] + 12), ratio: 1.5, t: lock, dur: 0.1, peak: 0.02, glide: 0.04, wet: 0.3 });
+    ping({ f: midi(chord[2]), t: lock, dur: 0.8, peak: 0.026 });
+    ring({ f: midi(chord[0] + 12), ratio: 1.5, t: lock, dur: 0.09, peak: 0.018, glide: 0.04, wet: 0.3 });
     ring({
       f: midi(chord[1] + 12),
       ratio: 1.5,
-      t: lock + 0.11,
-      dur: 0.14,
-      peak: 0.02,
+      t: lock + 0.1,
+      dur: 0.12,
+      peak: 0.018,
       glide: 0.04,
       wet: 0.4,
       echoSend: 0.3,
     });
-    tone({ f0: 55, f1: 46, t: lock, dur: 0.22, peak: 0.025, attack: 0.012 });
-  },
-
-  // a mechanical detent every so often while scrolling; the pitch climbs
-  // through the page like a scan position
-  detent({ progress = 0 }) {
-    const pool = [81, 84, 86, 88, 91, 93, 96];
-    const note = pool[Math.min(pool.length - 1, Math.floor(progress * pool.length))];
-    tone({ type: 'triangle', f0: midi(note), dur: 0.035, peak: 0.14, attack: 0.003, pan: rand(-0.2, 0.2) });
-    hiss({ type: 'highpass', f0: 7000, dur: 0.012, peak: 0.07, attack: 0.003 });
   },
 
   // going back
@@ -694,12 +759,12 @@ const CUES = {
 //   transition  a new page. Same as feedback, but longer.
 //   event       the section scan, which fires on its own as you scroll. It
 //               yields to a feedback cue that has only just played.
-const KIND = { hover: 'ambient', detent: 'ambient', scan: 'ambient', section: 'event', page: 'transition' };
+const KIND = { hover: 'ambient', scan: 'ambient', section: 'event', page: 'transition' };
 
 // How long each cue keeps the ambient layer quiet after it starts (ms).
 const QUIET = {
   page: 1100,
-  section: 1200,
+  section: 900,
   open: 600,
   close: 500,
   menuOpen: 500,
@@ -713,7 +778,8 @@ const QUIET = {
 };
 
 // Minimum gap between two plays of the same cue, in ms.
-const MIN_GAP = { hover: 150, detent: 450, section: 900, scan: 400, click: 60, page: 400 };
+// (section is spaced well apart: it should mark a move to a new part of the page, not chatter)
+const MIN_GAP = { hover: 150, section: 2200, scan: 400, click: 60, page: 400 };
 const MAX_VOICES = 48; // a runaway guard only: one section scan alone uses ~20
 const HOVER_BURST = { window: 1600, max: 3 }; // at most 3 hover pings per 1.6s
 
@@ -723,11 +789,171 @@ let hoverTimes = [];
 
 // Pull the ambient layer down under a bigger cue, and bring it back after.
 function duck(holdMs) {
-  if (!ambient) return;
+  if (!ctx) return;
   const now = ctx.currentTime;
-  ambient.gain.cancelScheduledValues(now);
-  ambient.gain.setTargetAtTime(0.12, now, 0.02);
-  ambient.gain.setTargetAtTime(1, now + holdMs / 1000, 0.2);
+  for (const layer of [ambient, bakedAmbient]) {
+    if (!layer) continue;
+    layer.gain.cancelScheduledValues(now);
+    layer.gain.setTargetAtTime(0.12, now, 0.02);
+    layer.gain.setTargetAtTime(1, now + holdMs / 1000, 0.2);
+  }
+}
+
+// ── Pre-rendered cues ──
+// Synthesising a cue live means building 5 to 20 audio nodes the instant you
+// hover or tap, plus a reverb and an echo running on the audio thread. On a
+// phone that is what makes sound hesitate (the cue arrives late) and crackle.
+// So each cue is rendered once, offline, into a buffer, and playing it is a
+// single buffer source. A cue that isn't rendered yet simply plays live as
+// before, so nothing is ever missing, only slower.
+const BAKE_RATE = 32000;
+const baked = new Map(); // key -> AudioBuffer
+
+function bakeKey(name, o = {}) {
+  switch (name) {
+    case 'hover':
+      return `hover:${o.tone ?? 'neutral'}:${o.idx ?? 0}`;
+    case 'scan':
+      return `scan:${o.tone ?? 'neutral'}`;
+    case 'section':
+      return `section:${o.index ?? 0}:${(o.dir ?? 1) >= 0 ? 1 : -1}`;
+    default:
+      return name;
+  }
+}
+
+// Schedule one cue on a fresh offline context (with the same graph as the
+// live one) and render it. The cue functions are synchronous, so swapping the
+// module's graph variables around the call is safe.
+function renderCue(name, options, seconds, channels) {
+  const offline = new OfflineAudioContext(channels, Math.ceil(seconds * BAKE_RATE), BAKE_RATE);
+  const graph = createGraph(offline);
+  const saved = { ctx, master, ambient, wetBus, reverb, echo, noiseBuffer, bus, counting, levelScale };
+  ctx = offline;
+  master = graph.master;
+  ambient = graph.ambient;
+  wetBus = graph.wetBus;
+  reverb = graph.reverb;
+  echo = graph.echo;
+  noiseBuffer = graph.noise;
+  bus = graph.master;
+  counting = false;
+  levelScale = 1;
+  try {
+    CUES[name](options);
+  } finally {
+    ({ ctx, master, ambient, wetBus, reverb, echo, noiseBuffer, bus, counting, levelScale } = saved);
+  }
+  return offline.startRendering();
+}
+
+// What to pre-render, most-used first: [cue, options, seconds, channels].
+// Cues that sweep across the stereo field are stereo; the rest are mono
+// (hover gets its left/right position from a panner at play time).
+function bakeJobs(touch) {
+  const jobs = [
+    ['click', {}, 0.8, 1],
+    ['page', {}, 1.5, 2],
+    ['menuOpen', {}, 1.1, 2],
+    ['menuClose', {}, 0.8, 2],
+    ['toggle', {}, 0.3, 1],
+    ['open', {}, 0.8, 1],
+    ['close', {}, 0.6, 1],
+    ['jump', {}, 0.9, 2],
+    ['back', {}, 0.4, 1],
+  ];
+  for (const index of [1, 2, 3, 4, 0]) {
+    jobs.push(['section', { index, dir: 1 }, 1.2, 2], ['section', { index, dir: -1 }, 1.2, 2]);
+  }
+  jobs.push(['on', {}, 1.3, 1], ['off', {}, 1.0, 1]);
+  // a touch screen has no hover: don't spend memory on those
+  if (!touch) {
+    for (const tone of ['neutral', 'blue', 'red']) {
+      for (let idx = 0; idx < 8; idx++) jobs.push(['hover', { tone, idx }, 0.8, 1]);
+    }
+    jobs.push(['scan', { tone: 'blue' }, 0.7, 1], ['scan', { tone: 'red' }, 0.7, 1]);
+  }
+  return jobs;
+}
+
+const pause = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+let warming = false;
+
+// Renders the cues in the background, one at a time. Starts once the opening
+// sequence is over, so it never competes with it.
+export function warmUpSound() {
+  if (warming || state !== 'on' || typeof OfflineAudioContext === 'undefined') return;
+  warming = true;
+  (async () => {
+    const touch = window.matchMedia('(pointer: coarse)').matches;
+    const root = document.documentElement;
+    while (root.classList.contains('intro-playing') || root.classList.contains('intro-reveal')) {
+      await pause(400);
+    }
+    await pause(900);
+    for (const [name, options, seconds, channels] of bakeJobs(touch)) {
+      if (state !== 'on') break;
+      const key = bakeKey(name, options);
+      if (baked.has(key)) continue;
+      // a short, fixed breather between renders. (requestIdleCallback would
+      // wait for the animated page to go quiet, which it rarely does; each
+      // job costs the main thread only a few ms, the rendering is off-thread.)
+      await pause(25);
+      try {
+        baked.set(key, await renderCue(name, options, seconds, channels));
+      } catch {
+        // a cue that fails to render just keeps playing live
+      }
+    }
+  })().finally(() => {
+    warming = false;
+  });
+}
+
+// Play a pre-rendered cue: one buffer source (plus a gain and a panner only
+// when this play needs them). Returns false if it isn't rendered yet.
+function playBaked(name, options, level, kind) {
+  const buffer = baked.get(bakeKey(name, options));
+  if (!buffer || !bakedOut) return false;
+  try {
+    const source = ctx.createBufferSource();
+    source.buffer = buffer;
+    // a hair of pitch variation, so the same note never sounds machine-identical
+    if (name === 'hover') source.playbackRate.value = 1 + (Math.random() - 0.5) * 0.05;
+    let tail = source;
+    if (level !== 1) {
+      const gain = ctx.createGain();
+      gain.gain.value = level;
+      tail.connect(gain);
+      tail = gain;
+    }
+    if (options.pan && buffer.numberOfChannels === 1 && ctx.createStereoPanner) {
+      const panner = ctx.createStereoPanner();
+      panner.pan.value = options.pan;
+      tail.connect(panner);
+      tail = panner;
+    }
+    tail.connect(kind === 'ambient' ? bakedAmbient : bakedOut);
+    source.start();
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+// Walks the pentatonic pool up and down as the pointer sweeps across items
+// (it restarts after a pause), and softens each hover in a quick streak so a
+// long sweep doesn't pile up.
+let hoverStreak = 0;
+function nextHover(tone, at) {
+  hoverStep = at - hoverAt > 1100 ? 0 : hoverStep + 1;
+  hoverStreak = at - hoverAt > 1400 ? 0 : hoverStreak + 1;
+  hoverAt = at;
+  const pool = POOLS[tone] ?? POOLS.neutral;
+  const cycle = pool.length * 2 - 2;
+  const k = hoverStep % cycle;
+  return { idx: k < pool.length ? k : cycle - k, level: Math.max(0.4, 1 - hoverStreak * 0.2) };
 }
 
 export function playSound(name, options = {}) {
@@ -760,13 +986,27 @@ export function playSound(name, options = {}) {
       if (kind !== 'event') lastFeedbackAt = at;
       duck(hold);
     }
+
+    let cueOptions = options;
+    let level = 1;
+    if (name === 'hover') {
+      const pick = nextHover(options.tone, at);
+      cueOptions = { ...options, idx: pick.idx };
+      level = pick.level;
+    }
+
+    if (playBaked(name, cueOptions, level, kind)) return;
+
+    // not rendered yet: synthesise it live
     bus = kind === 'ambient' ? ambient : master;
+    levelScale = level;
     try {
-      cue(options);
+      cue(cueOptions);
     } catch {
       // audio is decoration: never let it break an interaction
     }
     bus = master;
+    levelScale = 1;
   };
 
   if (context.state === 'running') {
@@ -793,8 +1033,12 @@ export function setSoundEnabled(on, { announce = true } = {}) {
   if (on) {
     state = 'on';
     persist('on');
-    ensureContext();
+    // During the opening sequence (announce: false) the audio graph isn't
+    // built yet: the intro has its own sound and the site's engine is created
+    // on the first gesture after it, so nothing extra is set up at that moment.
+    if (announce) ensureContext();
     emit();
+    warmUpSound();
     if (announce) playSound('on');
   } else {
     if (announce) playSound('off');

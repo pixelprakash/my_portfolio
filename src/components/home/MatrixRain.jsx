@@ -3,8 +3,21 @@ import { useEffect, useRef } from 'react';
 const CHARS = '01アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン';
 const FONT_SIZE = 14;
 
-export default function MatrixRain({ color = '#00ff00', opacity = 0.4, speed = 1 }) {
+// The rain is drawn at 30 fps (24 on phones): it's a soft background, the eye
+// can't tell, and a full-screen canvas redrawn at 60 fps is a heavy ask of a
+// phone. Speed and trail length are scaled by elapsed time, so it looks the same.
+const REFERENCE_FRAME_MS = 1000 / 60;
+
+export default function MatrixRain({ color = '#00ff00', opacity = 0.4, speed = 1, paused = false }) {
   const canvasRef = useRef(null);
+  const pausedRef = useRef(paused);
+  const syncRef = useRef(null);
+
+  // `paused` is read live, so toggling it never rebuilds the canvas.
+  useEffect(() => {
+    pausedRef.current = paused;
+    syncRef.current?.();
+  }, [paused]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -13,10 +26,19 @@ export default function MatrixRain({ color = '#00ff00', opacity = 0.4, speed = 1
     const ctx = canvas.getContext('2d');
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+    const frameGap = window.matchMedia('(pointer: coarse), (max-width: 768px)').matches
+      ? 1000 / 24
+      : 1000 / 30;
+    // While the opening sequence is up, the page behind it isn't visible, so
+    // its canvases wait (the loader's own canvases live outside #main).
+    const behindIntro = () =>
+      document.documentElement.classList.contains('intro-playing') && Boolean(canvas.closest('#main'));
+
     let drops = [];
     let frameId = 0;
     let running = false;
     let onScreen = true;
+    let lastFrame = 0;
 
     const randomChar = () => CHARS.charAt(Math.floor(Math.random() * CHARS.length));
 
@@ -44,8 +66,16 @@ export default function MatrixRain({ color = '#00ff00', opacity = 0.4, speed = 1
       if (prefersReducedMotion) drawStatic();
     }
 
-    function step() {
-      ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+    function step(now) {
+      if (running) frameId = requestAnimationFrame(step);
+
+      const elapsed = now - lastFrame;
+      if (elapsed < frameGap) return;
+      lastFrame = now;
+      const frames = Math.min(elapsed, 100) / REFERENCE_FRAME_MS;
+
+      // the trail fades 5% per 60 fps frame; scale that to the real gap
+      ctx.fillStyle = `rgba(0, 0, 0, ${1 - Math.pow(0.95, frames)})`;
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       ctx.fillStyle = color;
@@ -61,19 +91,19 @@ export default function MatrixRain({ color = '#00ff00', opacity = 0.4, speed = 1
           drops[i] = 0;
         }
 
-        drops[i] += speed * 0.5;
+        drops[i] += speed * 0.5 * frames;
       }
-
-      if (running) frameId = requestAnimationFrame(step);
     }
 
     // Only animate while the hero is actually visible and the tab is in
     // front — it's a full-viewport canvas, so running it in the background
     // is a steady drain on CPU and battery for no visual gain.
     function sync() {
-      const shouldRun = !prefersReducedMotion && onScreen && !document.hidden;
+      const shouldRun =
+        !prefersReducedMotion && onScreen && !document.hidden && !pausedRef.current && !behindIntro();
       if (shouldRun && !running) {
         running = true;
+        lastFrame = 0;
         frameId = requestAnimationFrame(step);
       } else if (!shouldRun && running) {
         running = false;
@@ -93,6 +123,12 @@ export default function MatrixRain({ color = '#00ff00', opacity = 0.4, speed = 1
     intersectionObserver.observe(canvas);
 
     document.addEventListener('visibilitychange', sync);
+
+    // start / stop as the opening sequence goes up and comes down
+    const classObserver = new MutationObserver(sync);
+    classObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+
+    syncRef.current = sync;
     sync();
 
     return () => {
@@ -100,6 +136,8 @@ export default function MatrixRain({ color = '#00ff00', opacity = 0.4, speed = 1
       cancelAnimationFrame(frameId);
       resizeObserver.disconnect();
       intersectionObserver.disconnect();
+      classObserver.disconnect();
+      syncRef.current = null;
       document.removeEventListener('visibilitychange', sync);
     };
   }, [color, speed]);

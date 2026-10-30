@@ -20,6 +20,9 @@
   width: 50%;
   overflow: hidden;
   will-change: transform;
+  /* the panel is its own island: nothing inside it can force the page to
+     re-layout or repaint while it slides */
+  contain: layout paint;
   transition: transform 1100ms var(--expo) 250ms;
 }
 

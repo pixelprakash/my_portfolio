@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useId, useLayoutEffect, useRef, useState } from 'react';
 import MatrixRain from '../home/MatrixRain';
 import { useScramble } from '../../hooks/useScramble';
-import { createIntroSound } from '../../audio/introSound';
+import { bakeIntroAssets, createBakedIntro, createIntroSound } from '../../audio/introSound';
 import { setSoundEnabled } from '../../audio/uiSound';
 import styles from './Loader.module.css';
 
@@ -25,6 +25,13 @@ const LOG = [
 const LOG_AT = [6, 34, 62, 90];
 
 const ease = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+
+// Phones and tablets: weaker GPUs and a much smaller frame budget. The effects
+// that cost real paint time every frame (blurred glows, a style change per
+// frame) are skipped there; the animation reads the same.
+const isLowPower = () =>
+  typeof window !== 'undefined' &&
+  window.matchMedia('(pointer: coarse), (max-width: 768px)').matches;
 
 const canPlaySound = () =>
   typeof window !== 'undefined' && Boolean(window.AudioContext || window.webkitAudioContext);
@@ -67,18 +74,32 @@ function Capsule() {
 // The progress bar as an oscilloscope: a track that fills outward from the
 // centre (blue left, red right) with the live waveform riding on it. With
 // sound on it draws the real signal; in quiet mode it draws a synthetic one.
-function ScopeBar({ analyserRef, progressRef }) {
+function ScopeBar({ analyserRef, progressRef, frozen }) {
   const canvasRef = useRef(null);
+  const frozenRef = useRef(false);
+
+  useEffect(() => {
+    frozenRef.current = frozen;
+  }, [frozen]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
     const g = canvas.getContext('2d');
+    const lowPower = isLowPower();
+    const frameGap = lowPower ? 1000 / 24 : 1000 / 30;
     const t0 = performance.now();
     let samples = null;
     let frame = 0;
+    let lastDraw = 0;
 
     function draw(now) {
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      frame = requestAnimationFrame(draw);
+      // the bar collapses away on exit, so there is nothing left to redraw;
+      // and 24-30 fps is plenty for a waveform
+      if (frozenRef.current || now - lastDraw < frameGap) return;
+      lastDraw = now;
+
+      const dpr = Math.min(window.devicePixelRatio || 1, lowPower ? 1.5 : 2);
       const w = canvas.clientWidth;
       const h = canvas.clientHeight;
       if (canvas.width !== Math.round(w * dpr) || canvas.height !== Math.round(h * dpr)) {
@@ -95,12 +116,24 @@ function ScopeBar({ analyserRef, progressRef }) {
       // track + the filled stretch, growing from the centre outward
       g.fillStyle = 'rgba(255,255,255,0.14)';
       g.fillRect(0, mid - 1, w, 2);
-      g.shadowBlur = 12;
+      // blurred glow is the costly part of canvas drawing: on phones the same
+      // line is simply drawn wider and fainter underneath instead
+      if (!lowPower) g.shadowBlur = 12;
       g.shadowColor = '#00d4ff';
       g.fillStyle = '#00d4ff';
+      if (lowPower) {
+        g.globalAlpha = 0.25;
+        g.fillRect(half - half * progress, mid - 4, half * progress, 8);
+        g.globalAlpha = 1;
+      }
       g.fillRect(half - half * progress, mid - 1.5, half * progress, 3);
       g.shadowColor = '#ff3b0e';
       g.fillStyle = '#ff3b0e';
+      if (lowPower) {
+        g.globalAlpha = 0.25;
+        g.fillRect(half, mid - 4, half * progress, 8);
+        g.globalAlpha = 1;
+      }
       g.fillRect(half, mid - 1.5, half * progress, 3);
       g.shadowBlur = 0;
 
@@ -135,8 +168,6 @@ function ScopeBar({ analyserRef, progressRef }) {
       }
       g.stroke();
       g.globalAlpha = 1;
-
-      frame = requestAnimationFrame(draw);
     }
     frame = requestAnimationFrame(draw);
     return () => cancelAnimationFrame(frame);
@@ -149,6 +180,7 @@ function ScopeBar({ analyserRef, progressRef }) {
 // a full viewport wide and centred on the seam, so the halves clip it down the
 // middle): at rest it looks whole, and when the doors part it splits with them.
 function SplitLayer({ side, stage, names, role, analyserRef, progressRef }) {
+  const frozen = stage === 'exit';
   const roleTone = (i) => (i < 8 ? styles.blueText : i > 10 ? styles.redText : '');
   const showTitle = stage !== 'gate';
 
@@ -173,7 +205,7 @@ function SplitLayer({ side, stage, names, role, analyserRef, progressRef }) {
             <Cells text={role} tone={roleTone} />
           </p>
           <div className={styles.progress}>
-            <ScopeBar analyserRef={analyserRef} progressRef={progressRef} />
+            <ScopeBar analyserRef={analyserRef} progressRef={progressRef} frozen={frozen} />
             <div className={styles.barLabels}>
               <span className={styles.blueText}>Design</span>
               <span className={styles.redText}>Develop</span>
@@ -195,6 +227,7 @@ export default function Loader({ onDone }) {
   const soundButton = useRef(null);
   const skipButton = useRef(null);
   const soundRef = useRef(null);
+  const assetsRef = useRef(null); // pre-rendered audio, once ready
   const analyserRef = useRef(null);
   const progressRef = useRef(0);
   const bluppedRef = useRef(0);
@@ -261,7 +294,9 @@ export default function Loader({ onDone }) {
         const AudioContextClass = window.AudioContext || window.webkitAudioContext;
         const context = new AudioContextClass();
         context.resume?.();
-        const sound = createIntroSound(context);
+        // pre-rendered if it finished while the visitor was choosing, else live
+        const assets = assetsRef.current;
+        const sound = assets ? createBakedIntro(context, assets) : createIntroSound(context);
         sound.start();
         soundRef.current = sound;
         analyserRef.current = sound.analyser;
@@ -281,6 +316,14 @@ export default function Loader({ onDone }) {
     const html = document.documentElement;
     html.classList.add('intro-playing');
     return () => html.classList.remove('intro-playing', 'intro-reveal');
+  }, []);
+
+  // While the visitor reads the pill choice, render the sound into buffers.
+  useEffect(() => {
+    if (!canPlaySound()) return;
+    bakeIntroAssets().then((assets) => {
+      assetsRef.current = assets;
+    });
   }, []);
 
   // Lock scroll, and let Escape skip from any stage.
@@ -340,7 +383,9 @@ export default function Loader({ onDone }) {
   // seam, pill and title follow. Real analysis with sound on, a faint
   // synthetic heartbeat in quiet mode. Runs through the exit so the boom lands.
   useEffect(() => {
-    if (stage === 'gate') return undefined;
+    // On phones this loop (a style change on the whole loader every frame,
+    // driving blurred shadows) is a real cost, so it only runs on desktop.
+    if (stage === 'gate' || isLowPower()) return undefined;
 
     let frame = 0;
     let pulse = 0;
@@ -396,7 +441,7 @@ export default function Loader({ onDone }) {
           centre stack is split across both), so on exit it all goes with the
           doors. */}
       <div className={`${styles.panel} ${styles.panelBlue}`} aria-hidden="true">
-        <MatrixRain color="#00d4ff" opacity={0.3} speed={1.1} />
+        <MatrixRain color="#00d4ff" opacity={0.3} speed={1.1} paused={exiting} />
         <span className={styles.scanlines} />
         <SplitLayer side="left" {...splitProps} />
 
@@ -425,7 +470,7 @@ export default function Loader({ onDone }) {
       </div>
 
       <div className={`${styles.panel} ${styles.panelRed}`} aria-hidden="true">
-        <MatrixRain color="#ff0033" opacity={0.3} speed={1.1} />
+        <MatrixRain color="#ff0033" opacity={0.3} speed={1.1} paused={exiting} />
         <span className={styles.scanlines} />
         <SplitLayer side="right" {...splitProps} />
 

@@ -244,6 +244,13 @@ export function createIntroSound(ctx) {
   const ARP_NOTES = [57, 60, 64, 69, 72, 69, 64, 60, 55, 59, 62, 67, 71, 67, 62, 59]; // Am | G
 
   // ── Public API ──
+  // Opens the master gain without starting the bed. Only used when a single
+  // piece (a blip, the exit) is rendered offline on its own for pre-rendered
+  // playback; start() normally does this.
+  function arm() {
+    out.gain.value = 0.85;
+  }
+
   function start(delay = 0) {
     const t0 = ctx.currentTime + delay + 0.03;
 
@@ -437,6 +444,117 @@ export function createIntroSound(ctx) {
   }
 
   // Safe to call on unmount: leaves a running exit() tail alone.
+  function release() {
+    if (!state.exited) stop();
+  }
+
+  return { analyser, start, blip, exit, release, stop, arm };
+}
+
+// ── Pre-rendered playback ──
+// Live, the score is ~165 audio nodes plus a convolution reverb, compressors
+// and an echo, all running on the audio thread; at the moment the doors open
+// (68 more nodes) a phone can stutter. So the pieces are rendered once into
+// buffers while the visitor is still choosing a pill (an offline context needs
+// no user gesture and renders off the main thread), then played back as plain
+// buffer sources: one node per piece, no synthesis, no reverb to compute.
+// If a visitor is quicker than the render, createIntroSound() still plays it live.
+const BAKE_RATE = 44100;
+let bakePromise = null;
+
+export function bakeIntroAssets() {
+  if (bakePromise) return bakePromise;
+  bakePromise = (async () => {
+    if (typeof OfflineAudioContext === 'undefined') return null;
+
+    const render = (seconds, build) => {
+      const offline = new OfflineAudioContext(2, Math.ceil(BAKE_RATE * seconds), BAKE_RATE);
+      build(createIntroSound(offline));
+      return offline.startRendering();
+    };
+
+    const bed = await render(2.6, (sound) => sound.start(0));
+    const blips = [];
+    for (let i = 0; i < 4; i++) {
+      blips.push(
+        await render(1.7, (sound) => {
+          sound.arm();
+          sound.blip(i, 0);
+        })
+      );
+    }
+    const exit = await render(EXIT_TAIL + 0.4, (sound) => {
+      sound.arm();
+      sound.exit(0);
+    });
+    return { bed, blips, exit };
+  })().catch(() => null);
+  return bakePromise;
+}
+
+// The same interface as createIntroSound(), over the pre-rendered buffers.
+export function createBakedIntro(ctx, assets) {
+  const state = { exited: false, stopped: false };
+
+  const out = ctx.createGain();
+  // each piece was already compressed when rendered; this only catches the
+  // rare moment when two of them add up
+  const limiter = ctx.createDynamicsCompressor();
+  limiter.threshold.value = -3;
+  limiter.knee.value = 0;
+  limiter.ratio.value = 12;
+  limiter.attack.value = 0.002;
+  limiter.release.value = 0.1;
+  const analyser = ctx.createAnalyser();
+  analyser.fftSize = 256;
+  analyser.smoothingTimeConstant = 0.78;
+  out.connect(limiter);
+  limiter.connect(analyser);
+  analyser.connect(ctx.destination);
+
+  const bed = ctx.createGain();
+  bed.connect(out);
+
+  const play = (buffer, destination, delay = 0) => {
+    const source = ctx.createBufferSource();
+    source.buffer = buffer;
+    source.connect(destination);
+    source.start(ctx.currentTime + delay);
+  };
+
+  const close = () => {
+    if (typeof ctx.close === 'function') ctx.close().catch(() => {});
+  };
+
+  function start(delay = 0) {
+    play(assets.bed, bed, delay);
+  }
+
+  function blip(index, delay = 0) {
+    play(assets.blips[Math.min(index, assets.blips.length - 1)], out, delay);
+  }
+
+  function exit(delay = 0) {
+    if (state.exited || state.stopped) return;
+    state.exited = true;
+    const e = ctx.currentTime + delay + 0.02;
+    // the build cuts out, then the exit piece lands
+    bed.gain.cancelScheduledValues(e);
+    bed.gain.setValueAtTime(1, e);
+    bed.gain.linearRampToValueAtTime(0, e + 0.09);
+    play(assets.exit, out, delay + 0.02);
+    setTimeout(close, (delay + EXIT_TAIL) * 1000);
+  }
+
+  function stop() {
+    if (state.stopped) return;
+    state.stopped = true;
+    const now = ctx.currentTime;
+    out.gain.cancelScheduledValues(now);
+    out.gain.setTargetAtTime(0.0001, now, 0.03);
+    setTimeout(close, 250);
+  }
+
   function release() {
     if (!state.exited) stop();
   }

@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
-import { isSoundEnabled, playSound, unlockSound } from '../../audio/uiSound';
+import { playSound, unlockSound } from '../../audio/uiSound';
 import { useScrollSpy } from '../../hooks/useScrollSpy';
 import { NAV_HEIGHT } from '../../constants';
 
@@ -19,15 +19,14 @@ const INTERACTIVE =
   'a[href], button:not([disabled]), [role="button"], summary, [data-sound-hover]';
 const HOME_SECTIONS = ['work', 'about', 'testimonials', 'contact'];
 const NO_SECTIONS = [];
-const DETENT_PX = 520;
 // A hover only counts once the pointer has rested on something this long, so
 // flying across the page doesn't ping every item on the way.
-const HOVER_DWELL = 70;
+const HOVER_DWELL = 45;
 // Content slides under a stationary pointer while scrolling: that isn't a hover.
 const SCROLL_QUIET = 320;
 // A section scan waits for the reader to stop in a section, so scrolling
 // through several in a row announces only where they end up.
-const SECTION_SETTLE = 280;
+const SECTION_SETTLE = 180;
 const SECTION_ARM = 1500;
 
 function interactiveOf(target) {
@@ -120,7 +119,9 @@ export default function SoundFX() {
       unlockSound();
     }
 
-    function onKeyDown() {
+    // iOS Safari only treats touchend and click as unlocking audio (not
+    // pointerdown), so all of them wake the engine; it's idempotent.
+    function onUnlock() {
       unlockSound();
     }
 
@@ -129,7 +130,9 @@ export default function SoundFX() {
     document.addEventListener('click', onClick, true);
     document.addEventListener('close', onDialogClose, true);
     document.addEventListener('pointerdown', onPointerDown, true);
-    document.addEventListener('keydown', onKeyDown, true);
+    document.addEventListener('keydown', onUnlock, true);
+    document.addEventListener('touchend', onUnlock, true);
+    document.addEventListener('click', onUnlock, true);
     return () => {
       cancelHover();
       document.removeEventListener('pointerover', onPointerOver);
@@ -137,7 +140,9 @@ export default function SoundFX() {
       document.removeEventListener('click', onClick, true);
       document.removeEventListener('close', onDialogClose, true);
       document.removeEventListener('pointerdown', onPointerDown, true);
-      document.removeEventListener('keydown', onKeyDown, true);
+      document.removeEventListener('keydown', onUnlock, true);
+      document.removeEventListener('touchend', onUnlock, true);
+      document.removeEventListener('click', onUnlock, true);
     };
   }, []);
 
@@ -185,19 +190,12 @@ export default function SoundFX() {
     return () => clearTimeout(state.timer);
   }, [activeSection]);
 
-  // A detent every so often while scrolling; also notes that the page is
-  // moving, so the pointer "hovering" things as they slide past stays quiet.
+  // Note that the page is moving, so the pointer "hovering" things as they
+  // slide past stays quiet. (There are no scroll ticks: they were the part of
+  // the soundscape that wore on people most.)
   useEffect(() => {
-    let lastY = window.scrollY;
-
     function onScroll() {
       lastScrollAt.current = performance.now();
-      const y = window.scrollY;
-      if (Math.abs(y - lastY) < DETENT_PX) return;
-      lastY = y;
-      if (!isSoundEnabled()) return;
-      const max = document.documentElement.scrollHeight - window.innerHeight;
-      playSound('detent', { progress: max > 0 ? Math.min(1, y / max) : 0 });
     }
 
     window.addEventListener('scroll', onScroll, { passive: true });

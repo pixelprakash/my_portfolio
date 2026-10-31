@@ -1,6 +1,6 @@
 // Site-wide interface sound: a tiny procedural synth that gives every
 // interaction a short, quiet "machine" cue (hover ticks, confirm blips,
-// page sweeps, section scans...). Nothing is a sample; everything is built
+// page sweeps...). Nothing is a sample; everything is built
 // from oscillators and filtered noise so it adds no bytes to the page.
 //
 // It is strictly opt-in. The opening screen's "red pill" turns it on; the
@@ -607,13 +607,6 @@ const CUES = {
     [69, 76, 81].forEach((note, i) => ping({ f: midi(note), t: 0.2 + i * 0.09, dur: 0.65, peak: 0.028 }));
   },
 
-  // an in-page jump: a brief servo glide and a soft ping. (The section scan
-  // lands separately when the scroll arrives, so this stays small.)
-  jump() {
-    servo({ f0: 500, f1: 2600, pitch: 90, dur: 0.16, peak: 0.024, pan: -0.3 });
-    ping({ f: midi(88), t: 0.1, dur: 0.35, peak: 0.028, pan: 0.2 });
-  },
-
   // the hamburger menu: a data burst up / down, landing on a ping
   menuOpen() {
     flutter({ count: 8, dir: 1, peak: 0.02 });
@@ -643,59 +636,6 @@ const CUES = {
   close() {
     tone({ f0: 880, f1: 110, dur: 0.28, peak: 0.06, attack: 0.01, wet: 0.3 });
     hiss({ f0: 3600, f1: 300, dur: 0.26, peak: 0.034, attack: 0.02 });
-  },
-
-  // The AI settles on a new section. A short burst of data blips sweeps the
-  // stereo field (left to right as you scroll down, back as you scroll up),
-  // then a sonar ping lands with two soft robotic tones. Each section has its
-  // own key. Kept short and light on purpose: it plays every time you move
-  // into a new section, so it must never wear on you. `index` is the section
-  // (0 = top of the page), `dir` is +1 / -1.
-  section({ index = 0, dir = 1 }) {
-    const chords = [
-      [64, 71, 76], // top of the page
-      [69, 76, 81], // work
-      [72, 79, 84], // about
-      [74, 81, 86], // testimonials
-      [76, 83, 88], // contact
-    ];
-    const chord = chords[index] ?? chords[1];
-    const down = dir >= 0;
-    const lock = 0.2;
-
-    hiss({
-      f0: down ? 400 : 4200,
-      f1: down ? 4200 : 400,
-      q: 1.4,
-      dur: 0.22,
-      peak: 0.024,
-      attack: 0.08,
-      pan: down ? -0.5 : 0.5,
-      panEnd: down ? 0.5 : -0.5,
-      wet: 0.2,
-    });
-
-    flutter({
-      count: 5,
-      step: 0.032,
-      dir,
-      peak: 0.012,
-      from: down ? -0.5 : 0.5,
-      to: down ? 0.5 : -0.5,
-    });
-
-    ping({ f: midi(chord[2]), t: lock, dur: 0.8, peak: 0.026 });
-    ring({ f: midi(chord[0] + 12), ratio: 1.5, t: lock, dur: 0.09, peak: 0.018, glide: 0.04, wet: 0.3 });
-    ring({
-      f: midi(chord[1] + 12),
-      ratio: 1.5,
-      t: lock + 0.1,
-      dur: 0.12,
-      peak: 0.018,
-      glide: 0.04,
-      wet: 0.4,
-      echoSend: 0.3,
-    });
   },
 
   // going back
@@ -751,40 +691,35 @@ const CUES = {
 
 // ── The director ──
 // Several cues firing at once is what makes interface sound annoying, so
-// nothing plays without the director's say-so. Cues come in four kinds:
-//   ambient     hover, scroll ticks, read-out scans: the quiet texture. Dropped
+// nothing plays without the director's say-so. Cues come in three kinds:
+//   ambient     hover and the hero read-out scans: the quiet texture. Dropped
 //               whenever something bigger is sounding, and ducked if already on.
 //   feedback    a direct answer to the visitor's action (click, menu, lightbox,
 //               toggles). Always plays, and quiets the ambient layer.
 //   transition  a new page. Same as feedback, but longer.
-//   event       the section scan, which fires on its own as you scroll. It
-//               yields to a feedback cue that has only just played.
-const KIND = { hover: 'ambient', scan: 'ambient', section: 'event', page: 'transition' };
+// Nothing sounds on its own as the page scrolls.
+const KIND = { hover: 'ambient', scan: 'ambient', page: 'transition' };
 
 // How long each cue keeps the ambient layer quiet after it starts (ms).
 const QUIET = {
   page: 1100,
-  section: 900,
   open: 600,
   close: 500,
   menuOpen: 500,
   menuClose: 400,
   click: 300,
   back: 300,
-  jump: 1100, // the smooth scroll that follows takes about this long
   toggle: 250,
   on: 800,
   off: 700,
 };
 
 // Minimum gap between two plays of the same cue, in ms.
-// (section is spaced well apart: it should mark a move to a new part of the page, not chatter)
-const MIN_GAP = { hover: 150, section: 2200, scan: 400, click: 60, page: 400 };
-const MAX_VOICES = 48; // a runaway guard only: one section scan alone uses ~20
+const MIN_GAP = { hover: 150, scan: 400, click: 60, page: 400 };
+const MAX_VOICES = 48; // a runaway guard only: the biggest cue uses ~20
 const HOVER_BURST = { window: 1600, max: 3 }; // at most 3 hover pings per 1.6s
 
 let quietUntil = 0;
-let lastFeedbackAt = -Infinity;
 let hoverTimes = [];
 
 // Pull the ambient layer down under a bigger cue, and bring it back after.
@@ -815,8 +750,6 @@ function bakeKey(name, o = {}) {
       return `hover:${o.tone ?? 'neutral'}:${o.idx ?? 0}`;
     case 'scan':
       return `scan:${o.tone ?? 'neutral'}`;
-    case 'section':
-      return `section:${o.index ?? 0}:${(o.dir ?? 1) >= 0 ? 1 : -1}`;
     default:
       return name;
   }
@@ -859,12 +792,8 @@ function bakeJobs(touch) {
     ['toggle', {}, 0.3, 1],
     ['open', {}, 0.8, 1],
     ['close', {}, 0.6, 1],
-    ['jump', {}, 0.9, 2],
     ['back', {}, 0.4, 1],
   ];
-  for (const index of [1, 2, 3, 4, 0]) {
-    jobs.push(['section', { index, dir: 1 }, 1.2, 2], ['section', { index, dir: -1 }, 1.2, 2]);
-  }
   jobs.push(['on', {}, 1.3, 1], ['off', {}, 1.0, 1]);
   // a touch screen has no hover: don't spend memory on those
   if (!touch) {
@@ -966,7 +895,6 @@ export function playSound(name, options = {}) {
 
   const kind = KIND[name] ?? 'feedback';
   if (kind === 'ambient' && now < quietUntil) return;
-  if (kind === 'event' && now - lastFeedbackAt < 500) return;
   if (name === 'hover') {
     hoverTimes = hoverTimes.filter((at) => now - at < HOVER_BURST.window);
     // sweeping across a row of items shouldn't machine-gun
@@ -983,7 +911,6 @@ export function playSound(name, options = {}) {
     if (kind !== 'ambient') {
       const hold = QUIET[name] ?? 300;
       quietUntil = Math.max(quietUntil, at + hold);
-      if (kind !== 'event') lastFeedbackAt = at;
       duck(hold);
     }
 

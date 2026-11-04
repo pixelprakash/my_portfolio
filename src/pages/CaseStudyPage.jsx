@@ -8,6 +8,94 @@ import { useDocumentHead } from '../hooks/useDocumentHead';
 import { NAV_HEIGHT } from '../constants';
 import styles from './CaseStudyPage.module.css';
 
+// A section's body is a list of blocks:
+//   { type: 'paragraph', text }
+//   { type: 'list', items: [string | { lead, text }] }   (lead is shown in bold)
+//   { type: 'table', caption, head: [...], rows: [[...]] }
+//   { type: 'figure', src, alt, caption, width, height, narrow? }
+//   { type: 'note', label?, text }                        (a caveat worth setting apart)
+function Block({ block }) {
+  switch (block.type) {
+    case 'list':
+      return (
+        <ul className={styles.bulletList}>
+          {block.items.map((item) => {
+            const lead = typeof item === 'string' ? null : item.lead;
+            const text = typeof item === 'string' ? item : item.text;
+            return (
+              <li key={lead ?? text}>
+                {lead && <strong className={styles.lead}>{lead} </strong>}
+                {text}
+              </li>
+            );
+          })}
+        </ul>
+      );
+
+    case 'table':
+      return (
+        <div className={styles.tableBlock}>
+          {block.caption && <p className={styles.tableCaption}>{block.caption}</p>}
+          <table className={styles.table}>
+            <thead>
+              <tr>
+                {block.head.map((heading) => (
+                  <th key={heading} scope="col">
+                    {heading}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {block.rows.map((row) => (
+                <tr key={row[0]}>
+                  {row.map((cell, i) =>
+                    i === 0 ? (
+                      <th key={block.head[i]} scope="row">
+                        {cell}
+                      </th>
+                    ) : (
+                      // data-label lets the stacked phone layout name each cell
+                      <td key={block.head[i]} data-label={block.head[i]}>
+                        {cell}
+                      </td>
+                    )
+                  )}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      );
+
+    case 'figure':
+      return (
+        <figure className={`${styles.figure} ${block.narrow ? styles.figureNarrow : ''}`}>
+          <img
+            src={block.src}
+            alt={block.alt}
+            width={block.width}
+            height={block.height}
+            loading="lazy"
+            decoding="async"
+          />
+          {block.caption && <figcaption className={styles.figcaption}>{block.caption}</figcaption>}
+        </figure>
+      );
+
+    case 'note':
+      return (
+        <p className={styles.note}>
+          {block.label && <strong className={styles.lead}>{block.label} </strong>}
+          {block.text}
+        </p>
+      );
+
+    default:
+      return <p className={styles.paragraph}>{block.text}</p>;
+  }
+}
+
 export default function CaseStudyPage() {
   const { slug } = useParams();
   const study = getCaseStudyBySlug(slug);
@@ -34,11 +122,11 @@ export default function CaseStudyPage() {
           <Breadcrumbs
             items={[
               { label: 'Home', href: '/' },
-              { label: 'Work', href: '/#work' },
+              { label: 'All projects', href: '/work' },
               { label: study.title },
             ]}
           />
-          <BackButton fallbackTo="/#work" label="Back to work" />
+          <BackButton fallbackTo="/work" label="Back to all projects" />
         </div>
 
         <header className={styles.header}>
@@ -62,6 +150,17 @@ export default function CaseStudyPage() {
               <dd className={styles.metaValue}>{study.tools.join(', ')}</dd>
             </div>
           </dl>
+
+          {study.facts && (
+            <dl className={styles.factList}>
+              {study.facts.map((fact) => (
+                <div key={fact.label}>
+                  <dt className={styles.metaLabel}>{fact.label}</dt>
+                  <dd className={styles.factValue}>{fact.value}</dd>
+                </div>
+              ))}
+            </dl>
+          )}
         </header>
 
         <div className={styles.layout}>
@@ -99,19 +198,9 @@ export default function CaseStudyPage() {
                 <h2 id={`${section.id}-heading`} className={styles.sectionHeading}>
                   {section.heading}
                 </h2>
-                {section.body.map((block, index) =>
-                  block.type === 'list' ? (
-                    <ul className={styles.bulletList} key={index}>
-                      {block.items.map((item) => (
-                        <li key={item}>{item}</li>
-                      ))}
-                    </ul>
-                  ) : (
-                    <p className={styles.paragraph} key={index}>
-                      {block.text}
-                    </p>
-                  )
-                )}
+                {section.body.map((block, index) => (
+                  <Block block={block} key={index} />
+                ))}
               </section>
             ))}
           </div>

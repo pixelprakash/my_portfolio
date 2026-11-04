@@ -19,6 +19,8 @@
 //   coverPosition — CSS object-position for the cover crop (default is
 //              the top of the image, which suits full-page screenshots).
 //   inProgress — shows the IN PROGRESS badge.
+//   caseStudy — slug of a case study in caseStudies.js: the card then opens that
+//              page on this site instead of an external link or a lightbox.
 //   role     — what you did on it ("Solo Designer & Developer"), shown on
 //              every card so work from different sources reads the same.
 //   year     — optional; shown after the role.
@@ -199,6 +201,20 @@ export const projects = [
     embedAspect: '4 / 3',
     role: 'Visual designer (freelance)',
     summary: 'A brochure for an online course, designed as freelance work.',
+  },
+  {
+    id: 'progressflow',
+    type: 'ux',
+    title: 'ProgressFlow: formative assessment for Indian art classrooms',
+    caseStudy: 'progressflow',
+    cover: '/work/progressflow.jpg',
+    coverPosition: 'center',
+    inProgress: true,
+    role: 'Product design, UX/UI and design engineering',
+    year: '2026',
+    summary:
+      'A phone app, teacher dashboard and student portal for assessing art in Classes 6 to 8, in English, Hindi and Telugu, offline-first. A grant-funded research prototype.',
+    tools: ['React Native', 'React', 'Express'],
   },
   {
     id: 'penny-wise-expense-tracker',

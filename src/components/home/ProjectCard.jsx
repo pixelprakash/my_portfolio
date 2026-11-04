@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { Link } from 'react-router-dom';
 import { disciplines, projectTypes } from '../../data/projects';
 import cardStyles from './CaseStudyCard.module.css';
 import styles from './ProjectShowcase.module.css';
@@ -189,6 +190,10 @@ export function ProjectCard({ project, onOpen, index, sizes = COVER_SIZES }) {
             >
               {project.title}
             </button>
+          ) : project.caseStudy ? (
+            <Link className={cardStyles.stretchedLink} to={`/work/${project.caseStudy}`}>
+              {project.title}
+            </Link>
           ) : (
             <a
               className={cardStyles.stretchedLink}

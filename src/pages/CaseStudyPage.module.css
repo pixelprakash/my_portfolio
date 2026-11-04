@@ -36,7 +36,9 @@
 }
 
 .title {
-  font-size: clamp(2rem, 5vw, 3.25rem);
+  /* the display face is very wide, so on a small phone the title has to be
+     allowed to go below 2rem or one long word pushes the page sideways */
+  font-size: clamp(1.6rem, 1rem + 3.2vw, 3.25rem);
   margin: var(--space-4) 0 var(--space-4);
 }
 
@@ -65,6 +67,7 @@
 }
 
 .metaValue {
+  margin: 0; /* drop the browser's default indent on <dd> */
   color: var(--color-text);
   font-weight: 600;
 }
@@ -156,6 +159,149 @@
   height: 6px;
   border-radius: 50%;
   background: var(--color-blue);
+}
+
+/* header: the extra facts under role / timeline / tools */
+.factList {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  gap: var(--space-5) var(--space-7);
+  margin-top: var(--space-5);
+}
+
+.factValue {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: 0.95rem;
+  line-height: 1.55;
+}
+
+/* "Constraint: what it forced"-style lead-in inside a list item or note */
+.lead {
+  color: var(--color-text);
+  font-weight: 600;
+}
+
+/* a caveat worth setting apart from the running text */
+.note {
+  margin: var(--space-4) 0;
+  padding: var(--space-4) var(--space-5);
+  border-left: 3px solid var(--color-red);
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  background: var(--color-surface);
+  color: var(--color-text-secondary);
+  font-size: 0.95rem;
+  line-height: 1.65;
+}
+
+/* screenshots: real artefacts, with sample data, captioned as such */
+.figure {
+  margin: var(--space-5) 0;
+}
+
+.figure img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-elevated);
+}
+
+.figureNarrow {
+  max-width: 300px;
+}
+
+.figcaption {
+  margin-top: var(--space-3);
+  color: var(--color-text-muted);
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
+/* tables: real <table>s on wide screens, stacked blocks on a phone */
+.tableBlock {
+  margin: var(--space-5) 0;
+}
+
+.tableCaption {
+  margin-bottom: var(--space-3);
+  color: var(--color-text-muted);
+  font-size: 0.85rem;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.92rem;
+  line-height: 1.55;
+}
+
+.table th,
+.table td {
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--color-border);
+  text-align: left;
+  vertical-align: top;
+  color: var(--color-text-secondary);
+}
+
+.table thead th {
+  color: var(--color-text-muted);
+  font-family: var(--font-display);
+  font-size: 0.65rem;
+  font-weight: 400;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+
+.table tbody th {
+  color: var(--color-text);
+  font-weight: 600;
+}
+
+@media (max-width: 640px) {
+  .table thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+  }
+
+  .table,
+  .table tbody,
+  .table tr,
+  .table th,
+  .table td {
+    display: block;
+    width: 100%;
+  }
+
+  .table tr {
+    margin-bottom: var(--space-4);
+    padding: var(--space-2) 0;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+  }
+
+  .table th,
+  .table td {
+    border-bottom: 0;
+    padding: var(--space-2) var(--space-4);
+  }
+
+  .table td::before {
+    content: attr(data-label);
+    display: block;
+    margin-bottom: 2px;
+    color: var(--color-text-faint);
+    font-family: var(--font-display);
+    font-size: 0.6rem;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+  }
 }
 
 @media (max-width: 900px) {

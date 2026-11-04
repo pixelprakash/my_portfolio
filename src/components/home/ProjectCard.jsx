@@ -1,6 +1,8 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { disciplines, projectTypes } from '../../data/projects';
+import { lockAgain, useUnlocked } from '../../lib/lock';
+import LockDialog, { LockIcon } from './LockDialog';
 import cardStyles from './CaseStudyCard.module.css';
 import styles from './ProjectShowcase.module.css';
 
@@ -102,7 +104,15 @@ export function EmbedDialog({ video, onClose }) {
   );
 }
 
-export function ProjectCard({ project, onOpen, index, sizes = COVER_SIZES }) {
+export function ProjectCard({ project: listed, onOpen, index, sizes = COVER_SIZES }) {
+  // NDA projects carry no link, screenshot or description in the page: those
+  // come from the encrypted file, once the visitor has the password.
+  const unlocked = useUnlocked(listed.lockId);
+  const isNda = Boolean(listed.lockId);
+  const locked = isNda && !unlocked;
+  const project = unlocked ? { ...listed, ...unlocked } : listed;
+  const [asking, setAsking] = useState(false);
+
   const type = projectTypes[project.type];
   const accent = ACCENT[disciplines[type.discipline].accent];
   // video + presentations open in a lightbox; websites link out
@@ -123,7 +133,7 @@ export function ProjectCard({ project, onOpen, index, sizes = COVER_SIZES }) {
               <i />
               <i />
             </span>
-            <span className={styles.host}>{hostOf(project.href)}</span>
+            <span className={styles.host}>{locked ? 'locked · under NDA' : hostOf(project.href)}</span>
           </div>
         )}
         <div className={styles.shot}>
@@ -134,10 +144,20 @@ export function ProjectCard({ project, onOpen, index, sizes = COVER_SIZES }) {
               ))}
               <span className={styles.mosaicCount}>{project.gallery.length} designs</span>
             </div>
+          ) : locked ? (
+            // no screenshot at all while locked: a placeholder, not a blurred copy
+            <div className={`${styles.slide} ${accent.slide} ${styles.lockedCover}`} aria-hidden="true">
+              <span className={styles.lockMark}>
+                <LockIcon size={34} />
+              </span>
+              <span className={styles.slideKicker}>Under NDA</span>
+              <span className={styles.slideTitle}>{project.title}</span>
+            </div>
           ) : project.cover ? (
             <img
               src={project.cover}
-              srcSet={coverSrcSet(project.cover)}
+              // the unlocked screenshot is an inline image, so no responsive set
+              srcSet={project.cover.startsWith('data:') ? undefined : coverSrcSet(project.cover)}
               sizes={sizes}
               alt=""
               loading="lazy"
@@ -175,13 +195,29 @@ export function ProjectCard({ project, onOpen, index, sizes = COVER_SIZES }) {
             )}
             {type.label}
           </span>
-          {project.inProgress && (
-            <span className={`${cardStyles.tag} ${accent.tag}`}>IN PROGRESS</span>
-          )}
+          <span className={styles.tags}>
+            {isNda && (
+              <span className={`${cardStyles.tag} ${accent.tag} ${styles.ndaTag}`}>
+                <LockIcon size={11} /> NDA
+              </span>
+            )}
+            {project.inProgress && (
+              <span className={`${cardStyles.tag} ${accent.tag}`}>IN PROGRESS</span>
+            )}
+          </span>
         </div>
 
         <h3 className={`${cardStyles.title} ${styles.title}`}>
-          {opensLightbox ? (
+          {locked ? (
+            <button
+              type="button"
+              className={`${cardStyles.stretchedLink} ${styles.titleButton}`}
+              data-sound="open"
+              onClick={() => setAsking(true)}
+            >
+              {project.title}
+            </button>
+          ) : opensLightbox ? (
             <button
               type="button"
               className={`${cardStyles.stretchedLink} ${styles.titleButton}`}
@@ -223,10 +259,25 @@ export function ProjectCard({ project, onOpen, index, sizes = COVER_SIZES }) {
           )}
         </div>
 
+        {unlocked && (
+          <button
+            type="button"
+            className={styles.relock}
+            data-sound="none"
+            onClick={() => lockAgain(listed.lockId)}
+          >
+            <LockIcon size={13} /> Lock again
+          </button>
+        )}
+
         <span className={`${cardStyles.link} ${accent.link}`} aria-hidden="true">
-          {project.cta ?? type.cta}
+          {locked ? 'Unlock with password' : (project.cta ?? type.cta)}
         </span>
       </div>
+
+      {isNda && (locked || asking) && (
+        <LockDialog project={listed} open={asking} onClose={() => setAsking(false)} />
+      )}
     </article>
   );
 }

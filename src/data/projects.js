@@ -19,6 +19,9 @@
 //   coverPosition — CSS object-position for the cover crop (default is
 //              the top of the image, which suits full-page screenshots).
 //   inProgress — shows the IN PROGRESS badge.
+//   lockId   — puts the project under an NDA lock. Leave out href, cover and any
+//              real description: they live encrypted in public/work/locked/<id>.enc
+//              (make it with `npm run lock -- <id>`, see scripts/lock-project.mjs).
 //   caseStudy — slug of a case study in caseStudies.js: the card then opens that
 //              page on this site instead of an external link or a lightbox.
 //   role     — what you did on it ("Solo Designer & Developer"), shown on
@@ -108,11 +111,13 @@ export const projects = [
     id: 'pedagogy-playcards',
     type: 'website',
     title: 'Pedagogy Playcards',
-    href: 'https://cards-omega-topaz.vercel.app/',
-    cover: '/work/cards.jpg',
+    // Under NDA: the real link, screenshot and description are NOT here. They are
+    // in public/work/locked/pedagogy-playcards.enc, encrypted, and the card shows
+    // them only after the password is entered (see src/lib/lock.js).
+    lockId: 'pedagogy-playcards',
     inProgress: true,
     role: 'Designer & Developer',
-    summary: 'An interactive web app for the Pedagogy Playcards.',
+    summary: 'Covered by a non-disclosure agreement. Unlock it with the password to see the work.',
   },
   {
     id: 'sricharan-reddy',

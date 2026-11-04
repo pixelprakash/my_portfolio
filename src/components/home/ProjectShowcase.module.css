@@ -444,6 +444,58 @@
     linear-gradient(135deg, #0a1a24, #1a0d0a);
 }
 
+/* ── NDA-locked projects ── */
+.tags {
+  display: inline-flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--space-2);
+}
+
+.ndaTag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+/* the placeholder that stands in for the screenshot while locked */
+.lockedCover {
+  position: relative;
+}
+
+.lockMark {
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  margin-bottom: auto;
+  border: 1px solid var(--color-border-strong);
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.35);
+  color: var(--color-text);
+}
+
+/* a small control above the card's stretched link */
+.relock {
+  position: relative;
+  z-index: 3;
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: var(--space-1) var(--space-3);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-pill);
+  color: var(--color-text-secondary);
+  font-size: 0.75rem;
+  transition: color var(--transition-fast), border-color var(--transition-fast);
+}
+
+.relock:hover {
+  color: var(--color-text);
+  border-color: var(--color-text);
+}
+
 /* the "view all" link under the featured grid */
 .allRow {
   display: flex;

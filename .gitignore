@@ -22,3 +22,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# NDA material: the real links and screenshots of locked projects. Local only.
+private/

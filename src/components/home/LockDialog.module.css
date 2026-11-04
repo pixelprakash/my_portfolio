@@ -1,0 +1,172 @@
+.dialog {
+  width: min(26rem, 92vw);
+  padding: 0;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-lg);
+  background: #090a0e;
+  color: var(--color-text);
+  overflow: hidden;
+  box-shadow: 0 40px 80px -30px rgba(0, 0, 0, 0.9), 0 0 60px rgba(0, 212, 255, 0.08);
+}
+
+.dialog::backdrop {
+  background: rgba(0, 0, 0, 0.82);
+  backdrop-filter: blur(4px);
+}
+
+/* the same blue-to-red hairline that opens every section */
+.dialog::before {
+  content: '';
+  display: block;
+  height: 2px;
+  background: linear-gradient(90deg, var(--color-blue), rgba(255, 255, 255, 0.2), var(--color-red));
+}
+
+.inner {
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-6);
+}
+
+.badge {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  margin-bottom: var(--space-4);
+  border: 1px solid var(--color-border-strong);
+  border-radius: 50%;
+  color: var(--color-text);
+  background: linear-gradient(135deg, rgba(0, 212, 255, 0.16), rgba(255, 59, 14, 0.16));
+}
+
+.title {
+  font-size: 1.35rem;
+}
+
+.text {
+  margin-top: var(--space-3);
+  color: var(--color-text-secondary);
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+.text strong {
+  color: var(--color-text);
+}
+
+.label {
+  margin-top: var(--space-5);
+  margin-bottom: var(--space-2);
+  font-family: var(--font-display);
+  font-size: 0.65rem;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.field {
+  display: flex;
+  align-items: stretch;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.field:focus-within {
+  border-color: var(--color-blue);
+  box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.18);
+}
+
+.input {
+  flex: 1;
+  min-width: 0;
+  height: 48px;
+  padding: 0 var(--space-4);
+  border: 0;
+  background: transparent;
+  color: var(--color-text);
+  font: inherit;
+  font-size: 1rem;
+}
+
+/* the field's own box draws the focus ring */
+.input:focus,
+.input:focus-visible {
+  outline: none;
+}
+
+.input[aria-invalid='true'] {
+  color: #ff8a70;
+}
+
+.reveal {
+  padding: 0 var(--space-4);
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  color: var(--color-text-secondary);
+  font-size: 0.8rem;
+}
+
+.reveal:hover {
+  color: var(--color-text);
+}
+
+/* reserves a line for the message so the dialog doesn't jump when it appears */
+.message {
+  min-height: 1.4em;
+  margin-top: var(--space-2);
+  color: #ff8a70;
+  font-size: 0.85rem;
+}
+
+.actions {
+  display: flex;
+  gap: var(--space-3);
+  margin-top: var(--space-4);
+}
+
+.primary,
+.secondary {
+  padding: var(--space-3) var(--space-6);
+  border-radius: var(--radius-pill);
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: transform var(--transition-fast), background var(--transition-fast),
+    border-color var(--transition-fast);
+}
+
+.primary {
+  background: var(--color-text);
+  color: var(--color-bg);
+}
+
+.primary:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.primary:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.secondary {
+  border: 1px solid var(--color-border-strong);
+  color: var(--color-text);
+}
+
+.secondary:hover {
+  border-color: var(--color-text);
+}
+
+.help {
+  margin-top: var(--space-5);
+  color: var(--color-text-muted);
+  font-size: 0.85rem;
+}
+
+.help a {
+  color: var(--color-blue);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}

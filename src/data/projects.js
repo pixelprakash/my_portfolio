@@ -213,7 +213,8 @@ export const projects = [
     title: 'ProgressFlow: formative assessment for Indian art classrooms',
     caseStudy: 'progressflow',
     cover: '/work/progressflow.jpg',
-    coverPosition: 'center',
+    // the wide lead card crops the sides of the cover; keep the phone fully in view
+    coverPosition: '30% center',
     inProgress: true,
     role: 'Product design, UX/UI and design engineering',
     year: '2026',
@@ -257,8 +258,10 @@ export const projects = [
 ];
 
 // The home page shows only these, in this order (the full list lives on the
-// all-projects page). Use ids from `projects` above.
+// all-projects page). Use ids from `projects` above. The first one is shown as
+// a wide lead card across the full width, the rest two across.
 export const featuredIds = [
+  'progressflow',
   '6th-mobile-studies-congress',
   'deepak-john-mathew',
   'pedagogy-playcards',

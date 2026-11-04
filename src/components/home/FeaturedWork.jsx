@@ -8,9 +8,12 @@ import styles from './ProjectShowcase.module.css';
 
 // Larger cards than the full list: two across on anything wider than a phone.
 const FEATURED_SIZES = '(min-width: 1280px) 600px, (min-width: 700px) 46vw, 92vw';
+// The lead card spans the full width, with its cover in the left 55%.
+const LEAD_SIZES = '(min-width: 900px) 55vw, 92vw';
 
-// The home page's work section: four projects, picked to be looked at first.
-// Everything else is one click away on the all-projects page.
+// The home page's work section: the projects picked to be looked at first, the
+// first one as a wide lead card. Everything else is one click away on the
+// all-projects page.
 export default function FeaturedWork() {
   const [playing, setPlaying] = useState(null);
 
@@ -19,14 +22,10 @@ export default function FeaturedWork() {
       <div className="section-container">
         <div className={styles.sectionTop}>
           <Reveal className={sectionStyles.header}>
-            <span className="kicker">Selected work</span>
-            <h2 id="work-heading" className={sectionStyles.heading}>
-              Four projects <span className="text-gradient">to start with</span>
+            {/* the section's heading is just its label: small, but a real <h2> */}
+            <h2 id="work-heading" className="kicker">
+              Selected work
             </h2>
-            <p className={sectionStyles.description}>
-              The ones I&apos;d show first. Everything else, from branding to film, is on the
-              all-projects page.
-            </p>
           </Reveal>
 
           <Link to="/work" className={styles.topLink}>
@@ -36,16 +35,26 @@ export default function FeaturedWork() {
         </div>
 
         <ul className={`${styles.grid} ${styles.gridFeatured}`}>
-          {featuredProjects.map((project, index) => (
-            <Reveal as="li" key={project.id} delay={(index % 2) * 110} className={styles.item}>
-              <ProjectCard
-                project={project}
-                index={index}
-                sizes={FEATURED_SIZES}
-                onOpen={setPlaying}
-              />
-            </Reveal>
-          ))}
+          {featuredProjects.map((project, index) => {
+            const lead = index === 0;
+            return (
+              <Reveal
+                as="li"
+                key={project.id}
+                // the cards after the lead pair up; stagger the right-hand one
+                delay={lead ? 0 : ((index - 1) % 2) * 110}
+                className={`${styles.item} ${lead ? styles.itemLead : ''}`}
+              >
+                <ProjectCard
+                  project={project}
+                  index={index}
+                  lead={lead}
+                  sizes={lead ? LEAD_SIZES : FEATURED_SIZES}
+                  onOpen={setPlaying}
+                />
+              </Reveal>
+            );
+          })}
         </ul>
 
         <div className={styles.allRow}>

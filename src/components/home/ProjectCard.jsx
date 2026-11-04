@@ -104,7 +104,7 @@ export function EmbedDialog({ video, onClose }) {
   );
 }
 
-export function ProjectCard({ project: listed, onOpen, index, sizes = COVER_SIZES }) {
+export function ProjectCard({ project: listed, onOpen, index, lead = false, sizes = COVER_SIZES }) {
   // NDA projects carry no link, screenshot or description in the page: those
   // come from the encrypted file, once the visitor has the password.
   const unlocked = useUnlocked(listed.lockId);
@@ -123,7 +123,7 @@ export function ProjectCard({ project: listed, onOpen, index, sizes = COVER_SIZE
   return (
     <article
       onPointerMove={trackPointer}
-      className={`${cardStyles.card} ${styles.card} ${accent.card}`}
+      className={`${cardStyles.card} ${styles.card} ${accent.card} ${lead ? styles.cardLead : ''}`}
     >
       <div className={`${styles.cover} ${opensLightbox ? styles.coverVideo : ''}`}>
         {type.frame === 'browser' && (

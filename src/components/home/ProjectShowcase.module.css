@@ -188,6 +188,53 @@
   }
 }
 
+/* The lead card spans the whole row. From 700px it is full width; from 900px
+   it also turns sideways: cover on the left, the text beside it. */
+@media (min-width: 700px) {
+  .itemLead {
+    grid-column: 1 / -1;
+  }
+
+  /* stacked but full width: a shorter crop of the cover keeps it from towering */
+  .cardLead .shot {
+    aspect-ratio: 2 / 1;
+  }
+}
+
+@media (min-width: 900px) {
+  .cardLead {
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+  }
+
+  .cardLead .cover {
+    display: flex;
+    flex-direction: column;
+    border-bottom: 0;
+    border-right: 1px solid var(--color-border);
+  }
+
+  /* the cover fills the column, however tall the text beside it runs */
+  .cardLead .shot {
+    flex: 1;
+    aspect-ratio: auto;
+    min-height: 100%;
+  }
+
+  .cardLead .body {
+    justify-content: center;
+    padding: var(--space-7);
+  }
+
+  .cardLead .title {
+    font-size: clamp(1.3rem, 1rem + 0.8vw, 1.75rem);
+  }
+
+  .cardLead .summary {
+    font-size: 1rem;
+  }
+}
+
 .item {
   display: flex;
 }

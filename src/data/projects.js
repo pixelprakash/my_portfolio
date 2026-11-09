@@ -216,10 +216,10 @@ export const projects = [
     // the wide lead card crops the sides of the cover; keep the phone fully in view
     coverPosition: '30% center',
     inProgress: true,
-    role: 'Product design, UX/UI and design engineering',
+    role: 'Product design (with Ganesh) and full-stack engineering',
     year: '2026',
     summary:
-      'A phone app, teacher dashboard and student portal for assessing art in Classes 6 to 8, in English, Hindi and Telugu, offline-first. A grant-funded research prototype.',
+      'A phone app, teacher dashboard and student portal for assessing art in Classes 6 to 8, in English, Hindi and Telugu, offline-first. Designed with a PhD researcher after interviewing 10 art educators; engineered end to end.',
     tools: ['React Native', 'React', 'Express'],
   },
   {

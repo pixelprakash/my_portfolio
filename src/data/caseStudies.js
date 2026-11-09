@@ -232,83 +232,214 @@ export const caseStudies = [
       },
     ],
   },
-  // Written from the ProgressFlow repository (~/progressflow, 3 – 4 Nov 2026), its docs, and the
-  // earlier PDF write-up, then brought up to date with the 4 Nov build: batch capture, an editable
-  // rubric and assessment types, progress views and reports, class import, and phone OTP.
-  // Figures are the real app and dashboard with sample data. Edit freely: the role, team and
-  // anything marked "not yet confirmed" are for you to check.
+  // ProgressFlow, in two parts: Design (what we learned, the idea, how it was shaped and tested)
+  // and Engineering (how it runs). Written from the repository (~/progressflow, through the
+  // 5 Nov 2026 "version 2" commits), its docs, the project's prototype and research figures, and the
+  // earlier PDF write-up. Figures are the real app, dashboard and prototype with sample data.
+  // Edit freely: the role split, the "reasoning" column of the version table and anything marked
+  // "not yet confirmed" are for you to check.
   {
     slug: 'progressflow',
     tag: 'Design + Dev',
     title: 'ProgressFlow: formative assessment for Indian art classrooms',
     summary:
-      'A phone app, teacher dashboard and student portal that help art teachers in Classes 6 to 8 assess drawings and paintings against a rubric, in English, Hindi and Telugu, with or without a signal. A grant-funded research prototype, designed and built end to end.',
-    role: 'Product design, UX/UI, front-end and design engineering',
-    timeline: '6-month grant (Aug – Dec 2026), written up to early Nov',
+      'A phone app, teacher dashboard and student portal that help art teachers assess drawings and paintings against a rubric, in English, Hindi and Telugu, with or without a signal. Designed with a PhD researcher after a workshop and interviews with 10 art educators, and engineered end to end.',
+    role: 'Product design (with Ganesh) and full-stack engineering',
+    timeline: '6-month research grant (Aug – Dec 2026), written up to early Nov',
     timelineShort: '6 months',
     tools: [
       'React Native (Expo)',
       'React (Vite)',
       'Express',
       'Prisma',
-      'PostgreSQL',
+      'PostgreSQL (Neon)',
       'TypeScript',
       'ML Kit',
       'Firebase Phone Auth',
     ],
     coverAlt:
-      "The ProgressFlow teacher dashboard showing a student's drawing with the teacher's markup beside the four-criterion rubric, next to the phone app's scan review screen",
+      'The ProgressFlow teacher dashboard showing a student’s drawing with the teacher’s markup beside the four-criterion rubric, next to the phone app’s scan review screen',
     accent: 'blue',
     facts: [
       {
         label: 'Surfaces',
-        value: 'Android app, teacher web dashboard, student web portal, public project page',
+        value: 'Android app, API server, teacher web dashboard, student web portal, public project page',
       },
       { label: 'Languages', value: 'English, Hindi, Telugu' },
       {
         label: 'Team',
         value:
-          'Project lead Ganesh Kumar Malthurkar (PhD scholar, Department of Design, IIT Hyderabad); mentor Prof. Deepak John Mathew',
+          'Project lead Ganesh Kumar Malthurkar (PhD scholar, Department of Design, IIT Hyderabad); mentor Prof. Deepak John Mathew. Designed together; engineered by me.',
       },
       {
         label: 'Status',
         value:
-          'Working Android prototype. Teacher and student flows run end to end; no classroom has used it yet. Pilot planned for late Nov and Dec 2026.',
+          'Working Android prototype and a deployed API. Teacher and student flows run end to end; no classroom has used it yet. Pilot planned for late Nov and Dec 2026.',
       },
     ],
+    parts: {
+      design: {
+        number: '01',
+        kicker: 'Part 1',
+        name: 'Design',
+        tagline: 'the why',
+        blurb:
+          'What we learned from educators, the idea we settled on, and how it was shaped, tested and improved.',
+        accent: 'blue',
+      },
+      engineering: {
+        number: '02',
+        kicker: 'Part 2',
+        name: 'Engineering',
+        tagline: 'the how',
+        blurb:
+          'How it runs: a phone that works offline, a server that keeps everything in sync, and the guarantees that keep a child’s work private.',
+        accent: 'red',
+      },
+    },
     sections: [
+      // ───────────────────────── Overview ─────────────────────────
       {
         id: 'overview',
+        group: 'Overview',
         label: 'Overview',
-        heading: 'What it is, and what is proven so far',
+        heading: 'Art is hard to assess fairly, and harder to assess fast',
         body: [
           {
             type: 'paragraph',
-            text: 'ProgressFlow is a phone app, a teacher dashboard and a student portal that help art teachers in Classes 6 to 8 assess drawings and paintings against a rubric, in English, Hindi and Telugu, with or without a signal. It is a six-month, grant-funded research prototype (August to December 2026), built from a mixed-methods study of 70 art educators in Telangana. This write-up covers the work up to early November.',
+            text: 'ProgressFlow is a phone app, a teacher dashboard and a student portal that help art teachers in Classes 6 to 8 assess drawings and paintings against a rubric, in English, Hindi and Telugu, with or without a signal. A teacher photographs a stack of papers, the phone sorts them by student, and feedback travels from the teacher’s phone to the student’s.',
           },
           {
             type: 'paragraph',
-            text: "A rubric a teacher can use one-handed between periods, a camera that photographs a whole stack of papers without stopping, and a student view that treats a child's work as private by default. This is how I designed and built it, what I got wrong, and what is still unproven.",
+            text: 'It began as part of Ganesh Kumar Malthurkar’s PhD research at IIT Hyderabad, with a workshop and interviews with 10 art educators from residential schools in Telangana. We designed it together. I built every part of the technology.',
+          },
+          {
+            type: 'stats',
+            items: [
+              { value: '3', label: 'languages, built into every screen' },
+              { value: '4', label: 'surfaces: phone, server, dashboard, student portal' },
+              { value: '127', label: 'server checks, 63 of them trying to break privacy rules' },
+              { value: '1,346', label: 'translation checks, all passing' },
+            ],
+          },
+          {
+            type: 'paragraph',
+            text: 'Short on time? This overview and the journey below tell the whole story. The two parts go deeper.',
+          },
+          {
+            type: 'cards',
+            items: [
+              {
+                kicker: 'Part 1',
+                title: 'Design',
+                text: 'What the research told us, the idea we settled on, and how it was shaped, tested and improved.',
+                points: [
+                  'Insights from educators',
+                  'A pocket assessor for the minutes between periods',
+                  'Wireframes, a prototype and two versions',
+                ],
+                href: '#part-design',
+                linkLabel: 'Read the design',
+                accent: 'blue',
+              },
+              {
+                kicker: 'Part 2',
+                title: 'Engineering',
+                text: 'How it runs: a phone that works offline, a server that keeps everything in sync, and the guarantees that keep a child’s work private.',
+                points: [
+                  'One codebase, four surfaces',
+                  'Offline-first sync and on-device intelligence',
+                  'Privacy, deployment and tests written as attacks',
+                ],
+                href: '#part-engineering',
+                linkLabel: 'Read the engineering',
+                accent: 'red',
+              },
+            ],
           },
           {
             type: 'figure',
             src: '/work/progressflow/dashboard-submission.webp',
-            alt: "The teacher dashboard showing a student's pencil drawing with a red circle, a blue arrow and a highlighted roll number, beside four rubric criteria rated Exemplary or Proficient",
+            alt: 'The teacher dashboard showing a student’s pencil drawing with a red circle, a blue arrow and a highlighted roll number, beside four rubric criteria rated Exemplary or Proficient',
             caption:
-              "The teacher dashboard, with sample data: one student's piece with the teacher's markup beside the four-criterion rubric.",
+              'The teacher dashboard, with sample data: one student’s piece with the teacher’s markup beside the four-criterion rubric.',
             width: 800,
             height: 536,
           },
         ],
       },
       {
-        id: 'problem',
-        label: 'Problem',
-        heading: "What the tools teachers have don't give them",
+        id: 'journey',
+        group: 'Overview',
+        label: 'The journey',
+        heading: 'From a workshop to a working system',
         body: [
           {
             type: 'paragraph',
-            text: 'Assessing art well needs a shared language for quality, feedback that arrives while it can still be used, and a record of growth. The tools teachers have offer none of the three.',
+            text: 'Six steps took it from a room of educators to a deployed system. The chips show where each one is covered.',
+          },
+          {
+            type: 'steps',
+            items: [
+              {
+                title: 'Listen to educators',
+                text: 'As part of Ganesh’s PhD research we ran a workshop and qualitative interviews with 10 art educators from residential schools in Telangana. It built on a wider study of 70 educators across the state.',
+                part: 'design',
+              },
+              {
+                title: 'Turn insights into a brief',
+                text: 'We pulled out the key insights, then brainstormed a better way to evaluate exams and submissions.',
+                part: 'design',
+              },
+              {
+                title: 'Decide on the idea',
+                text: 'We chose an app-shaped answer: a pocket assessor a teacher can use between periods. Photograph the papers, score them against a rubric that teaches, mark up and speak the feedback, and let students see it and answer.',
+                part: 'design',
+              },
+              {
+                title: 'Shape it on paper',
+                text: 'We wrote the features, drew the wireframes and flows, and agreed them on a clickable prototype before any native code existed.',
+                part: 'design',
+              },
+              {
+                title: 'Version 1: build, test, improve',
+                text: 'I built the first version of the app. We reviewed and tested it, then added a handful of features and options to improve the UX.',
+                part: ['design', 'engineering'],
+              },
+              {
+                title: 'Version 2: make it a system',
+                text: 'With the app’s expectations settled, I built the server, the database and everything else needed to run and use it, and made sure it worked end to end.',
+                part: 'engineering',
+              },
+            ],
+          },
+        ],
+      },
+
+      // ───────────────────────── Part 1: Design ─────────────────────────
+      {
+        id: 'insights',
+        part: 'design',
+        group: 'Part 1 · Design',
+        label: 'Insights',
+        heading: 'What the research told us',
+        body: [
+          {
+            type: 'paragraph',
+            text: 'Ganesh’s research gave the project its evidence, and the workshop and interviews gave it voices.',
+          },
+          {
+            type: 'stats',
+            items: [
+              { value: '70', label: 'art educators studied across Telangana' },
+              { value: '10', label: 'educators from residential schools in the workshop and interviews' },
+              { value: '58%', label: 'cited limited documentation' },
+              { value: '32%', label: 'cited time scarcity: 50+ students, two periods a week' },
+            ],
+          },
+          {
+            type: 'paragraph',
+            text: 'Together they pointed to four problems the app had to solve.',
           },
           {
             type: 'list',
@@ -326,30 +457,69 @@ export const caseStudies = [
                 text: 'Most assessment apps assume steady internet and English-only input. Many Indian classrooms have neither, and spoken feedback in Telugu or Hindi has nowhere to live.',
               },
               {
-                lead: "Children's data.",
-                text: "Photos, voices and judgements about minors fall under India's Digital Personal Data Protection Act, 2023.",
+                lead: 'Children’s data.',
+                text: 'Photos, voices and judgements about minors fall under India’s Digital Personal Data Protection Act, 2023.',
               },
             ],
           },
           {
             type: 'paragraph',
-            text: 'The design question I worked from: how might a teacher give specific, kind and trustworthy feedback on a child’s drawing, in the minutes between periods, on a phone, offline, in the language the child thinks in?',
+            text: 'The design question we worked from: how might a teacher give specific, kind and trustworthy feedback on a child’s drawing, in the minutes between periods, on a phone, offline, in the language the child thinks in?',
           },
         ],
       },
       {
-        id: 'users',
-        label: 'Users',
-        heading: 'Two users, and the limits they set',
+        id: 'idea',
+        part: 'design',
+        group: 'Part 1 · Design',
+        label: 'The idea',
+        heading: 'A pocket assessor for the minutes between periods',
         body: [
           {
             type: 'paragraph',
-            text: 'The two users are a time-poor art teacher on a mid-range Android phone and a child of 11 to 14 on a phone that may be shared. Those two facts set most of the constraints.',
+            text: 'We answered with an app, because the phone is the one device every teacher already has in the classroom. The idea is to turn the dead minutes between periods into assessment that is quick, specific and kind. One loop, six moves:',
+          },
+          {
+            type: 'steps',
+            items: [
+              {
+                title: 'Capture',
+                text: 'Photograph a stack of papers in a row, without stopping to review each one.',
+              },
+              {
+                title: 'Sort',
+                text: 'The phone reads whose paper each one is, shows why, and files it. The teacher confirms anything it is unsure of.',
+              },
+              {
+                title: 'Score',
+                text: 'Tap a level on each of four criteria. Every level explains itself.',
+              },
+              {
+                title: 'Mark up and speak',
+                text: 'Circle, highlight, draw an arrow, and leave a voice note in English, Hindi or Telugu.',
+              },
+              {
+                title: 'Reflect',
+                text: 'Students see the work and the feedback on their own phone, rate themselves, and review a classmate’s piece with guard rails.',
+              },
+              {
+                title: 'See growth',
+                text: 'A teacher sees progress across a term, per student and per criterion, and can hand it over as a report.',
+              },
+            ],
+          },
+          {
+            type: 'paragraph',
+            text: 'Underneath it sits one rule: never block the teacher on the network. Everything works offline, and the server exists only to sync and to give a laptop view.',
+          },
+          {
+            type: 'paragraph',
+            text: 'Two people use it: a time-poor art teacher on a mid-range Android phone, and a child of 11 to 14 on a phone that may be shared. Those two facts set most of the constraints.',
           },
           {
             type: 'note',
             label: 'A caveat I want to be clear about.',
-            text: 'These are working assumptions from the project brief and my own reasoning. I have not yet run interviews or usability sessions with teachers or students, so they are hypotheses for the pilot to test.',
+            text: 'The research was with teachers. What I assume about children (shared phones, limited English, reading level) comes from the project brief and my own reasoning, and I have not yet tested the student side with children. They are hypotheses for the pilot.',
           },
           {
             type: 'table',
@@ -377,7 +547,7 @@ export const caseStudies = [
                 'Sign-in by a 6-character code; plain wording; hints on demand',
               ],
               [
-                "Minors' photos and voices",
+                'Minors’ photos and voices',
                 'Device PIN lock, per-teacher separation, no cloud backup, teacher approval before classmates see feedback',
               ],
             ],
@@ -386,13 +556,11 @@ export const caseStudies = [
       },
       {
         id: 'principles',
+        part: 'design',
+        group: 'Part 1 · Design',
         label: 'Principles',
         heading: 'Six principles that settled the trade-offs',
         body: [
-          {
-            type: 'paragraph',
-            text: 'Six principles decided almost every trade-off that follows.',
-          },
           {
             type: 'list',
             items: [
@@ -405,12 +573,12 @@ export const caseStudies = [
                 text: 'Every automatic guess shows its reasoning and can be changed. The app says “Matched by roll number” and offers a Change button.',
               },
               {
-                lead: "Explain, don't just score.",
+                lead: 'Explain, don’t just score.',
                 text: 'The rubric is a teaching tool. Each criterion has a diagram, three things to look for, a question to ask the student and a description of every level.',
               },
               {
-                lead: "A child's work is private by default.",
-                text: "Design for the awkward case, not the happy one. Classmates' feedback is hidden until the teacher approves it.",
+                lead: 'A child’s work is private by default.',
+                text: 'Design for the awkward case, not the happy one. Classmates’ feedback is hidden until the teacher approves it.',
               },
               {
                 lead: 'Language is interface.',
@@ -425,64 +593,48 @@ export const caseStudies = [
         ],
       },
       {
-        id: 'process',
-        label: 'Process',
-        heading: 'How I worked',
+        id: 'prototype',
+        part: 'design',
+        group: 'Part 1 · Design',
+        label: 'Prototype',
+        heading: 'Wireframes, flows and a clickable prototype',
         body: [
           {
             type: 'paragraph',
-            text: 'I agreed the shape of the product on a clickable prototype first, then built the real thing in the order that carried the most risk.',
+            text: 'We wrote the features, drew the wireframes and mapped the flows. The research framework had four components; we turned them into five MVP features: visual rubric scoring, photo with annotation and voice, peer and self assessment, a teacher dashboard and a student portal.',
           },
           {
-            type: 'list',
-            items: [
-              {
-                lead: 'Scope.',
-                text: 'From the project’s pitch deck I locked five features (scoring, annotation and voice, self and peer review, teacher dashboard, student portal) and a phased roadmap.',
-              },
-              {
-                lead: 'Clickable prototype.',
-                text: 'A single HTML file with five screens, so the flow could be judged before any native code existed.',
-              },
-              {
-                lead: 'One source of truth.',
-                text: 'A monorepo whose shared package holds the data model, the rubric text and the translations, so the phone, the web and the server cannot drift apart.',
-              },
-              {
-                lead: 'The Android app, on a real phone.',
-                text: 'I ran builds on a Samsung Galaxy S25 Ultra over USB. That is where I found problems a desktop preview hides, such as controls pushed below the fold.',
-              },
-              {
-                lead: 'Web dashboard, then the student portal.',
-                text: 'Read-only for teachers first, because a laptop view of data entered on the phone has nothing to merge.',
-              },
-              {
-                lead: 'Critique.',
-                text: 'The public project page went through three versions after two rounds of blunt feedback; see the last decision below.',
-              },
-              {
-                lead: 'A second pass on capture and set-up.',
-                text: 'Once the first full flow ran, I rebuilt capture around batches and added class import, an editable rubric, progress views and reports (4 November).',
-              },
-            ],
+            type: 'paragraph',
+            text: 'Then I built a single-file clickable prototype with five screens, so the whole flow could be judged on a phone before any native code existed. Every screen is tagged with the feature it answers and the research component behind it, so nothing in the app exists without a reason.',
+          },
+          {
+            type: 'figure',
+            src: '/work/progressflow/prototype.webp',
+            alt: 'Four screens of the clickable prototype side by side: the class roster, tap-to-rate rubric scoring, markup and voice recording, and a student’s My Work screen with a growth chart',
+            caption:
+              'The clickable prototype: the class roster, rubric scoring, markup with a voice note, and the student’s own view. Each screen maps to one of the five MVP features.',
+            width: 1964,
+            height: 1131,
           },
         ],
       },
       {
         id: 'capture',
-        label: 'Capture',
-        heading: 'Decision 1: photograph the whole stack, sort afterwards',
+        part: 'design',
+        group: 'Part 1 · Design',
+        label: 'Capture & sorting',
+        heading: 'Photograph the whole stack, then sort it with reasoning',
         body: [
           {
             type: 'paragraph',
-            text: 'A class set of papers means dozens of photos, so I stopped treating capture as one careful scan at a time. The camera now takes a whole stack in a row and the thinking happens afterwards, in a class inbox.',
+            text: 'A class set of papers means dozens of photos, so we stopped treating capture as one careful scan at a time. The camera takes a whole stack in a row, and the thinking happens afterwards in a class inbox.',
           },
           {
             type: 'figure',
             src: '/work/progressflow/scan-review.webp',
-            alt: "The phone app's scan review screen: a photographed notebook cover, a green “Good scan” banner with sharpness and brightness readings, a thumbnail strip, and Keep scanning and Save buttons",
+            alt: 'The phone app’s scan review screen: a photographed notebook cover, a green “Good scan” banner with sharpness and brightness readings, a thumbnail strip, and Keep scanning and Save buttons',
             caption:
-              'The first capture flow (3 Nov): scan a page, check it, save it. A real build with sample data. Since 4 Nov capture is batch-first, and the same checks run in the class inbox.',
+              'The first capture flow (version 1): scan a page, check it, save it. A real build with sample data. Version 2 is batch-first, and the same checks run in the class inbox.',
             width: 540,
             height: 1108,
             narrow: true,
@@ -492,11 +644,11 @@ export const caseStudies = [
             items: [
               {
                 lead: 'Batch first.',
-                text: "Each shot goes straight into the class's inbox with no review in between, so nothing is lost if the phone goes back in a pocket.",
+                text: 'Each shot goes straight into the class’s inbox with no review in between, so nothing is lost if the phone goes back in a pocket.',
               },
               {
                 lead: 'Two ways to shoot.',
-                text: '“Edge detect + crop” (the default) finds the page edges and crops, with no filters. “Full photo” keeps the camera’s own picture whole. I patched the scanner plugin down to its crop-only mode, so the app never changes the colour of a child’s artwork.',
+                text: '“Edge detect + crop” (the default) finds the page edges and crops, with no filters. “Full photo” keeps the camera’s own picture whole. The app never changes the colour of a child’s artwork.',
               },
               {
                 lead: 'A gate with reasons.',
@@ -507,10 +659,6 @@ export const caseStudies = [
                 text: 'Filing papers that look poor raises “3 photos look poor”, with Look and File anyway, because the teacher knows things the checker cannot, such as a drawing that is meant to be sideways.',
               },
               {
-                lead: 'Cheap on old phones.',
-                text: 'The checks run on a 640 px copy of the photo.',
-              },
-              {
                 lead: 'Permissions that recover.',
                 text: 'If Android will no longer show the camera prompt, the screen offers Open settings and picks the new permission up when the teacher comes back. A first-launch screen explains why the camera and microphone are needed.',
               },
@@ -518,18 +666,7 @@ export const caseStudies = [
           },
           {
             type: 'paragraph',
-            text: 'The calibration story. My first blur threshold was a guess. To replace it with evidence I generated test pages and measured them with the same algorithm: sharp pages scored 2.4 to 3.1, a mildly blurred page 0.09 and a heavily blurred one 0.012. One real scan from the phone read 3.05, which matched. A threshold of 0.06 would have let the mildly blurred page through, so I raised it to 0.3. The raw numbers are shown on the review screen so the next person can tune them. This is still based on a handful of photos.',
-          },
-        ],
-      },
-      {
-        id: 'matching',
-        label: 'Matching',
-        heading: 'Decision 2: knowing whose work it is, without silently misfiling',
-        body: [
-          {
-            type: 'paragraph',
-            text: 'Misfiling a child’s work is worse than asking, so the app reads each paper, proposes a student, shows why, and leaves anything it is unsure of for the teacher. The inbox keeps count: “12 ready · 3 to check · 2 not read”.',
+            text: 'Then comes the part where a mistake would hurt most. Misfiling a child’s work is worse than asking, so the app reads each paper, proposes a student, shows why, and leaves anything it is unsure of for the teacher. The inbox keeps count: “12 ready · 3 to check · 2 not read”.',
           },
           {
             type: 'list',
@@ -539,16 +676,12 @@ export const caseStudies = [
                 text: 'The roll number written in digits is the strong signal; a fuzzy name match is the backup. A misspelt name (“Dlya”) with the right roll still resolves to the right student.',
               },
               {
-                lead: 'Header first.',
-                text: 'The name and roll number are normally at the top of a page, so the reader looks at the top third first and the whole page only if that finds nobody. That stops a stray number in the drawing being taken for a roll number.',
-              },
-              {
                 lead: 'Reasoning on screen.',
                 text: 'The student chip reads “Matched by roll number”, “Matched by name, please check” or “Could not read a roll number or name. Choose the student.” Lower-confidence matches use a warning colour.',
               },
               {
                 lead: 'Only confident matches file themselves.',
-                text: 'A match on the roll number is filed without a second look. A match on the name alone, or a roll number that disagrees with the name, is marked and waits for the teacher to confirm or change it.',
+                text: 'A match on the roll number is filed without a second look. A match on the name alone, or a roll number that disagrees with the name, is marked and waits for the teacher.',
               },
               {
                 lead: 'Scoped to the open class.',
@@ -560,7 +693,7 @@ export const caseStudies = [
               },
               {
                 lead: 'Designing around a limit.',
-                text: 'The on-device text reader handles Latin script but has no Telugu model, and handwriting is unreliable. Instead of pretending, the design leans on digits and asks students to write “Roll No: 12” and their name in block letters. The project page says so plainly.',
+                text: 'The on-device text reader handles Latin script but has no Telugu model, and handwriting is unreliable. Instead of pretending, the design leans on digits and asks students to write “Roll No: 12” and their name in block letters.',
               },
             ],
           },
@@ -568,12 +701,14 @@ export const caseStudies = [
       },
       {
         id: 'rubric',
+        part: 'design',
+        group: 'Part 1 · Design',
         label: 'Rubric',
-        heading: 'Decision 3: a rubric that teaches, and that a teacher can change',
+        heading: 'A rubric that teaches, and that a teacher can change',
         body: [
           {
             type: 'paragraph',
-            text: 'I treated the rubric as the main interface for teachers and the main learning tool for students, not as a form to fill in.',
+            text: 'We treated the rubric as the main interface for teachers and the main learning tool for students, not as a form to fill in.',
           },
           {
             type: 'list',
@@ -591,16 +726,12 @@ export const caseStudies = [
                 text: 'Once a level is chosen, the description of that level appears under the buttons. A line like “+1 since 7 Oct” shows growth against the student’s previous piece.',
               },
               {
-                lead: "The teacher's own rubric.",
+                lead: 'The teacher’s own rubric.',
                 text: 'A teacher can rename, add or remove criteria and pick each one’s icon and colour. The assessment types (Assignment, Exam 1, Exam 2, Quarterly, Sketch, Progress, Portfolio) can be renamed, reordered and added to.',
               },
               {
                 lead: 'A Save button that tells the truth.',
                 text: 'An evaluation counts as saved only when the teacher presses Save and has not changed it since. If they have, the screen says “Changed since saved”.',
-              },
-              {
-                lead: 'One source of text.',
-                text: 'The wording lives in the shared package and is used by the phone, the dashboard, the student form and the translations, so a teacher and a student read the same descriptor.',
               },
             ],
           },
@@ -613,8 +744,10 @@ export const caseStudies = [
       },
       {
         id: 'feedback',
+        part: 'design',
+        group: 'Part 1 · Design',
         label: 'Feedback',
-        heading: 'Decision 4: marking up, speaking and attaching',
+        heading: 'Marking up, speaking and attaching',
         body: [
           {
             type: 'paragraph',
@@ -628,11 +761,7 @@ export const caseStudies = [
                 text: 'Circle, highlight, arrow and pen, in four colours, with Undo and Clear. A single switch hides all markup without deleting it, so the teacher can show the clean work and the corrections separately.',
               },
               {
-                lead: 'Markup that survives every screen.',
-                text: "Strokes are stored as fractions of the image (0 to 1), so the same circle lands in the same place on the phone, the laptop dashboard and the student's screen.",
-              },
-              {
-                lead: "Voice in the child's language.",
+                lead: 'Voice in the child’s language.',
                 text: 'A voice note can be recorded and tagged English, Hindi or Telugu. Spoken feedback is quicker for the teacher and easier for many students to take in.',
               },
               {
@@ -643,90 +772,28 @@ export const caseStudies = [
           },
           {
             type: 'note',
-            label: 'A bug worth naming.',
-            text: "My first link check used the browser's URL parser, which React Native only half implements, so every link would have been rejected as invalid. I found it by reading the framework's source before it reached a teacher, and replaced it with a small parser that also refuses non-web schemes.",
-          },
-          {
-            type: 'note',
             label: 'Not built yet.',
             text: 'Automatic transcripts of voice notes. The audio is saved, but nothing turns it into text.',
           },
         ],
       },
       {
-        id: 'offline',
-        label: 'Offline & sync',
-        heading: "Decision 5: offline-first, accounts and the teacher's laptop",
-        body: [
-          {
-            type: 'paragraph',
-            text: "The phone is the only place data is entered, which removes almost every sync conflict and keeps the teacher's workflow independent of the network.",
-          },
-          {
-            type: 'figure',
-            src: '/work/progressflow/dashboard-class.webp',
-            alt: 'The teacher dashboard for Class 7-B: five students, six submissions, a class average of 2.8 out of 4, bars for the average of each criterion and a trend line below',
-            caption:
-              'The laptop view, with sample data: a class at a glance, with the average for each criterion and a trend over time.',
-            width: 800,
-            height: 528,
-          },
-          {
-            type: 'list',
-            items: [
-              {
-                lead: 'One writer.',
-                text: 'The phone pushes classes, students and the submissions that changed. The server says which photos and recordings it still lacks, and the phone uploads only those. If two versions meet, the newer one wins per submission.',
-              },
-              {
-                lead: 'Quiet, visible status.',
-                text: 'Sync starts a few seconds after a change and retries every minute when offline. The Account sheet says “Up to date”, “Waiting for a connection” or “3 waiting to upload”; it never blocks the screen.',
-              },
-              {
-                lead: 'A laptop view, read-only.',
-                text: 'The dashboard moves from Overview to Class to Student to Submission, with class averages, a monthly trend, a student’s growth over time and the original work with its markup. Signing in is a web password with an httpOnly cookie; the phone keeps its own PIN.',
-              },
-              {
-                lead: 'Lock the phone, not just the account.',
-                text: 'The PIN is stored in the device keystore, repeated wrong guesses cause lockouts that start at 30 seconds and double up to 15 minutes, and the app locks after five minutes away.',
-              },
-              {
-                lead: 'A forgotten PIN no longer erases a child’s data.',
-                text: 'The first build erased the account, because the data belongs to children and cannot be recovered offline. It now verifies the teacher’s phone number with a six-digit code and sets a new PIN instead. Registration asks for the same code, with “Skip for now” so the app still works with no connection and the number can be verified later.',
-              },
-              {
-                lead: 'Set-up without typing.',
-                text: 'A class list can be imported from a spreadsheet, Word file, CSV or text file, with names and roll numbers read from it. Classes are organised by grade and section (6-A, 6-B, 7-A), and can be edited or deleted. A sample-data mode lets someone try the app before adding real students.',
-              },
-            ],
-          },
-          {
-            type: 'note',
-            label: 'Status of the code check.',
-            text: 'It uses Firebase Phone Auth, with a demo mode so builds never depend on a Firebase project. Real SMS delivery is not yet confirmed.',
-          },
-          {
-            type: 'note',
-            label: 'The trade-offs I accepted.',
-            text: 'A new phone cannot yet download older data, scores cannot be edited from the web, and deleting a class, student or paper erases its files on the phone but is not yet passed on to the server.',
-          },
-        ],
-      },
-      {
         id: 'students',
-        label: 'Students',
-        heading: 'Decision 6: the student side, self-review, peer review and privacy',
+        part: 'design',
+        group: 'Part 1 · Design',
+        label: 'The student side',
+        heading: 'A student side that treats a child’s work as private',
         body: [
           {
             type: 'paragraph',
-            text: 'I gave students a portal with no account to create, and designed peer review around the ways it could hurt a child.',
+            text: 'We gave students a portal with no account to create, and designed peer review around the ways it could hurt a child.',
           },
           {
             type: 'list',
             items: [
               {
                 lead: 'A code, not an account.',
-                text: 'Each student has a 6-character join code that the teacher prints from the class page and can replace at any time. It opens a separate kind of session that can read only that student’s own work.',
+                text: 'Each student has a 6-character join code that the teacher prints from the class page and can replace at any time. It shows only that student’s own work.',
               },
               {
                 lead: 'Built for a phone and a child.',
@@ -740,10 +807,6 @@ export const caseStudies = [
                 lead: 'Peer review, with guard rails.',
                 text: 'A classmate sees only the image of a piece the teacher has opened in their own class: no name, no scores, no voice note. Their feedback stays hidden until the teacher approves it, and the author never learns who wrote it.',
               },
-              {
-                lead: 'Proven by trying to break it.',
-                text: 'An automated suite of 63 checks attempts cross-student reads, reuse of a teacher session as a student and the reverse, reviewing your own work and reading another class’s images.',
-              },
             ],
           },
           {
@@ -755,27 +818,17 @@ export const caseStudies = [
       },
       {
         id: 'languages',
+        part: 'design',
+        group: 'Part 1 · Design',
         label: 'Languages',
-        heading: 'Decision 7: Hindi, Telugu and English as interface, not an afterthought',
+        heading: 'Hindi, Telugu and English as interface, not an afterthought',
         body: [
-          {
-            type: 'paragraph',
-            text: 'I made translation a build-time guarantee, so no screen can quietly fall back to English.',
-          },
           {
             type: 'list',
             items: [
               {
-                lead: 'One typed dictionary.',
-                text: 'English is the source (673 strings); Hindi and Telugu are typed against it, so a missing translation does not compile. It covers the student portal, the teacher dashboard, the phone app and all rubric text.',
-              },
-              {
                 lead: 'Switch where it is needed.',
-                text: "Language chips sit on the phone's sign-in screen and in the student portal's header. A language is picked from the phone's own setting, then the teacher's profile, until the person chooses.",
-              },
-              {
-                lead: "A test for what the compiler can't see.",
-                text: '1,346 checks confirm no placeholder such as {name} was lost and no string was left in English by mistake.',
+                text: 'Language chips sit on the phone’s sign-in screen and in the student portal’s header. A language is picked from the phone’s own setting, then the teacher’s profile, until the person chooses.',
               },
               {
                 lead: 'Details that are easy to miss.',
@@ -785,24 +838,21 @@ export const caseStudies = [
           },
           {
             type: 'note',
-            label: 'A leak I caught.',
-            text: "A signed-in teacher's profile language was being applied to the student page in the same browser, so a child could see the teacher's language. It now applies only to teacher pages.",
-          },
-          {
-            type: 'note',
             label: 'What I have not done.',
-            text: "I wrote the Hindi and Telugu myself, with no native-speaker review. They are drafts, and the rubric descriptors in particular need teachers' eyes before any student relies on them. The newest strings (phone verification, the inbox, reports) are drafts too. The project page and server error messages are English only.",
+            text: 'I wrote the Hindi and Telugu myself, with no native-speaker review. They are drafts, and the rubric descriptors in particular need teachers’ eyes before any student relies on them. The newest strings (phone verification, the inbox, reports) are drafts too. The project page and server error messages are English only.',
           },
         ],
       },
       {
-        id: 'insight',
+        id: 'progress',
+        part: 'design',
+        group: 'Part 1 · Design',
         label: 'Progress & reports',
-        heading: 'Decision 8: from scores to a story, with progress views and reports',
+        heading: 'From scores to a story',
         body: [
           {
             type: 'paragraph',
-            text: 'A rubric score on its own is just a number. The phone now turns a teacher’s marks into pictures that can be read at a glance and documents that can be handed over.',
+            text: 'A rubric score on its own is just a number. The phone turns a teacher’s marks into pictures that can be read at a glance and documents that can be handed over.',
           },
           {
             type: 'list',
@@ -813,11 +863,7 @@ export const caseStudies = [
               },
               {
                 lead: 'Reports in formats teachers already use.',
-                text: 'Class and student reports as PDF, Word, Excel or CSV through the phone’s share sheet. All four are built from one neutral report model, so they always say the same thing.',
-              },
-              {
-                lead: 'Plain maths, tested.',
-                text: 'The numbers behind the charts are plain functions over the phone’s own data, so they run in Node tests. 46 checks cover roster import, the analytics, the report files and the name matching.',
+                text: 'Class and student reports as PDF, Word, Excel or CSV through the phone’s share sheet.',
               },
             ],
           },
@@ -829,9 +875,61 @@ export const caseStudies = [
         ],
       },
       {
+        id: 'iteration',
+        part: 'design',
+        group: 'Part 1 · Design',
+        label: 'Version 1 to 2',
+        heading: 'Version 1: test, review, improve',
+        body: [
+          {
+            type: 'paragraph',
+            text: 'We reviewed and tested the first version of the app, then added a handful of features and options to improve the UX. These are the changes that mattered most between version 1 and version 2.',
+          },
+          {
+            type: 'table',
+            caption: 'What changed, and the reasoning behind it',
+            head: ['Area', 'Version 1', 'Version 2', 'The reasoning'],
+            rows: [
+              [
+                'Capture',
+                'Scan one page at a time: scan, check, save',
+                'Photograph a whole stack, sort it afterwards in a class inbox',
+                'A class set is dozens of papers; stopping to review each one costs more than sorting them together',
+              ],
+              [
+                'Forgotten PIN',
+                'Erased that account’s data on the phone',
+                'Verified by a six-digit code, then a new PIN',
+                'The data belongs to children and cannot be recovered offline',
+              ],
+              [
+                'Rubric and types',
+                'Four fixed criteria',
+                'A teacher-editable rubric and assessment types',
+                'Teachers assess different things in different exams',
+              ],
+              [
+                'Insight',
+                'A score per criterion',
+                'Four progress views, and reports in PDF, Word, Excel and CSV',
+                'A teacher needs something to hand over, not only a number to read',
+              ],
+              [
+                'Set-up',
+                'Add students one by one',
+                'Import a class list from a spreadsheet, Word file, CSV or text',
+                'Typing 50 names on a phone is the wrong job',
+              ],
+            ],
+          },
+        ],
+      },
+      {
         id: 'project-page',
+        part: 'design',
+        group: 'Part 1 · Design',
         label: 'Project page',
-        heading: 'Decision 9: the project page, and what two rounds of critique taught',
+        heading: 'The project page, and what two rounds of critique taught',
         body: [
           {
             type: 'paragraph',
@@ -881,97 +979,336 @@ export const caseStudies = [
           },
         ],
       },
+
+      // ───────────────────────── Part 2: Engineering ─────────────────────────
       {
-        id: 'engineering',
-        label: 'Engineering',
-        heading: 'Design engineering: keeping design decisions true in code',
+        id: 'architecture',
+        part: 'engineering',
+        group: 'Part 2 · Engineering',
+        label: 'Architecture',
+        heading: 'One codebase, four surfaces',
         body: [
           {
             type: 'paragraph',
-            text: 'The design decisions above only hold if the code cannot quietly undo them, so I built the guarantees into the system.',
+            text: 'Version 2 turned the app into a system. One TypeScript monorepo holds the phone app, the API server, the teacher dashboard, the student portal and the public project page, all built around a single shared package.',
+          },
+          {
+            type: 'figure',
+            src: '/work/progressflow/architecture.svg',
+            alt: 'System diagram. A shared TypeScript package feeds everything. The teacher’s phone pushes snapshots to an API server, a Vercel function in Singapore, which stores data in a Neon PostgreSQL database and files in private object storage, and serves a read-only teacher dashboard and a student portal. Firebase Phone Auth sends the phone a verification code.',
+            caption:
+              'How the pieces fit. The phone works fully offline; the server and web apps exist for sync, the laptop view and students.',
+            width: 1200,
+            height: 700,
+          },
+          {
+            type: 'stats',
+            items: [
+              { value: '≈19k', label: 'lines of TypeScript and CSS across five apps and a shared package' },
+              { value: '18', label: 'database models' },
+              { value: '6', label: 'API route groups: auth, sync, media, dashboard, student, health' },
+              { value: '1', label: 'shared package that every surface imports' },
+            ],
+          },
+          {
+            type: 'table',
+            caption: 'The four surfaces and the project page',
+            head: ['Surface', 'Built with', 'What it does'],
+            rows: [
+              [
+                'Phone app',
+                'React Native (Expo), TypeScript, ML Kit',
+                'Capture, sort, score, mark up and record; works offline; syncs when it can',
+              ],
+              [
+                'API server',
+                'Express, Prisma, PostgreSQL (Neon), S3-compatible storage, running as a Vercel function',
+                'Accepts the phone’s pushes, keeps the data and files, answers the dashboards',
+              ],
+              [
+                'Teacher dashboard',
+                'React (Vite)',
+                'A read-only laptop view: class averages, trends, a student’s growth, the original work with its markup',
+              ],
+              [
+                'Student portal',
+                'React (Vite)',
+                'Join-code sign-in; a student’s own work, self-review and approved peer review',
+              ],
+              [
+                'Project page',
+                'Static React, plain CSS',
+                'The public explanation of the project',
+              ],
+            ],
+          },
+        ],
+      },
+      {
+        id: 'sync',
+        part: 'engineering',
+        group: 'Part 2 · Engineering',
+        label: 'Offline & sync',
+        heading: 'Offline-first, with one writer',
+        body: [
+          {
+            type: 'paragraph',
+            text: 'The phone is the only place data is entered. That removes almost every sync conflict and keeps the teacher’s workflow independent of the network.',
+          },
+          {
+            type: 'figure',
+            src: '/work/progressflow/dashboard-class.webp',
+            alt: 'The teacher dashboard for Class 7-B: five students, six submissions, a class average of 2.8 out of 4, bars for the average of each criterion and a trend line below',
+            caption:
+              'The laptop view, with sample data: a class at a glance, with the average for each criterion and a trend over time.',
+            width: 800,
+            height: 528,
           },
           {
             type: 'list',
             items: [
               {
+                lead: 'Snapshot push.',
+                text: 'The phone pushes classes, students and the submissions that changed. The server replies with the photos and recordings it still lacks, and the phone uploads only those. If two versions meet, the newer one wins per submission.',
+              },
+              {
+                lead: 'Photos sized for the host.',
+                text: 'The original stays on the phone. The dashboard gets a 2,000 px copy, well under 1 MB, so it fits hosts that cap a request near 4.5 MB.',
+              },
+              {
+                lead: 'Quiet, visible status.',
+                text: 'Sync starts a few seconds after a change and retries every minute when offline. The Account sheet says “Up to date”, “Waiting for a connection” or “3 waiting to upload”; it never blocks the screen.',
+              },
+              {
+                lead: 'Version 2 taught the server about the teacher.',
+                text: 'The teacher’s own assessment types and rubric now travel with the push and are kept in their settings, so the dashboard averages only the criteria in the current rubric. The Save status syncs too: “waiting” on the dashboard means photographed but not saved.',
+              },
+              {
+                lead: 'Deletions travel as tombstones.',
+                text: 'A delete on the phone is sent on the next push. The server soft-deletes the rows with their cascade, erases the stored photos and recordings, and closes the student’s portal code. Ids that are not the teacher’s are ignored.',
+              },
+              {
+                lead: 'An assessment kind that can be anything.',
+                text: 'The kind of assessment went from a fixed set of four values to any short id, through a migration that turned the column into text.',
+              },
+            ],
+          },
+          {
+            type: 'note',
+            label: 'The trade-offs I accepted.',
+            text: 'A new phone cannot yet download older data, scores cannot be edited from the web, and the student portal’s review form still uses the standard four criteria.',
+          },
+        ],
+      },
+      {
+        id: 'on-device',
+        part: 'engineering',
+        group: 'Part 2 · Engineering',
+        label: 'On-device intelligence',
+        heading: 'On-device intelligence, cheap on old phones',
+        body: [
+          {
+            type: 'paragraph',
+            text: 'Capture and sorting run on the phone, so they work with no signal, and no photo has to leave the device to be understood.',
+          },
+          {
+            type: 'list',
+            items: [
+              {
+                lead: 'A quality gate with measured thresholds.',
+                text: 'Each photo is checked on a 640 px copy: a shorter side of at least 900 px, sharpness measured as the variance of the Laplacian divided by luminance variance, brightness between 70 and 245, a plausible aspect ratio, and no dark strip along an edge where the background crept in.',
+              },
+              {
+                lead: 'Reading names.',
+                text: 'ML Kit’s on-device text recognition reads a 1,600 px copy. The top third of the page is read first, and the whole page only if that finds nobody, so a stray number in the drawing is not taken for a roll number.',
+              },
+              {
+                lead: 'A matcher you can test.',
+                text: 'Matching is plain TypeScript with no native modules, so it runs under Node. A roll number found by pattern is the strong signal; a fuzzy name (edit-distance similarity of 0.8 or more on the first name) is the backup. The resulting confidence decides whether a paper files itself.',
+              },
+              {
+                lead: 'Crop-only scanning.',
+                text: 'The scanner plugin is patched down to its crop-only mode. The patch is applied by patch-package in every build, so a clean build behaves the same as mine.',
+              },
+            ],
+          },
+          {
+            type: 'paragraph',
+            text: 'The calibration story. My first blur threshold was a guess. To replace it with evidence I generated test pages and measured them with the same algorithm: sharp pages scored 2.4 to 3.1, a mildly blurred page 0.09 and a heavily blurred one 0.012. One real scan from the phone read 3.05, which matched. A threshold of 0.06 would have let the mildly blurred page through, so I raised it to 0.3. The raw numbers are shown on the review screen so the next person can tune them. This is still based on a handful of photos.',
+          },
+        ],
+      },
+      {
+        id: 'privacy',
+        part: 'engineering',
+        group: 'Part 2 · Engineering',
+        label: 'Privacy & security',
+        heading: 'Privacy and security, built in',
+        body: [
+          {
+            type: 'paragraph',
+            text: 'The design says a child’s work is private by default. The code has to make that true even when something goes wrong.',
+          },
+          {
+            type: 'list',
+            items: [
+              {
+                lead: 'Separate sessions.',
+                text: 'Student and teacher sessions are different token types; neither works on the other’s routes. A student’s id always comes from the session, never from the request.',
+              },
+              {
+                lead: 'Every id is checked.',
+                text: 'Every id in a push is checked against the signed-in teacher before anything is written, and media is looked up by database row, never by a path the client supplies.',
+              },
+              {
+                lead: 'Guard rails on peer review.',
+                text: 'A reviewer can load only the images of a piece open for review in their own class: not the author’s name, scores, voice note or attachments. Join-code sign-in is rate-limited, and a replaced code stops working at once.',
+              },
+              {
+                lead: 'Files stay private.',
+                text: 'Photos, voice notes and attachments live in a private S3-compatible bucket, and every read passes through the API’s ownership check. Uploads are served with nosniff, and only images and audio are shown inline.',
+              },
+              {
+                lead: 'Two different locks.',
+                text: 'On the web: scrypt password hashes and an httpOnly, SameSite cookie. On the phone: a PIN kept in the device keystore, lockouts that start at 30 seconds and double up to 15 minutes, a lock after five minutes away, and no operating-system backup.',
+              },
+              {
+                lead: 'A forgotten PIN no longer erases a child’s data.',
+                text: 'The phone number is verified with a six-digit code (Firebase Phone Auth, with a demo mode so builds never depend on a Firebase project) and a new PIN is set. Registration asks for the same code, with “Skip for now” so the app stays offline-first.',
+              },
+            ],
+          },
+          {
+            type: 'note',
+            label: 'Not done yet.',
+            text: 'Token revocation, an audit log, guardian consent records, and application-level encryption of stored photos and recordings. Real SMS delivery for the phone code is not yet confirmed.',
+          },
+        ],
+      },
+      {
+        id: 'i18n',
+        part: 'engineering',
+        group: 'Part 2 · Engineering',
+        label: 'Translation',
+        heading: 'Translation as a build-time guarantee',
+        body: [
+          {
+            type: 'paragraph',
+            text: 'I made translation something the compiler enforces, so no screen can quietly fall back to English.',
+          },
+          {
+            type: 'list',
+            items: [
+              {
+                lead: 'One typed dictionary.',
+                text: 'English is the source (673 strings); Hindi and Telugu are typed against it, so a missing translation does not compile. It covers the student portal, the teacher dashboard, the phone app and all rubric text.',
+              },
+              {
+                lead: 'A test for what the compiler can’t see.',
+                text: '1,346 checks confirm no placeholder such as {name} was lost and no string was left in English by mistake.',
+              },
+              {
                 lead: 'A shared package as the source of truth.',
-                text: 'Data types, rubric descriptors, translations and the sync and review contracts live in one package that the phone, the web app and the server all import. Change a descriptor once and every screen changes.',
+                text: 'Data types, rubric descriptors, translations and the sync and review contracts live in one package that the phone, the web apps and the server all import. Change a descriptor once and every screen changes. A wrong score range or a malformed sync payload is a build error, not a blank on a child’s screen.',
+              },
+            ],
+          },
+          {
+            type: 'note',
+            label: 'A leak I caught.',
+            text: 'A signed-in teacher’s profile language was being applied to the student page in the same browser, so a child could see the teacher’s language. It now applies only to teacher pages.',
+          },
+        ],
+      },
+      {
+        id: 'shipping',
+        part: 'engineering',
+        group: 'Part 2 · Engineering',
+        label: 'Shipping it',
+        heading: 'Shipping it: from a laptop to a live API',
+        body: [
+          {
+            type: 'paragraph',
+            text: 'Most of the real engineering problems showed up only when the system left my laptop.',
+          },
+          {
+            type: 'list',
+            items: [
+              {
+                lead: 'Builds from a clean clone.',
+                text: 'The shared package’s compiled output is not committed, so a clean clone had no types and the compiler failed on every import. The web app and the project page now build the shared package first. I verified it by deleting the output and rebuilding.',
               },
               {
-                lead: 'The compiler enforces completeness.',
-                text: 'A missing translation, a wrong score range or a malformed sync payload is a build error, not a blank on a child’s screen.',
+                lead: 'A function, not a server.',
+                text: 'The API runs as a Vercel function: the build generates the database client and runs the migrations, and the Express app is wrapped as the handler.',
               },
               {
-                lead: 'Tests written as attacks.',
-                text: '31 checks cover accounts, sync and teacher isolation, and 63 cover the student and peer-review privacy rules. They try to break the rules instead of confirming the happy path. 1,346 translation checks and 46 phone-logic checks sit beside them.',
+                lead: 'No disk on a function.',
+                text: 'Photos and recordings go to a private S3-compatible bucket. Without its keys, uploads answer a clear 503 while scores and notes still sync.',
+              },
+              {
+                lead: 'The Mumbai timeout.',
+                text: 'A sync push of 25 students and 6 submissions timed out at 30 seconds. The server makes a few hundred sequential queries and each one paid the round trip from Mumbai to the database. I moved the function to Singapore beside the database and raised the limit to 60 seconds.',
+              },
+              {
+                lead: 'Readiness, not guesswork.',
+                text: 'A readiness check now probes object storage and reports “ok” or the error name and status, with no secrets, so a deploy can be checked without reading logs. Unknown pages answer 404, not 500.',
+              },
+              {
+                lead: 'Cookies that stay same-origin.',
+                text: 'The web dashboard proxies its API calls to the deployed server, so the session cookie never crosses an origin.',
+              },
+              {
+                lead: 'A different compiler on the host.',
+                text: 'Vercel’s own compile resolved the default imports of two middleware libraries as the module object, a type error that never appeared locally. Importing them by name works under every resolution.',
+              },
+            ],
+          },
+        ],
+      },
+      {
+        id: 'quality',
+        part: 'engineering',
+        group: 'Part 2 · Engineering',
+        label: 'Testing',
+        heading: 'Tests written as attacks, devices as truth',
+        body: [
+          {
+            type: 'paragraph',
+            text: 'The privacy tests try to break the rules instead of confirming the happy path.',
+          },
+          {
+            type: 'list',
+            items: [
+              {
+                lead: '127 server checks.',
+                text: '31 cover accounts, sync and teacher isolation, including a second teacher. 63 cover the student and peer-review rules: cross-student reads, reuse of a teacher session as a student and the reverse, reviewing your own work, and reading another class’s images. 33 cover version 2: teacher types, the rubric, Save status and deletions.',
+              },
+              {
+                lead: '1,346 translation checks and 47 phone-logic checks.',
+                text: 'The logic checks cover roster import, the analytics, the report files and the name matching.',
+              },
+              {
+                lead: 'Plain functions, so they can be tested.',
+                text: 'The numbers behind the charts are plain functions over the phone’s own data. All four report formats are built from one neutral report model, so they always say the same thing. Importing a class list from a spreadsheet, Word file, CSV or text file is pure TypeScript that runs in Node.',
               },
               {
                 lead: 'Measured, not eyeballed.',
                 text: 'Image-quality thresholds, colour contrast and text sizes were measured and the numbers recorded.',
               },
               {
-                lead: 'Real artefacts.',
-                text: 'Every screenshot on the project page is the working app or dashboard with sample data, and every build was installed on a real phone.',
-              },
-              {
-                lead: 'Native patches kept in the repo.',
-                text: 'The scanner patch is applied by patch-package in every build, so a clean build gets the same crop-only behaviour.',
-              },
-              {
-                lead: 'Reproducible from a clean clone.',
-                text: 'Builds, the database migration and the deployable server function were each verified from nothing, because that is what a host does.',
+                lead: 'A real phone.',
+                text: 'I ran builds on a Samsung Galaxy S25 Ultra over USB. That is where I found problems a desktop preview hides, such as controls pushed below the fold.',
               },
             ],
           },
         ],
       },
-      {
-        id: 'mistakes',
-        label: 'Mistakes',
-        heading: 'What went wrong, and what I would do differently',
-        body: [
-          {
-            type: 'paragraph',
-            text: 'Most of the real problems appeared only when I ran something on a real device or tried to break my own rules.',
-          },
-          {
-            type: 'list',
-            items: [
-              {
-                lead: 'Controls below the fold.',
-                text: 'The review screen hid its main actions on a real phone. A desktop preview never showed it.',
-              },
-              {
-                lead: 'Sample data that clashed.',
-                text: 'The sample classes used fixed IDs, so a second teacher trying them would have been refused by the server. Caught by testing with two teachers.',
-              },
-              {
-                lead: 'A dev setting that broke uploads.',
-                text: 'The example configuration switched on cloud storage by default, which does not exist on a laptop.',
-              },
-              {
-                lead: 'Drift between two packages.',
-                text: 'After changing what the portal returns, a stale server crashed the student page to blank. I now treat the API contract as something to test, not assume.',
-              },
-              { lead: 'A language leak.', text: "A teacher's language setting leaked onto the student page." },
-              {
-                lead: 'Two rejected pages.',
-                text: 'I shipped a generic page twice before asking what the product itself could show.',
-              },
-              {
-                lead: 'Translations without a reviewer.',
-                text: 'I wrote the Hindi and Telugu myself. That is a risk I accepted to keep moving and will not repeat for the pilot.',
-              },
-            ],
-          },
-          {
-            type: 'paragraph',
-            text: 'What I would change. Put one teacher in front of the review screen in the first week instead of the fifth. Test peer review with a small group of real students before designing its guard rails. Photograph real classroom artwork early, so the quality thresholds start from evidence, not synthetic pages.',
-          },
-        ],
-      },
+
+      // ───────────────────────── Outcome ─────────────────────────
       {
         id: 'evidence',
+        group: 'Outcome',
         label: 'Evidence',
         heading: 'What is validated and what is not yet',
         body: [
@@ -984,6 +1321,11 @@ export const caseStudies = [
             caption: 'Claims, the evidence so far, and their status',
             head: ['Claim', 'Evidence so far', 'Status'],
             rows: [
+              [
+                'The design answers what educators described',
+                'A workshop and interviews with 10 educators, and a study of 70, shaped the brief',
+                'Research-informed; not yet tested in a classroom',
+              ],
               [
                 'The teacher flow runs end to end on a real Android phone',
                 'Installed and run on a Galaxy S25 Ultra over USB; sign-in, class list and review screens observed',
@@ -1016,13 +1358,18 @@ export const caseStudies = [
                 'Weak evidence',
               ],
               [
+                'The server holds up beyond a laptop',
+                'Deployed as a function beside a managed database; a timeout on a 25-student push led to moving it to the database’s region',
+                'Deployed; not load-tested',
+              ],
+              [
                 'Contrast and text size on the project page meet WCAG 2.2 AA',
                 'Contrast measured on every colour',
                 'Measured; no screen-reader or automated audit',
               ],
               ['The app halves assessment time per student', 'None', 'Not measured'],
               ['Teachers find the rubric hints and progress views useful', 'None', 'Not measured'],
-              ['Sync works on a school’s network', 'Local test setup only', 'Not tested'],
+              ['Sync works on a school’s network', 'A deployed server; no school network yet', 'Not tested'],
               [
                 'The phone verification code reaches real numbers',
                 'Firebase Phone Auth wired in, with a demo mode',
@@ -1034,7 +1381,57 @@ export const caseStudies = [
         ],
       },
       {
+        id: 'mistakes',
+        group: 'Outcome',
+        label: 'Mistakes',
+        heading: 'What went wrong, and what I would do differently',
+        body: [
+          {
+            type: 'paragraph',
+            text: 'Most of the real problems appeared only when I ran something on a real device, on a real host, or tried to break my own rules.',
+          },
+          {
+            type: 'list',
+            items: [
+              {
+                lead: 'Controls below the fold.',
+                text: 'The review screen hid its main actions on a real phone. A desktop preview never showed it.',
+              },
+              {
+                lead: 'A sync that worked on my laptop.',
+                text: 'It timed out over a real network because every query paid a round trip to a distant database. Where code runs matters as much as what it does.',
+              },
+              {
+                lead: 'Sample data that clashed.',
+                text: 'The sample classes used fixed IDs, so a second teacher trying them would have been refused by the server. Caught by testing with two teachers.',
+              },
+              {
+                lead: 'A dev setting that broke uploads.',
+                text: 'The example configuration switched on cloud storage by default, which does not exist on a laptop.',
+              },
+              {
+                lead: 'Drift between two packages.',
+                text: 'After changing what the portal returns, a stale server crashed the student page to blank. I now treat the API contract as something to test, not assume.',
+              },
+              {
+                lead: 'Two rejected pages.',
+                text: 'I shipped a generic page twice before asking what the product itself could show.',
+              },
+              {
+                lead: 'Translations without a reviewer.',
+                text: 'I wrote the Hindi and Telugu myself. That is a risk I accepted to keep moving and will not repeat for the pilot.',
+              },
+            ],
+          },
+          {
+            type: 'paragraph',
+            text: 'What I would change. Put one teacher in front of the review screen in the first week instead of the fifth. Test peer review with a small group of real students before designing its guard rails. Photograph real classroom artwork early, so the quality thresholds start from evidence, not synthetic pages.',
+          },
+        ],
+      },
+      {
         id: 'next',
+        group: 'Outcome',
         label: 'Next steps',
         heading: 'Next steps',
         body: [

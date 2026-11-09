@@ -1,0 +1,89 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 700" width="1200" height="700" role="img" aria-labelledby="t d">
+  <title id="t">ProgressFlow system architecture</title>
+  <desc id="d">A shared TypeScript package feeds every part. The teacher's phone, which works offline, pushes snapshots to an API server running as a Vercel function in Singapore. The server stores data in a Neon PostgreSQL database and files in private object storage, and serves a read-only teacher dashboard and a student portal. Firebase Phone Auth sends the phone a verification code.</desc>
+  <defs>
+    <radialGradient id="gb" cx="0.03" cy="0.2" r="0.6"><stop offset="0" stop-color="#0096dc" stop-opacity="0.28"/><stop offset="1" stop-color="#0096dc" stop-opacity="0"/></radialGradient>
+    <radialGradient id="gr" cx="0.97" cy="0.9" r="0.6"><stop offset="0" stop-color="#e62d14" stop-opacity="0.24"/><stop offset="1" stop-color="#e62d14" stop-opacity="0"/></radialGradient>
+    <marker id="ab" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M1 1 L9 5 L1 9 z" fill="#00d4ff"/></marker>
+    <marker id="ar" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M1 1 L9 5 L1 9 z" fill="#ff6a4d"/></marker>
+    <marker id="aw" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M1 1 L9 5 L1 9 z" fill="#c9cfdd"/></marker>
+  </defs>
+  <style>
+    text { font-family: Helvetica, Arial, sans-serif; fill: #e9ecf5; }
+    .h { font-size: 24px; font-weight: 700; }
+    .s { font-size: 17px; fill: #9aa4c8; }
+    .i { font-size: 18px; }
+    .l { font-size: 18px; fill: #c9cfdd; }
+    .k { font-size: 15px; letter-spacing: 2px; fill: #9aa4c8; }
+    .box { fill: #0d0f16; stroke-width: 2; }
+    .row { fill: #151926; stroke: #2a3046; stroke-width: 1; }
+  </style>
+
+  <rect width="1200" height="700" fill="#08090d"/>
+  <rect width="1200" height="700" fill="url(#gb)"/>
+  <rect width="1200" height="700" fill="url(#gr)"/>
+
+  <!-- shared package -->
+  <rect x="40" y="26" width="1120" height="74" rx="16" fill="#0d0f16" stroke="#c9cfdd" stroke-opacity="0.45" stroke-width="2" stroke-dasharray="8 7"/>
+  <text x="68" y="58" class="k">ONE SHARED PACKAGE</text>
+  <text x="68" y="86" class="i">Data model · rubric text · translations (English, Hindi, Telugu) · sync and review contracts</text>
+  <path d="M185 100 V160" stroke="#c9cfdd" stroke-opacity="0.45" stroke-width="2" stroke-dasharray="6 6"/>
+  <path d="M665 100 V160" stroke="#c9cfdd" stroke-opacity="0.45" stroke-width="2" stroke-dasharray="6 6"/>
+  <path d="M1030 100 V160" stroke="#c9cfdd" stroke-opacity="0.45" stroke-width="2" stroke-dasharray="6 6"/>
+
+  <!-- phone -->
+  <rect class="box" x="40" y="160" width="290" height="270" rx="18" stroke="#00d4ff"/>
+  <text x="62" y="196" class="h">Teacher's phone</text>
+  <text x="62" y="222" class="s">Android · React Native (Expo)</text>
+  <rect class="row" x="60" y="244" width="250" height="46" rx="10"/><text x="76" y="273" class="i">Batch camera + names</text>
+  <rect class="row" x="60" y="300" width="250" height="46" rx="10"/><text x="76" y="329" class="i">Rubric · markup · voice</text>
+  <rect class="row" x="60" y="356" width="250" height="46" rx="10"/><text x="76" y="385" class="i">Local store + PIN lock</text>
+
+  <!-- sync arrow -->
+  <path d="M334 296 H516" stroke="#00d4ff" stroke-width="3" marker-end="url(#ab)"/>
+  <text x="425" y="258" class="l" text-anchor="middle">snapshot push</text>
+  <text x="425" y="280" class="s" text-anchor="middle">one writer: the phone</text>
+  <text x="425" y="330" class="s" text-anchor="middle">2,000 px photo copies,</text>
+  <text x="425" y="352" class="s" text-anchor="middle">only what is missing</text>
+
+  <!-- server -->
+  <rect class="box" x="520" y="160" width="290" height="270" rx="18" stroke="#ff6a4d"/>
+  <text x="542" y="196" class="h">API server</text>
+  <text x="542" y="222" class="s">Express + Prisma · TypeScript</text>
+  <rect class="row" x="540" y="244" width="250" height="46" rx="10"/><text x="556" y="273" class="i">Vercel · Singapore</text>
+  <rect class="row" x="540" y="300" width="250" height="46" rx="10"/><text x="556" y="329" class="i">Ownership checks</text>
+  <rect class="row" x="540" y="356" width="250" height="46" rx="10"/><text x="556" y="385" class="i">Rate limits · health probe</text>
+
+  <!-- data -->
+  <rect class="box" x="900" y="160" width="260" height="118" rx="18" stroke="#ff6a4d"/>
+  <text x="922" y="196" class="h">PostgreSQL</text>
+  <text x="922" y="224" class="s">Neon · 18 models</text>
+  <text x="922" y="252" class="s">soft deletes · settings</text>
+  <rect class="box" x="900" y="312" width="260" height="118" rx="18" stroke="#ff6a4d"/>
+  <text x="922" y="348" class="h">Object storage</text>
+  <text x="922" y="376" class="s">private · S3-compatible</text>
+  <text x="922" y="404" class="s">photos · voice · files</text>
+  <path d="M812 220 H896" stroke="#ff6a4d" stroke-width="3" marker-end="url(#ar)"/>
+  <path d="M812 371 H896" stroke="#ff6a4d" stroke-width="3" marker-end="url(#ar)"/>
+
+  <!-- web apps -->
+  <path d="M600 432 V500" stroke="#c9cfdd" stroke-width="3" marker-end="url(#aw)"/>
+  <path d="M770 432 V500" stroke="#c9cfdd" stroke-width="3" marker-end="url(#aw)"/>
+  <rect class="box" x="400" y="502" width="330" height="124" rx="18" stroke="#c9cfdd" stroke-opacity="0.7"/>
+  <text x="422" y="538" class="h">Teacher dashboard</text>
+  <text x="422" y="564" class="s">React (Vite) · read-only</text>
+  <text x="422" y="594" class="s">httpOnly cookie · proxy</text>
+  <rect class="box" x="750" y="502" width="330" height="124" rx="18" stroke="#c9cfdd" stroke-opacity="0.7"/>
+  <text x="772" y="538" class="h">Student portal</text>
+  <text x="772" y="564" class="s">React · 6-character join code</text>
+  <text x="772" y="594" class="s">reviews wait for approval</text>
+
+  <!-- phone verification -->
+  <rect class="box" x="40" y="502" width="290" height="124" rx="18" stroke="#00d4ff" stroke-opacity="0.6"/>
+  <text x="62" y="538" class="h">Phone verification</text>
+  <text x="62" y="564" class="s">Firebase Phone Auth</text>
+  <text x="62" y="594" class="s">six-digit code · PIN reset</text>
+  <path d="M185 500 V434" stroke="#00d4ff" stroke-width="3" marker-end="url(#ab)"/>
+
+  <text x="600" y="666" class="s" text-anchor="middle">Everything on the phone works offline. The server and web apps exist for sync, the laptop view and students.</text>
+</svg>

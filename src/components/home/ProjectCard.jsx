@@ -24,9 +24,12 @@ function trackPointer(event) {
 
 // Each cover has a 600w and a 1200w WebP next to the JPG (see public/work):
 // phones get the small one, and the JPG stays as the plain `src` fallback.
-function coverSrcSet(cover) {
+// A cover marked `coverHd` has a third, 1800w tier for sharp (retina) screens.
+function coverSrcSet(cover, hd) {
   const base = cover.replace(/\.jpg$/, '');
-  return `${base}-600.webp 600w, ${base}.webp 1200w`;
+  return hd
+    ? `${base}-600.webp 700w, ${base}-1200.webp 1200w, ${base}.webp 1800w`
+    : `${base}-600.webp 600w, ${base}.webp 1200w`;
 }
 const COVER_SIZES = '(min-width: 1100px) 380px, (min-width: 640px) 46vw, 92vw';
 
@@ -157,7 +160,7 @@ export function ProjectCard({ project: listed, onOpen, index, lead = false, size
             <img
               src={project.cover}
               // the unlocked screenshot is an inline image, so no responsive set
-              srcSet={project.cover.startsWith('data:') ? undefined : coverSrcSet(project.cover)}
+              srcSet={project.cover.startsWith('data:') ? undefined : coverSrcSet(project.cover, project.coverHd)}
               sizes={sizes}
               alt=""
               loading="lazy"

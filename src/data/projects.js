@@ -109,18 +109,20 @@ export const projects = [
     role: 'Designer & Developer',
     summary: 'The website for the Design Innovation Centre at IIT Hyderabad.',
   },
-  {
-    id: 'pedagogy-playcards',
-    type: 'website',
-    title: 'Pedagogy Playcards',
-    // Under NDA: the real link, screenshot and description are NOT here. They are
-    // in public/work/locked/pedagogy-playcards.enc, encrypted, and the card shows
-    // them only after the password is entered (see src/lib/lock.js).
-    lockId: 'pedagogy-playcards',
-    inProgress: true,
-    role: 'Designer & Developer',
-    summary: 'Covered by a non-disclosure agreement. Unlock it with the password to see the work.',
-  },
+  // Hidden for now (NDA project). To bring it back, uncomment this entry and
+  // the 'pedagogy-playcards' line in featuredIds below.
+  // {
+  //   id: 'pedagogy-playcards',
+  //   type: 'website',
+  //   title: 'Pedagogy Playcards',
+  //   // Under NDA: the real link, screenshot and description are NOT here. They are
+  //   // in public/work/locked/pedagogy-playcards.enc, encrypted, and the card shows
+  //   // them only after the password is entered (see src/lib/lock.js).
+  //   lockId: 'pedagogy-playcards',
+  //   inProgress: true,
+  //   role: 'Designer & Developer',
+  //   summary: 'Covered by a non-disclosure agreement. Unlock it with the password to see the work.',
+  // },
   {
     id: 'sricharan-reddy',
     type: 'website',
@@ -266,7 +268,7 @@ export const featuredIds = [
   'progressflow',
   '6th-mobile-studies-congress',
   'deepak-john-mathew',
-  'pedagogy-playcards',
+  // 'pedagogy-playcards',
   'dic-iith',
 ];
 export const featuredProjects = featuredIds.map((id) => projects.find((p) => p.id === id));

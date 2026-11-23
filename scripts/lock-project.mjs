@@ -6,8 +6,12 @@
 //
 // Reads the project's private details from  private/<id>/  (git-ignored, stays
 // on this machine):
-//   payload.json   { "href": "https://…", "summary": "…" }   what unlocking reveals
+//   payload.json   { "href": "https://…", "summary": "…" }   what unlocking reveals.
+//                  A project with a case study (no outside link) uses
+//                  { "caseStudy": "<slug>", "study": { …the whole case study… }, … }
 //   cover.webp     the screenshot shown on the card once unlocked
+//   assets/        optional: any string in payload.json written as "asset:<file>"
+//                  is replaced by that file from assets/, inlined (and so encrypted)
 // and writes  public/work/locked/<id>.enc  : the same data, encrypted. That file
 // is safe to publish. The site decrypts it in the visitor's browser only when the
 // right password is typed, so the real link and screenshot are never in the page.
@@ -21,6 +25,7 @@
 
 import { webcrypto as crypto } from 'node:crypto';
 import { readFile, writeFile, mkdir } from 'node:fs/promises';
+import { existsSync } from 'node:fs';
 import { createInterface } from 'node:readline/promises';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
@@ -50,12 +55,33 @@ if (password.length < 8) {
 
 const source = path.join(root, 'private', id);
 const payload = JSON.parse(await readFile(path.join(source, 'payload.json'), 'utf8'));
-if (!payload.href) {
-  console.error('payload.json needs an "href".');
+if (!payload.href && !payload.caseStudy) {
+  console.error('payload.json needs an "href" (or a "caseStudy" with its "study").');
   process.exit(1);
 }
-const cover = await readFile(path.join(source, 'cover.webp'));
-payload.cover = `data:image/webp;base64,${cover.toString('base64')}`;
+const coverFile = path.join(source, 'cover.webp');
+if (existsSync(coverFile)) {
+  const cover = await readFile(coverFile);
+  payload.cover = `data:image/webp;base64,${cover.toString('base64')}`;
+}
+
+// "asset:<file>" strings become data URIs of the files in private/<id>/assets/
+const MIME = { '.webp': 'image/webp', '.svg': 'image/svg+xml', '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg' };
+async function inline(value) {
+  if (Array.isArray(value)) return Promise.all(value.map(inline));
+  if (value && typeof value === 'object') {
+    return Object.fromEntries(await Promise.all(Object.entries(value).map(async ([k, v]) => [k, await inline(v)])));
+  }
+  if (typeof value === 'string' && value.startsWith('asset:')) {
+    const name = value.slice('asset:'.length);
+    const mime = MIME[path.extname(name).toLowerCase()];
+    if (!mime || name.includes('/') || name.includes('..')) throw new Error(`Unsupported asset "${name}"`);
+    const file = await readFile(path.join(source, 'assets', name));
+    return `data:${mime};base64,${file.toString('base64')}`;
+  }
+  return value;
+}
+const sealed = await inline(payload);
 
 const salt = crypto.getRandomValues(new Uint8Array(16));
 const iv = crypto.getRandomValues(new Uint8Array(12));
@@ -72,7 +98,7 @@ const key = await crypto.subtle.deriveKey(
 const data = await crypto.subtle.encrypt(
   { name: 'AES-GCM', iv },
   key,
-  new TextEncoder().encode(JSON.stringify(payload)),
+  new TextEncoder().encode(JSON.stringify(sealed)),
 );
 
 const b64 = (bytes) => Buffer.from(bytes).toString('base64');

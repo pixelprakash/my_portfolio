@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { disciplines, projectTypes } from '../../data/projects';
-import { lockAgain, useUnlocked } from '../../lib/lock';
+import { lockAgain, lockWords, useUnlocked } from '../../lib/lock';
 import LockDialog, { LockIcon } from './LockDialog';
 import cardStyles from './CaseStudyCard.module.css';
 import styles from './ProjectShowcase.module.css';
@@ -115,6 +115,7 @@ export function ProjectCard({ project: listed, onOpen, index, lead = false, size
   const locked = isNda && !unlocked;
   const project = unlocked ? { ...listed, ...unlocked } : listed;
   const [asking, setAsking] = useState(false);
+  const words = lockWords(listed);
 
   const type = projectTypes[project.type];
   const accent = ACCENT[disciplines[type.discipline].accent];
@@ -136,7 +137,7 @@ export function ProjectCard({ project: listed, onOpen, index, lead = false, size
               <i />
               <i />
             </span>
-            <span className={styles.host}>{locked ? 'locked · under NDA' : hostOf(project.href)}</span>
+            <span className={styles.host}>{locked ? words.host : hostOf(project.href)}</span>
           </div>
         )}
         <div className={styles.shot}>
@@ -153,7 +154,7 @@ export function ProjectCard({ project: listed, onOpen, index, lead = false, size
               <span className={styles.lockMark}>
                 <LockIcon size={34} />
               </span>
-              <span className={styles.slideKicker}>Under NDA</span>
+              <span className={styles.slideKicker}>{words.kicker}</span>
               <span className={styles.slideTitle}>{project.title}</span>
             </div>
           ) : project.cover ? (
@@ -201,7 +202,7 @@ export function ProjectCard({ project: listed, onOpen, index, lead = false, size
           <span className={styles.tags}>
             {isNda && (
               <span className={`${cardStyles.tag} ${accent.tag} ${styles.ndaTag}`}>
-                <LockIcon size={11} /> NDA
+                <LockIcon size={11} /> {words.tag}
               </span>
             )}
             {project.inProgress && (

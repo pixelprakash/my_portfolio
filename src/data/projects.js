@@ -22,6 +22,7 @@
 //   lockId   — puts the project under an NDA lock. Leave out href, cover and any
 //              real description: they live encrypted in public/work/locked/<id>.enc
 //              (make it with `npm run lock -- <id>`, see scripts/lock-project.mjs).
+//   lockKind — 'private' words the lock as "Private" instead of "Under NDA".
 //   caseStudy — slug of a case study in caseStudies.js: the card then opens that
 //              page on this site instead of an external link or a lightbox.
 //   role     — what you did on it ("Solo Designer & Developer"), shown on
@@ -215,16 +216,14 @@ export const projects = [
     id: 'progressflow',
     type: 'ux',
     title: 'ProgressFlow: formative assessment for Indian art classrooms',
-    caseStudy: 'progressflow',
-    cover: '/work/progressflow.jpg',
-    // the wide lead card crops the sides of the cover; keep the phone fully in view
-    coverPosition: '30% center',
+    // Private: the cover, summary, role, tools and the whole case study are NOT here.
+    // They are in public/work/locked/progressflow.enc, encrypted, and appear only after
+    // the password is entered (see src/lib/lock.js).
+    lockId: 'progressflow',
+    lockKind: 'private',
     inProgress: true,
-    role: 'Product design (with Ganesh) and full-stack engineering',
-    year: '2026',
-    summary:
-      'A phone app, teacher dashboard and student portal for assessing art in Classes 6 to 8, in English, Hindi and Telugu, offline-first. Designed with a PhD researcher after interviewing 10 art educators; engineered end to end.',
-    tools: ['React Native', 'React', 'Express'],
+    role: 'Designer & Developer',
+    summary: 'A private project. Unlock it with the password to see the work.',
   },
   {
     id: 'penny-wise-expense-tracker',

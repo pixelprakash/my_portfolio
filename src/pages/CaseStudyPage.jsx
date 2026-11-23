@@ -2,10 +2,12 @@ import { Fragment, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import Breadcrumbs from '../components/common/Breadcrumbs';
 import BackButton from '../components/common/BackButton';
+import { LockForm, LockIcon } from '../components/home/LockDialog';
 import NotFoundPage from './NotFoundPage';
 import { getCaseStudyBySlug } from '../data/caseStudies';
 import { useActiveSection } from '../hooks/useActiveSection';
 import { useDocumentHead } from '../hooks/useDocumentHead';
+import { lockAgain, useUnlocked } from '../lib/lock';
 import { NAV_HEIGHT } from '../constants';
 import styles from './CaseStudyPage.module.css';
 
@@ -413,9 +415,42 @@ function PartsArea({ study, active, counts, onSelect, onReveal }) {
   );
 }
 
+// A private case study: its title and a password form, nothing else. The study
+// itself is not in the site's code; it arrives (decrypted) from lib/lock.js.
+function LockedCaseStudy({ entry }) {
+  return (
+    <article className={styles.page}>
+      <div className="section-container">
+        <div className={styles.topRow}>
+          <Breadcrumbs
+            items={[
+              { label: 'Home', href: '/' },
+              { label: 'All projects', href: '/work' },
+              { label: entry.title },
+            ]}
+          />
+          <BackButton fallbackTo="/work" label="Back to all projects" />
+        </div>
+        <header className={styles.lockedHeader}>
+          <span className={styles.lockedMark} aria-hidden="true">
+            <LockIcon size={14} /> Private
+          </span>
+          <h1 className={styles.title}>{entry.title}</h1>
+        </header>
+        <div className={styles.lockPanel}>
+          <LockForm project={entry} />
+        </div>
+      </div>
+    </article>
+  );
+}
+
 export default function CaseStudyPage() {
   const { slug } = useParams();
-  const study = getCaseStudyBySlug(slug);
+  const listed = getCaseStudyBySlug(slug);
+  // a private case study is a stub in the code; the real one comes from the unlock
+  const unlocked = useUnlocked(listed?.lockId);
+  const study = listed?.lockId ? unlocked?.study : listed;
   const hasParts = Boolean(study?.parts);
 
   // The part being read. Remembered with its slug, so moving to another case
@@ -434,9 +469,11 @@ export default function CaseStudyPage() {
   const activeId = useActiveSection(sectionIds, { navHeight: NAV_HEIGHT });
 
   useDocumentHead({
-    title: study?.title ?? 'Case study not found',
-    description: study?.summary,
-    path: study ? `/work/${study.slug}` : undefined,
+    title: study?.title ?? listed?.title ?? 'Case study not found',
+    description:
+      study?.summary ??
+      (listed?.lockId ? 'A private project. Enter the password to read the case study.' : undefined),
+    path: listed ? `/work/${listed.slug}` : undefined,
   });
 
   // Go to a section or a part: switch to its part if it is in one, keep the
@@ -487,6 +524,10 @@ export default function CaseStudyPage() {
     goTo(id);
   }
 
+  if (listed?.lockId && !study) {
+    return <LockedCaseStudy entry={listed} />;
+  }
+
   if (!study) {
     return <NotFoundPage />;
   }
@@ -513,7 +554,19 @@ export default function CaseStudyPage() {
               { label: study.title },
             ]}
           />
-          <BackButton fallbackTo="/work" label="Back to all projects" />
+          <div className={styles.topActions}>
+            {listed.lockId && (
+              <button
+                type="button"
+                className={styles.relock}
+                data-sound="none"
+                onClick={() => lockAgain(listed.lockId)}
+              >
+                <LockIcon size={13} /> Lock again
+              </button>
+            )}
+            <BackButton fallbackTo="/work" label="Back to all projects" />
+          </div>
         </div>
 
         <header className={styles.header}>

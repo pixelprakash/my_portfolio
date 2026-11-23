@@ -102,3 +102,23 @@ export async function unlock(id, password) {
   emit();
   return details;
 }
+
+/**
+ * The words used for a locked project: an NDA project says so, a project that is
+ * simply private (lockKind: 'private') doesn't claim an agreement.
+ */
+export function lockWords(project) {
+  return project.lockKind === 'private'
+    ? {
+        tag: 'Private',
+        kicker: 'Private project',
+        host: 'locked · private',
+        sentence: 'is private for now.',
+      }
+    : {
+        tag: 'NDA',
+        kicker: 'Under NDA',
+        host: 'locked · under NDA',
+        sentence: 'is covered by a non-disclosure agreement.',
+      };
+}

@@ -6,7 +6,7 @@ export default function ContactCta() {
   return (
     <section className={styles.section} aria-labelledby="cta-heading">
       <div className="section-container">
-        <Reveal className={styles.panel}>
+        <Reveal className={styles.panel} data-skin="cta-panel">
           <span className="kicker">Let's work together</span>
           <h2 id="cta-heading" className={styles.heading}>
             Have a project <span className="text-gradient">in mind?</span>
@@ -15,7 +15,7 @@ export default function ContactCta() {
             A product to design, a site to build, or both — I'd love to hear about it.
           </p>
           <div className={styles.actions}>
-            <a className={styles.primary} href={`mailto:${siteConfig.email}`}>
+            <a className={styles.primary} data-skin="pill-primary" href={`mailto:${siteConfig.email}`}>
               Say hello <span aria-hidden="true">→</span>
             </a>
             <a

@@ -34,6 +34,7 @@ export default function AllProjects() {
           <button
             key={group.key}
             type="button"
+            data-skin="chip"
             className={`${styles.chip} ${filter === group.key ? styles.chipActive : ''}`}
             aria-pressed={filter === group.key}
             onClick={() => setFilter(group.key)}
@@ -54,7 +55,7 @@ export default function AllProjects() {
           role="group"
           aria-labelledby={`work-group-${group.key}`}
         >
-          <div className={styles.groupHeader}>
+          <div className={styles.groupHeader} data-skin="group-header">
             <h2 id={`work-group-${group.key}`} className={styles.groupTitle}>
               {group.label}
             </h2>

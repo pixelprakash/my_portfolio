@@ -48,7 +48,7 @@ export default function ScrollAids() {
   return (
     <>
       <div className={styles.progress} aria-hidden="true">
-        <div ref={barRef} className={styles.bar} />
+        <div ref={barRef} className={styles.bar} data-skin="progress" />
       </div>
 
       <button

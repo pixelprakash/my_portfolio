@@ -1,0 +1,552 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   v2 "Spectrum Cinema"
+   A layer over v1, loaded only for a v2 preview (see lib/uiVersion).
+   Every rule is scoped to html[data-ui='v2'], so v1 can't be affected.
+   Components are targeted through their data-skin="…" attributes.
+   To retire v2, delete src/v2. To make it the only design, fold these
+   rules into the components and drop the scope.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* ── Tokens ── */
+html[data-ui='v2'] {
+  --color-bg: #040406;
+  --color-bg-elevated: #0b0b10;
+  --color-surface: rgba(244, 242, 238, 0.035);
+  --color-surface-strong: rgba(244, 242, 238, 0.07);
+  --color-border: rgba(244, 242, 238, 0.13);
+  --color-border-strong: rgba(244, 242, 238, 0.26);
+
+  --color-text: #f4f2ee;
+  --color-text-secondary: #cfccc6;
+  --color-text-muted: #9d9b98;
+  --color-text-faint: #82807f;
+
+  /* the two accents, softened from neon to light */
+  --color-blue: #6fb4ff;
+  --color-blue-deep: #2347ff;
+  --color-blue-soft: #c4dcff;
+  --color-blue-tint: rgba(35, 71, 255, 0.17);
+  --color-red: #ff7a52;
+  --color-red-deep: #d92f17;
+  --color-red-soft: #ffc4b0;
+  --color-red-tint: rgba(255, 77, 46, 0.15);
+
+  --spectrum: linear-gradient(90deg, #2347ff, #35c8ff 26%, #eef6ff 50%, #ffb347 72%, #ff4d2e 90%, #e8308c);
+  /* for text: the same run without the dark cobalt end */
+  --spectrum-text: linear-gradient(100deg, #5b8cff, #55d2ff 24%, #f4f8ff 48%, #ffc06a 70%, #ff7458);
+
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 10px;
+  --shadow-glow-blue: 0 20px 60px -20px rgba(35, 71, 255, 0.6);
+  --shadow-glow-red: 0 20px 60px -20px rgba(255, 77, 46, 0.55);
+
+  --font-display: 'Instrument Sans', 'Segoe UI', system-ui, sans-serif;
+  --font-body: 'Instrument Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-serif: 'Instrument Serif', 'Iowan Old Style', Georgia, serif;
+
+  --section-space: clamp(5.5rem, 11vw, 11rem);
+  scrollbar-color: rgba(244, 242, 238, 0.24) transparent;
+}
+
+html[data-ui='v2'] ::selection {
+  background: rgba(35, 71, 255, 0.6);
+  color: #fff;
+}
+
+html[data-ui='v2'] h1,
+html[data-ui='v2'] h2,
+html[data-ui='v2'] h3,
+html[data-ui='v2'] h4 {
+  font-weight: 600;
+  line-height: 1.16;
+  letter-spacing: -0.015em;
+}
+
+/* ── Atmosphere: columns of light behind a pane of fine ribbed glass ── */
+html[data-ui='v2'] body::before {
+  background:
+    radial-gradient(18vmax 75vmax at 6% 8%, rgba(35, 71, 255, 0.3), transparent 70%),
+    radial-gradient(7vmax 55vmax at 17% 0%, rgba(53, 200, 255, 0.12), transparent 70%),
+    radial-gradient(20vmax 70vmax at 96% 92%, rgba(255, 77, 46, 0.22), transparent 70%),
+    radial-gradient(8vmax 50vmax at 84% 108%, rgba(232, 48, 140, 0.14), transparent 70%);
+}
+
+html[data-ui='v2'] body::after {
+  background: repeating-linear-gradient(90deg, rgba(244, 242, 238, 0.035) 0 1px, transparent 1px 9px);
+  -webkit-mask-image: linear-gradient(90deg, #000, transparent 26% 74%, #000);
+  mask-image: linear-gradient(90deg, #000, transparent 26% 74%, #000);
+}
+
+/* ── Headings: grotesk, with the key words in a spectrum serif italic ── */
+html[data-ui='v2'] main section h2:not(.kicker):not(.visually-hidden),
+html[data-ui='v2'] [data-skin='page-title'] {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  line-height: 1.02;
+  letter-spacing: -0.02em;
+}
+
+html[data-ui='v2'] #about-heading,
+html[data-ui='v2'] #testimonials-heading {
+  font-size: clamp(2.6rem, 6.4vw, 5.25rem);
+}
+
+html[data-ui='v2'] .text-gradient {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 400;
+  background-image: var(--spectrum-text);
+  padding-right: 0.08em; /* room for the italic's overhang inside the clip */
+}
+
+html[data-ui='v2'] .kicker {
+  font-family: var(--font-body);
+  font-size: 0.74rem;
+  font-weight: 600;
+  letter-spacing: 0.26em;
+  color: var(--color-text-secondary);
+}
+
+html[data-ui='v2'] .kicker::before {
+  width: 2.75rem;
+  height: 3px;
+  background: var(--spectrum);
+  box-shadow: 0 0 14px rgba(53, 200, 255, 0.45);
+}
+
+html[data-ui='v2'] h2.kicker {
+  line-height: 1.4;
+  letter-spacing: 0.26em;
+}
+
+html[data-ui='v2'] main > section[id]::before,
+html[data-ui='v2'] [data-skin='footer']::before {
+  background: var(--spectrum);
+  opacity: 0.6;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 22% 78%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 22% 78%, transparent);
+}
+
+/* ── Navigation ── */
+html[data-ui='v2'] [data-skin='nav'] {
+  background: rgba(4, 4, 6, 0.72);
+  border-bottom-color: rgba(244, 242, 238, 0.09);
+}
+
+html[data-ui='v2'] [data-skin='logo'] {
+  position: relative;
+  background: none;
+  -webkit-text-fill-color: currentColor;
+  color: var(--color-text);
+  font-family: var(--font-serif);
+  font-size: clamp(1.3rem, 2vw, 1.6rem);
+  letter-spacing: 0;
+  line-height: 1;
+}
+
+html[data-ui='v2'] [data-skin='logo'] > span {
+  margin-top: 4px;
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  -webkit-text-fill-color: var(--color-text-muted);
+}
+
+html[data-ui='v2'] [data-skin='nav-links'] a {
+  position: relative;
+  border-bottom: 0;
+}
+
+html[data-ui='v2'] [data-skin='nav-links'] a::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 2px;
+  background: var(--spectrum);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform var(--transition-base);
+}
+
+html[data-ui='v2'] [data-skin='nav-links'] a:hover::after,
+html[data-ui='v2'] [data-skin='nav-links'] a[aria-current='true']::after {
+  transform: scaleX(1);
+}
+
+html[data-ui='v2'] [data-skin='nav-menu'] a {
+  font-family: var(--font-serif);
+  font-size: 2.2rem;
+}
+
+html[data-ui='v2'] [data-skin='nav-menu'] a:last-child {
+  font-family: var(--font-body);
+  font-size: 1rem;
+}
+
+html[data-ui='v2'] [data-skin='sound'] {
+  font-family: var(--font-body);
+  font-weight: 600;
+}
+
+html[data-ui='v2'] [data-skin='progress'] {
+  background: var(--spectrum);
+  box-shadow: 0 0 12px rgba(53, 200, 255, 0.5);
+}
+
+/* ── Buttons: solid warm white, with light spilling underneath on hover ── */
+html[data-ui='v2'] [data-skin='pill-primary'] {
+  background: var(--color-text);
+  border-color: var(--color-text);
+  color: #08080b;
+}
+
+html[data-ui='v2'] [data-skin='pill-primary']:hover {
+  background: #fff;
+  box-shadow: -14px 10px 34px -10px rgba(53, 120, 255, 0.85), 14px 10px 34px -10px rgba(255, 90, 50, 0.85);
+}
+
+/* ── Project cards: no box; the cover is the object, the text sits under it ── */
+html[data-ui='v2'] [data-skin='card'] {
+  --tone: #6fb4ff;
+  --glow-a: rgba(35, 71, 255, 0.75);
+  --glow-b: rgba(53, 200, 255, 0.55);
+  background: none;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  overflow: visible;
+  transform: none;
+}
+
+html[data-ui='v2'] [data-skin='card']:nth-child(n):hover {
+  background: none;
+  box-shadow: none;
+  transform: none;
+}
+
+html[data-ui='v2'] li:nth-child(even) > [data-skin='card'] {
+  --tone: #ff7a52;
+  --glow-a: rgba(255, 77, 46, 0.7);
+  --glow-b: rgba(232, 48, 140, 0.55);
+}
+
+html[data-ui='v2'] [data-skin='card']::before {
+  display: none;
+}
+
+/* the cover itself stays untouched: the light lives around it */
+html[data-ui='v2'] [data-skin='card-cover'] {
+  position: relative;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  transition: box-shadow var(--transition-slow), border-color var(--transition-slow),
+    transform var(--transition-slow);
+}
+
+html[data-ui='v2'] [data-skin='card']:hover [data-skin='card-cover'],
+html[data-ui='v2'] [data-skin='card']:focus-within [data-skin='card-cover'] {
+  border-color: rgba(244, 242, 238, 0.4);
+  box-shadow: -22px 22px 56px -26px var(--glow-a), 22px 28px 60px -28px var(--glow-b);
+  transform: translateY(-6px);
+}
+
+html[data-ui='v2'] [data-skin='card-cover'] + div {
+  padding: var(--space-5) 2px 0;
+}
+
+html[data-ui='v2'] [data-skin='card-chrome'] {
+  background: #0d0d12;
+}
+
+html[data-ui='v2'] [data-skin='card-title'] {
+  font-family: var(--font-serif);
+  font-size: clamp(1.7rem, 1.3rem + 0.9vw, 2.3rem);
+  font-weight: 400;
+  line-height: 1.08;
+  letter-spacing: -0.012em;
+}
+
+html[data-ui='v2'] [data-skin='card-index'] {
+  -webkit-text-stroke: 0;
+  -webkit-text-fill-color: var(--tone);
+  color: var(--tone);
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 1.7rem;
+}
+
+html[data-ui='v2'] [data-skin='card-link'] {
+  align-self: flex-start;
+  color: var(--color-text);
+  border-bottom: 1px solid var(--tone);
+  padding-bottom: 3px;
+}
+
+/* locked and cover-less cards: a slit-scan column of light */
+html[data-ui='v2'] [data-skin='card-slide'] {
+  background:
+    repeating-linear-gradient(90deg, rgba(4, 4, 6, 0.55) 0 2px, transparent 2px 7px),
+    radial-gradient(34% 90% at 50% 108%, #ff5a3c 0%, rgba(255, 179, 71, 0.75) 22%, rgba(233, 244, 255, 0.55) 40%, rgba(53, 200, 255, 0.42) 58%, rgba(35, 71, 255, 0.3) 76%, transparent 100%),
+    radial-gradient(80% 60% at 50% 100%, rgba(35, 71, 255, 0.5), transparent 75%),
+    #05060f;
+}
+
+/* neighbours get different light, so a row of placeholders never repeats */
+html[data-ui='v2'] li:nth-child(3n + 2) [data-skin='card-slide'] {
+  background:
+    repeating-linear-gradient(90deg, rgba(4, 4, 6, 0.55) 0 2px, transparent 2px 7px),
+    linear-gradient(108deg, transparent 34%, rgba(35, 71, 255, 0.55) 52%, rgba(53, 200, 255, 0.5) 62%, rgba(233, 244, 255, 0.6) 69%, rgba(255, 179, 71, 0.65) 75%, rgba(255, 77, 46, 0.6) 82%, transparent 96%),
+    #05060f;
+}
+
+html[data-ui='v2'] li:nth-child(3n) [data-skin='card-slide'] {
+  background:
+    repeating-linear-gradient(90deg, rgba(4, 4, 6, 0.55) 0 2px, transparent 2px 7px),
+    radial-gradient(95% 26% at 78% 34%, rgba(233, 244, 255, 0.75), rgba(255, 179, 71, 0.55) 26%, rgba(255, 77, 46, 0.5) 46%, rgba(232, 48, 140, 0.34) 66%, transparent 100%),
+    radial-gradient(70% 80% at 90% 10%, rgba(35, 71, 255, 0.6), transparent 72%),
+    #05060f;
+}
+
+html[data-ui='v2'] [data-skin='card-slide'] > span:last-child {
+  font-family: var(--font-serif);
+  font-size: clamp(1.6rem, 3.2vw, 2.2rem);
+  line-height: 1.05;
+  text-shadow: 0 2px 24px rgba(0, 0, 0, 0.9);
+}
+
+/* the lead card keeps its two columns, so its text needs the side padding */
+@media (min-width: 900px) {
+  html[data-ui='v2'] li:first-child > [data-skin='card']:has([data-skin='card-index']) [data-skin='card-cover'] {
+    border-right: 1px solid var(--color-border);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  html[data-ui='v2'] li:first-child > [data-skin='card']:has([data-skin='card-index']) [data-skin='card-cover'] + div {
+    padding: var(--space-5) 0 var(--space-5) var(--space-7);
+  }
+
+  html[data-ui='v2'] li:first-child > [data-skin='card']:has([data-skin='card-index']) [data-skin='card-title'] {
+    font-size: clamp(2.2rem, 3.4vw, 3.6rem);
+    line-height: 1.02;
+  }
+}
+
+/* ── All-projects page ── */
+html[data-ui='v2'] [data-skin='page-title'] {
+  font-size: clamp(2.5rem, 6.5vw, 5.5rem);
+}
+
+html[data-ui='v2'] [data-skin='group-header'] h2 {
+  font-family: var(--font-serif);
+  font-size: clamp(2.2rem, 4vw, 3.25rem);
+  font-weight: 400;
+  color: var(--color-text);
+}
+
+html[data-ui='v2'] [data-skin='group-header']::after {
+  width: 9rem;
+  height: 3px;
+  background: var(--spectrum);
+}
+
+/* ── About ── */
+html[data-ui='v2'] [data-skin='persona'] {
+  --accent: #6fb4ff;
+  --beam: rgba(35, 71, 255, 0.5);
+  --beam-core: rgba(53, 200, 255, 0.3);
+  background:
+    radial-gradient(34% 100% at 88% 112%, var(--beam-core), transparent 70%),
+    radial-gradient(70% 120% at 88% 112%, var(--beam), transparent 70%),
+    #08080d;
+}
+
+html[data-ui='v2'] [data-skin='persona'][data-tone='red'] {
+  --accent: #ff7a52;
+  --beam: rgba(255, 77, 46, 0.4);
+  --beam-core: rgba(255, 179, 71, 0.26);
+}
+
+html[data-ui='v2'] [data-skin='persona']::before {
+  background: linear-gradient(90deg, var(--accent), transparent);
+  height: 1px;
+}
+
+html[data-ui='v2'] [data-skin='persona'] h3 {
+  font-family: var(--font-serif);
+  font-size: 2.1rem;
+  font-weight: 400;
+  color: var(--color-text);
+}
+
+/* outlined numerals become solid spectrum serif */
+html[data-ui='v2'] [data-skin='numeral'] {
+  font-family: var(--font-serif);
+  font-style: italic;
+  -webkit-text-stroke: 0;
+  background: var(--spectrum-text);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  padding-right: 0.12em;
+  filter: none;
+}
+
+html[data-ui='v2'] [data-skin='now-tag'] {
+  font-family: var(--font-body);
+  font-weight: 700;
+}
+
+/* ── Testimonials: set as pull quotes ── */
+html[data-ui='v2'] [data-skin='quote-card'] {
+  --accent: #6fb4ff;
+  --accent-glow: rgba(35, 71, 255, 0.35);
+  --accent-tint: rgba(35, 71, 255, 0.22);
+  background: linear-gradient(180deg, rgba(244, 242, 238, 0.05), rgba(244, 242, 238, 0.012));
+}
+
+html[data-ui='v2'] [data-skin='quote-card'][data-tone='red'] {
+  --accent: #ff7a52;
+  --accent-glow: rgba(255, 77, 46, 0.3);
+  --accent-tint: rgba(255, 77, 46, 0.2);
+}
+
+html[data-ui='v2'] [data-skin='quote-card']::before {
+  height: 1px;
+}
+
+html[data-ui='v2'] [data-skin='quote-mark'] {
+  width: 30px;
+  height: 23px;
+}
+
+html[data-ui='v2'] [data-skin='quote-card'] blockquote p {
+  font-family: var(--font-serif);
+  font-size: 1.45rem;
+  line-height: 1.38;
+}
+
+html[data-ui='v2'] li:first-child > [data-skin='quote-card'] blockquote p {
+  font-size: clamp(1.6rem, 2.8vw, 2.4rem);
+  line-height: 1.24;
+}
+
+html[data-ui='v2'] [data-skin='avatar'] {
+  border-width: 1px;
+  font-family: var(--font-body);
+  font-weight: 700;
+}
+
+/* ── Contact call-to-action: light rising through ribbed glass ── */
+html[data-ui='v2'] [data-skin='cta-panel'] {
+  isolation: isolate;
+  padding-top: clamp(5rem, 11vw, 10rem);
+  padding-bottom: clamp(5rem, 11vw, 10rem);
+  border-color: var(--color-border);
+  background:
+    radial-gradient(26% 105% at 50% 122%, #ff5a3c 0%, rgba(255, 179, 71, 0.8) 24%, rgba(233, 244, 255, 0.4) 42%, rgba(53, 200, 255, 0.3) 60%, transparent 100%),
+    radial-gradient(70% 95% at 50% 112%, rgba(35, 71, 255, 0.62), transparent 72%),
+    #05050c;
+}
+
+html[data-ui='v2'] [data-skin='cta-panel']::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: repeating-linear-gradient(90deg, rgba(4, 4, 6, 0.5) 0 3px, rgba(255, 255, 255, 0.025) 3px 4px, transparent 4px 11px);
+  -webkit-mask-image: linear-gradient(to top, #000 10%, transparent 85%);
+  mask-image: linear-gradient(to top, #000 10%, transparent 85%);
+}
+
+html[data-ui='v2'] #cta-heading {
+  font-size: clamp(2.8rem, 8vw, 7rem);
+  text-shadow: 0 4px 40px rgba(4, 4, 6, 0.8);
+}
+
+/* a shadow would paint over gradient-filled text and dull it */
+html[data-ui='v2'] #cta-heading .text-gradient {
+  text-shadow: none;
+}
+
+html[data-ui='v2'] [data-skin='cta-panel'] p {
+  text-shadow: 0 1px 12px rgba(4, 4, 6, 0.95);
+  color: var(--color-text);
+}
+
+/* ── Footer ── */
+html[data-ui='v2'] [data-skin='footer-title'] {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  font-size: clamp(3.5rem, 12vw, 10rem);
+  line-height: 1;
+}
+
+html[data-ui='v2'] [data-skin='footer-row'] {
+  background-image: linear-gradient(90deg, rgba(35, 71, 255, 0.2), rgba(255, 77, 46, 0.08) 60%, transparent);
+}
+
+html[data-ui='v2'] [data-skin='footer-row'] a {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  font-size: clamp(1.4rem, 2.6vw, 2rem);
+}
+
+html[data-ui='v2'] [data-skin='footer-row'] > span {
+  font-family: var(--font-body);
+  font-weight: 600;
+  letter-spacing: 0.2em;
+}
+
+/* ── Case studies: the same light, kept quiet for reading ── */
+html[data-ui='v2'] [data-skin='part-banner'],
+html[data-ui='v2'] [data-skin='part-card'] {
+  --accent: #6fb4ff;
+  --accent-tint: rgba(35, 71, 255, 0.34);
+  background: radial-gradient(60% 130% at 92% 115%, var(--accent-tint), transparent 70%), #08080d;
+}
+
+html[data-ui='v2'] [data-skin='part-banner'][data-tone='red'],
+html[data-ui='v2'] [data-skin='part-card'][data-tone='red'] {
+  --accent: #ff7a52;
+  --accent-tint: rgba(255, 77, 46, 0.28);
+}
+
+html[data-ui='v2'] [data-skin='part-banner'] h2,
+html[data-ui='v2'] [data-skin='part-card'] h3,
+html[data-ui='v2'] [data-skin='part-card'] > span:nth-of-type(2) {
+  font-family: var(--font-serif);
+  font-weight: 400;
+}
+
+html[data-ui='v2'] [data-skin='switch-thumb'] {
+  box-shadow: 0 12px 40px -14px var(--accent);
+}
+
+html[data-ui='v2'] [data-skin='lock-panel'],
+html[data-ui='v2'] [data-skin='dialog'] {
+  background: #09090e;
+}
+
+html[data-ui='v2'] [data-skin='lock-panel']::before,
+html[data-ui='v2'] [data-skin='dialog']::before {
+  background: var(--spectrum);
+}
+
+html[data-ui='v2'] [data-skin='badge'] {
+  background: linear-gradient(135deg, rgba(35, 71, 255, 0.4), rgba(255, 77, 46, 0.32));
+}
+
+@media (max-width: 768px) {
+  html[data-ui='v2'] body::after {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html[data-ui='v2'] [data-skin='card']:hover [data-skin='card-cover'] {
+    transform: none;
+  }
+}

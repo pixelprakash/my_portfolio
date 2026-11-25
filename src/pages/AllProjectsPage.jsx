@@ -23,7 +23,7 @@ export default function AllProjectsPage() {
 
         <header className={styles.header}>
           <span className="kicker">Work</span>
-          <h1 className={styles.title}>All projects</h1>
+          <h1 className={styles.title} data-skin="page-title">All projects</h1>
           <p className={styles.description}>
             Every project in one place: {projects.length} of them, grouped by discipline. Open any
             card to see it.

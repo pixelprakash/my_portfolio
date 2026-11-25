@@ -1,0 +1,400 @@
+/* v2 hero: one dark stage. The WebGL canvas fills it; the headline sits in
+   the top corners, clear of the beams, and the two experience notes sit in the
+   bottom corners, outside the shoulders. */
+.hero {
+  --frame-h: calc(100vh - var(--nav-height) - 2.5rem);
+  position: relative;
+  isolation: isolate;
+  width: 100%;
+  height: calc(100vh - var(--nav-height));
+  min-height: 560px;
+  overflow: hidden;
+  background: #040406;
+  /* a vertical swipe still scrolls; sideways drags clear the glass */
+  touch-action: pan-y;
+}
+
+/* melts into the page below */
+.hero::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 16%;
+  z-index: 2;
+  pointer-events: none;
+  background: linear-gradient(to bottom, transparent, var(--color-bg));
+}
+
+.stage {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.stage canvas {
+  display: block;
+}
+
+/* The portrait's box, cropped to chest height (--crop of the photo). The
+   canvas draws into this box; the <img> is what shows until it is ready, and
+   stays if WebGL isn't there. */
+.frame {
+  position: absolute;
+  z-index: 1;
+  left: 50%;
+  bottom: 0;
+  height: var(--frame-h);
+  aspect-ratio: calc(1100 / (1422 * var(--crop)));
+  transform: translateX(-50%);
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.photo {
+  display: block;
+  width: 100%;
+  max-width: none;
+  height: auto;
+  -webkit-mask-image: linear-gradient(to bottom, #000 76%, transparent 99%);
+  mask-image: linear-gradient(to bottom, #000 76%, transparent 99%);
+}
+
+.live .photo {
+  opacity: 0;
+}
+
+.headline {
+  position: absolute;
+  z-index: 3;
+  top: clamp(1.25rem, 4vh, 3rem);
+  left: var(--container-padding);
+  right: var(--container-padding);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--space-5);
+  margin: 0;
+  pointer-events: none;
+}
+
+.headline:focus {
+  outline: none;
+}
+
+.headLeft,
+.headRight {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  animation: rise 900ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.headRight {
+  align-items: flex-end;
+  text-align: right;
+  animation-delay: 140ms;
+}
+
+.eyebrow {
+  font-family: var(--font-body);
+  font-size: 0.78rem;
+  font-weight: 600;
+  line-height: 1.4;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: rgba(244, 242, 238, 0.78);
+}
+
+.word {
+  font-family: var(--font-serif);
+  font-size: clamp(3.25rem, min(8.4vw, 17vh), 11rem);
+  font-weight: 400;
+  line-height: 0.92;
+  letter-spacing: -0.025em;
+  white-space: nowrap;
+  color: #f4f2ee;
+  text-shadow: 0 6px 40px rgba(0, 0, 0, 0.7);
+}
+
+.amp {
+  font-style: italic;
+  background: linear-gradient(160deg, #ffb347, #ff4d2e 55%, #e8308c);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  padding-right: 0.04em;
+  text-shadow: none;
+}
+
+.stats {
+  position: absolute;
+  z-index: 3;
+  left: var(--container-padding);
+  right: var(--container-padding);
+  bottom: 5.25rem; /* clears the preview switch and back-to-top */
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: var(--space-5);
+  pointer-events: none;
+}
+
+.stat {
+  --tone: #35c8ff;
+  position: relative;
+  isolation: isolate;
+  width: min(19rem, 24vw);
+  padding-top: var(--space-4);
+  animation: rise 900ms 280ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.warm {
+  --tone: #ff7a52;
+  text-align: right;
+  animation-delay: 400ms;
+}
+
+/* a soft shadow, not a card, so the words hold up over the light */
+.stat::after {
+  content: '';
+  position: absolute;
+  inset: -28px -44px;
+  z-index: -1;
+  background: radial-gradient(closest-side, rgba(4, 4, 6, 0.86) 0 55%, transparent 100%);
+}
+
+.stat::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, var(--tone), transparent 88%);
+}
+
+.warm::before {
+  background: linear-gradient(270deg, var(--tone), transparent 88%);
+}
+
+.years {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-3);
+}
+
+.warm .years {
+  justify-content: flex-end;
+}
+
+.yearsNum {
+  font-family: var(--font-serif);
+  font-size: clamp(2.8rem, 8vh, 4.5rem);
+  line-height: 0.9;
+  color: var(--tone);
+}
+
+.yearsUnit {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(244, 242, 238, 0.75);
+}
+
+.statLabel {
+  margin-top: var(--space-3);
+  font-size: clamp(1rem, 1.3vw, 1.15rem);
+  line-height: 1.4;
+  color: rgba(244, 242, 238, 0.84);
+}
+
+.statLabel strong,
+.now strong {
+  font-weight: 700;
+  color: #fff;
+}
+
+.now {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  margin-top: var(--space-3);
+  font-size: 0.9rem;
+  line-height: 1.45;
+  color: rgba(244, 242, 238, 0.78);
+}
+
+.nowTag {
+  flex: none;
+  margin-top: 1px;
+  padding: 1px 8px;
+  border: 1px solid var(--tone);
+  border-radius: 999px;
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--tone);
+}
+
+.cleanToggle {
+  position: absolute;
+  z-index: 4;
+  left: 50%;
+  bottom: 1.15rem;
+  transform: translateX(-50%);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  height: 40px;
+  padding: 0 var(--space-5) 0 var(--space-3);
+  border: 1px solid rgba(244, 242, 238, 0.24);
+  border-radius: 999px;
+  background: rgba(6, 6, 9, 0.66);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  font-size: 0.82rem;
+  font-weight: 600;
+  white-space: nowrap;
+  color: #f4f2ee;
+  transition: border-color var(--transition-fast), background var(--transition-fast);
+}
+
+.cleanToggle:hover {
+  border-color: rgba(244, 242, 238, 0.7);
+}
+
+.swatch {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: repeating-linear-gradient(90deg, #35c8ff 0 2px, #14143a 2px 4px, #ff7a52 4px 6px);
+}
+
+.cleanToggle[aria-pressed='true'] .swatch {
+  background: #f4f2ee;
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Tablets, phones and near-square windows: everything stacks. */
+@media (max-width: 1024px), (max-aspect-ratio: 7/5) {
+  .hero {
+    --frame-w: min(100%, 640px, 78vh);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: auto;
+    min-height: calc(100vh - var(--nav-height));
+    padding-top: var(--space-6);
+  }
+
+  .headline {
+    position: relative;
+    top: auto;
+    left: auto;
+    right: auto;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+    width: 100%;
+    padding: 0 var(--container-padding);
+  }
+
+  .headLeft,
+  .headRight {
+    align-items: center;
+    gap: var(--space-3);
+    text-align: center;
+  }
+
+  /* one name line is enough when the two halves stack */
+  .headRight .eyebrow {
+    display: none;
+  }
+
+  .word {
+    font-size: clamp(3.4rem, 16vw, 7.5rem);
+  }
+
+  .frame {
+    position: relative;
+    left: auto;
+    bottom: auto;
+    flex: none;
+    width: var(--frame-w);
+    height: auto;
+    margin-top: auto;
+    transform: none;
+  }
+
+  .stats {
+    position: relative;
+    left: auto;
+    right: auto;
+    bottom: auto;
+    order: 2;
+    align-items: flex-start;
+    width: 100%;
+    margin: var(--space-7) 0 var(--space-8);
+    padding: 0 var(--container-padding);
+  }
+
+  .stat {
+    flex: 1 1 0;
+    width: auto;
+    min-width: 0;
+  }
+
+  /* straight under the photo it controls, over its faded foot */
+  .cleanToggle {
+    position: relative;
+    order: 1;
+    left: auto;
+    bottom: auto;
+    transform: none;
+    margin-top: -2.5rem;
+  }
+}
+
+@media (max-width: 560px) {
+  .stats {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--space-6);
+  }
+
+  .stat,
+  .warm {
+    flex: none;
+    text-align: left;
+  }
+
+  .warm .years {
+    justify-content: flex-start;
+  }
+
+  .warm::before {
+    background: linear-gradient(90deg, var(--tone), transparent 88%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .headLeft,
+  .headRight,
+  .stat {
+    animation: none;
+  }
+}

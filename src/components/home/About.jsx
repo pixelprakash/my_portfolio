@@ -12,11 +12,11 @@ function Emphasis({ text }) {
 
 function PersonaCard({ accent, title, years, label, now, tools }) {
   return (
-    <div className={`${styles.persona} ${accent === 'blue' ? styles.personaBlue : styles.personaRed}`}>
+    <div data-skin="persona" data-tone={accent} className={`${styles.persona} ${accent === 'blue' ? styles.personaBlue : styles.personaRed}`}>
       <div className={styles.personaTop}>
         <h3 className={styles.personaTitle}>{title}</h3>
         <p className={styles.years}>
-          <span className={styles.yearsNum}>{years}</span>
+          <span className={styles.yearsNum} data-skin="numeral">{years}</span>
           <span className={styles.yearsUnit}>yrs</span>
         </p>
       </div>
@@ -25,7 +25,7 @@ function PersonaCard({ accent, title, years, label, now, tools }) {
       </p>
       {now && (
         <p className={styles.now}>
-          <span className={styles.nowTag}>Now</span>
+          <span className={styles.nowTag} data-skin="now-tag">Now</span>
           <span>
             <strong>{now.role}</strong> · {now.at}
           </span>
@@ -65,7 +65,7 @@ export default function About() {
               <ol className={styles.principles}>
                 {about.principles.map((principle, index) => (
                   <li key={principle.title} className={styles.principle}>
-                    <span className={styles.number} aria-hidden="true">
+                    <span className={styles.number} data-skin="numeral" aria-hidden="true">
                       {String(index + 1).padStart(2, '0')}
                     </span>
                     <div>
@@ -79,7 +79,7 @@ export default function About() {
 
             <Reveal delay={150} className={styles.actions}>
               {about.resumeHref && (
-                <a className={styles.primary} href={about.resumeHref} download>
+                <a className={styles.primary} data-skin="pill-primary" href={about.resumeHref} download>
                   Download resume
                 </a>
               )}

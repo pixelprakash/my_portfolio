@@ -105,7 +105,7 @@ function Block({ block }) {
         <ul className={styles.stats}>
           {block.items.map((item) => (
             <li key={item.label} className={styles.stat}>
-              <span className={styles.statValue}>{item.value}</span>
+              <span data-skin="numeral" className={styles.statValue}>{item.value}</span>
               <span className={styles.statLabel}>{item.label}</span>
             </li>
           ))}
@@ -117,7 +117,7 @@ function Block({ block }) {
         <ol className={styles.steps}>
           {block.items.map((item, i) => (
             <li key={item.title} className={styles.step}>
-              <span className={styles.stepNumber} aria-hidden="true">
+              <span data-skin="numeral" className={styles.stepNumber} aria-hidden="true">
                 {String(i + 1).padStart(2, '0')}
               </span>
               <div className={styles.stepBody}>
@@ -149,6 +149,8 @@ function Block({ block }) {
             <li key={item.title}>
               <a
                 href={item.href}
+                data-skin="part-card"
+                data-tone={item.accent === 'red' ? 'red' : 'blue'}
                 className={`${styles.partCard} ${item.accent === 'red' ? styles.partCardRed : styles.partCardBlue}`}
               >
                 <span className={styles.partCardKicker}>{item.kicker}</span>
@@ -229,11 +231,13 @@ function SectionView({ section, inPart }) {
 function PartBanner({ id, part }) {
   return (
     <div
+      data-skin="part-banner"
+      data-tone={part.accent === 'red' ? 'red' : 'blue'}
       className={`${styles.partBanner} ${part.accent === 'red' ? styles.partRed : styles.partBlue}`}
       role="group"
       aria-labelledby={`${id}-title`}
     >
-      <span className={styles.partNumber} aria-hidden="true">
+      <span data-skin="numeral" className={styles.partNumber} aria-hidden="true">
         {part.number}
       </span>
       <div>
@@ -288,13 +292,14 @@ function PartSwitch({ parts, counts, active, onSelect, compact = false }) {
 
   return (
     <div
+      data-skin="switch"
       className={styles.switch}
       data-active={active}
       role="tablist"
       aria-label="Choose a part of the case study"
       onKeyDown={onKeyDown}
     >
-      <span className={styles.switchThumb} aria-hidden="true" />
+      <span data-skin="switch-thumb" className={styles.switchThumb} aria-hidden="true" />
       {keys.map((key) => (
         <button
           key={key}
@@ -435,9 +440,9 @@ function LockedCaseStudy({ entry }) {
           <span className={styles.lockedMark} aria-hidden="true">
             <LockIcon size={14} /> Private
           </span>
-          <h1 className={styles.title}>{entry.title}</h1>
+          <h1 data-skin="page-title" className={styles.title}>{entry.title}</h1>
         </header>
-        <div className={styles.lockPanel}>
+        <div data-skin="lock-panel" className={styles.lockPanel}>
           <LockForm project={entry} />
         </div>
       </div>
@@ -573,7 +578,7 @@ export default function CaseStudyPage() {
           <span className={`${styles.tag} ${isBlue ? styles.tagBlue : styles.tagRed}`}>
             {study.tag}
           </span>
-          <h1 className={styles.title}>{study.title}</h1>
+          <h1 data-skin="page-title" className={styles.title}>{study.title}</h1>
           <p className={styles.summary}>{study.summary}</p>
 
           <dl className={styles.metaList}>

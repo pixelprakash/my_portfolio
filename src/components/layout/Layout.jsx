@@ -5,6 +5,7 @@ import Navbar from './Navbar';
 import Footer from './Footer';
 import ScrollAids from './ScrollAids';
 import SoundFX from './SoundFX';
+import PreviewSwitch from './PreviewSwitch';
 import { NAV_HEIGHT } from '../../constants';
 
 export default function Layout() {
@@ -40,6 +41,7 @@ export default function Layout() {
         <Outlet />
       </main>
       <Footer />
+      <PreviewSwitch />
     </>
   );
 }

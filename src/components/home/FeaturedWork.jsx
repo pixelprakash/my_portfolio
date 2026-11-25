@@ -58,7 +58,7 @@ export default function FeaturedWork() {
         </ul>
 
         <div className={styles.allRow}>
-          <Link to="/work" className={styles.allLink}>
+          <Link to="/work" className={styles.allLink} data-skin="pill-primary">
             View all {projects.length} projects
             <span aria-hidden="true">→</span>
           </Link>

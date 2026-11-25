@@ -52,7 +52,7 @@ export function LockForm({ project, titleId, onDone, onCancel }) {
 
   return (
     <form className={styles.inner} onSubmit={submit}>
-      <span className={styles.badge}>
+      <span data-skin="badge" className={styles.badge}>
         <LockIcon size={26} />
       </span>
       <h2 id={titleId} className={styles.title}>
@@ -137,6 +137,7 @@ export default function LockDialog({ project, open, onClose }) {
   return (
     <dialog
       ref={ref}
+      data-skin="dialog"
       className={styles.dialog}
       aria-labelledby={titleId}
       onClose={onClose}

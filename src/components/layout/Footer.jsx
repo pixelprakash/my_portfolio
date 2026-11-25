@@ -12,15 +12,15 @@ export default function Footer() {
   const year = new Date().getFullYear();
 
   return (
-    <footer id="contact" className={styles.footer}>
+    <footer id="contact" className={styles.footer} data-skin="footer">
       <div className="section-container">
-        <h2 className={`${styles.heading} text-gradient`}>Contact</h2>
+        <h2 className={`${styles.heading} text-gradient`} data-skin="footer-title">Contact</h2>
 
         <div className={styles.rows}>
           {contactRows.map((row) => {
             const isExternal = row.href.startsWith('http');
             return (
-              <div className={styles.row} key={row.label}>
+              <div className={styles.row} key={row.label} data-skin="footer-row">
                 <span className={styles.label}>{row.label.toUpperCase()}</span>
                 <a
                   className={styles.value}

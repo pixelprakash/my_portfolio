@@ -54,14 +54,14 @@ export default function Navbar() {
 
   return (
     <>
-      <header className={styles.navbar}>
+      <header className={styles.navbar} data-skin="nav">
         <div className={`section-container ${styles.inner}`}>
-          <Link to="/" className={styles.logo} onClick={() => setIsOpen(false)}>
+          <Link to="/" className={styles.logo} data-skin="logo" onClick={() => setIsOpen(false)}>
             {siteConfig.shortName}
             <span className={styles.logoSub}>{siteConfig.role}</span>
           </Link>
 
-          <nav className={styles.desktopNav} aria-label="Primary">
+          <nav className={styles.desktopNav} data-skin="nav-links" aria-label="Primary">
             {siteConfig.navItems.map((item) => (
               <Link
                 key={item.href}
@@ -75,7 +75,7 @@ export default function Navbar() {
 
           <div className={styles.navActions}>
             <SoundToggle />
-            <a className={styles.cta} href={`mailto:${siteConfig.email}`}>
+            <a className={styles.cta} data-skin="pill-primary" href={`mailto:${siteConfig.email}`}>
               Let's talk
             </a>
             <button
@@ -100,7 +100,7 @@ export default function Navbar() {
         <nav
           id="mobile-menu"
           ref={menuRef}
-          className={styles.mobileMenu}
+          className={styles.mobileMenu} data-skin="nav-menu"
           aria-label="Mobile"
         >
           {siteConfig.navItems.map((item) => (

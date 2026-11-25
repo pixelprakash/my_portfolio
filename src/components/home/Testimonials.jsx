@@ -15,6 +15,7 @@ function QuoteMark() {
   return (
     <svg
       className={styles.mark}
+      data-skin="quote-mark"
       width="44"
       height="33"
       viewBox="0 0 48 36"
@@ -52,6 +53,8 @@ export default function Testimonials() {
                 className={`${styles.item} ${testimonial.featured ? styles.itemFeatured : ''}`}
               >
                 <figure
+                  data-skin="quote-card"
+                  data-tone={testimonial.accent}
                   className={`${styles.card} ${isBlue ? styles.cardBlue : styles.cardRed} ${
                     testimonial.featured ? styles.cardFeatured : ''
                   }`}
@@ -61,7 +64,7 @@ export default function Testimonials() {
                     <p>{testimonial.quote}</p>
                   </blockquote>
                   <figcaption className={styles.person}>
-                    <span className={styles.avatar} aria-hidden="true">
+                    <span className={styles.avatar} data-skin="avatar" aria-hidden="true">
                       {initialsOf(testimonial.name)}
                     </span>
                     <span className={styles.who}>

@@ -11,7 +11,7 @@ export default function SoundToggle() {
 
   return (
     <button
-      type="button"
+      type="button" data-skin="sound"
       className={`${styles.toggle} ${on ? styles.on : ''} ${
         soundState === 'unset' ? styles.invite : ''
       }`}

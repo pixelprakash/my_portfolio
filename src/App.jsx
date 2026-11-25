@@ -6,6 +6,7 @@ import HomePage from './pages/HomePage';
 import CaseStudyPage from './pages/CaseStudyPage';
 import AllProjectsPage from './pages/AllProjectsPage';
 import NotFoundPage from './pages/NotFoundPage';
+import { getUiVersion } from './lib/uiVersion';
 
 const SEEN_KEY = 'sp-intro-seen';
 // Someone who has seen the opening doesn't need it again for a week.
@@ -29,6 +30,8 @@ function shouldShowIntro() {
   try {
     const { pathname, hash, search } = window.location;
     if (pathname !== '/') return false;
+    // the opening is built on the v1 pill choice, which v2 retires
+    if (getUiVersion() === 'v2') return false;
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return false;
     if (new URLSearchParams(search).has('intro')) return true;
     if (hash) return false;

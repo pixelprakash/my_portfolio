@@ -127,11 +127,12 @@ export function ProjectCard({ project: listed, onOpen, index, lead = false, size
   return (
     <article
       onPointerMove={trackPointer}
+      data-skin="card"
       className={`${cardStyles.card} ${styles.card} ${accent.card} ${lead ? styles.cardLead : ''}`}
     >
-      <div className={`${styles.cover} ${opensLightbox ? styles.coverVideo : ''}`}>
+      <div className={`${styles.cover} ${opensLightbox ? styles.coverVideo : ''}`} data-skin="card-cover">
         {type.frame === 'browser' && (
-          <div className={styles.chrome} aria-hidden="true">
+          <div className={styles.chrome} data-skin="card-chrome" aria-hidden="true">
             <span className={styles.dots}>
               <i />
               <i />
@@ -150,7 +151,7 @@ export function ProjectCard({ project: listed, onOpen, index, lead = false, size
             </div>
           ) : locked ? (
             // no screenshot at all while locked: a placeholder, not a blurred copy
-            <div className={`${styles.slide} ${accent.slide} ${styles.lockedCover}`} aria-hidden="true">
+            <div className={`${styles.slide} ${accent.slide} ${styles.lockedCover}`} data-skin="card-slide" aria-hidden="true">
               <span className={styles.lockMark}>
                 <LockIcon size={34} />
               </span>
@@ -173,6 +174,7 @@ export function ProjectCard({ project: listed, onOpen, index, lead = false, size
             // no exported cover yet: title-slide style placeholder
             <div
               className={`${styles.slide} ${accent.slide}`}
+              data-skin="card-slide"
               aria-hidden="true"
             >
               <span className={styles.slideKicker}>{type.label}</span>
@@ -193,7 +195,7 @@ export function ProjectCard({ project: listed, onOpen, index, lead = false, size
         <div className={styles.meta}>
           <span className={styles.type}>
             {index !== undefined && (
-              <span className={styles.index} aria-hidden="true">
+              <span className={styles.index} data-skin="card-index" aria-hidden="true">
                 {String(index + 1).padStart(2, '0')}
               </span>
             )}
@@ -211,7 +213,7 @@ export function ProjectCard({ project: listed, onOpen, index, lead = false, size
           </span>
         </div>
 
-        <h3 className={`${cardStyles.title} ${styles.title}`}>
+        <h3 className={`${cardStyles.title} ${styles.title}`} data-skin="card-title">
           {locked ? (
             <button
               type="button"
@@ -274,7 +276,7 @@ export function ProjectCard({ project: listed, onOpen, index, lead = false, size
           </button>
         )}
 
-        <span className={`${cardStyles.link} ${accent.link}`} aria-hidden="true">
+        <span data-skin="card-link" className={`${cardStyles.link} ${accent.link}`} aria-hidden="true">
           {locked ? 'Unlock with password' : (project.cta ?? type.cta)}
         </span>
       </div>

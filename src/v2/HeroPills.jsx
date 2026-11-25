@@ -12,6 +12,7 @@ import portrait from '../assets/portrait-cutout.webp';
 import portraitSmall from '../assets/portrait-cutout-700.webp';
 import { createPillStage } from './pillStage';
 import { across, CROP, down, HEAD_BOX, PHOTO, PILLS } from './pills';
+import Years from './Years';
 import styles from './HeroPills.module.css';
 
 const { design, development } = siteConfig.experience;
@@ -20,6 +21,10 @@ const { design, development } = siteConfig.experience;
 const TOUCH_LINGER_MS = 1400;
 
 const TONE = { blue: styles.cool, red: styles.warm };
+// Both year scales share a length, so the two can be compared at a glance.
+const YEAR_SCALE = Math.max(design.years, development.years);
+// how each side's numeral looks while its own pill is in play
+const WORLD_LOOK = { blue: 'design', red: 'code' };
 
 // "plain **bold** plain" -> plain <strong>bold</strong> plain
 function Emphasis({ text }) {
@@ -28,13 +33,15 @@ function Emphasis({ text }) {
     .map((part, i) => (i % 2 ? <strong key={i}>{part}</strong> : part));
 }
 
-function Stat({ id, years, label, now, peek }) {
+function Stat({ id, years, label, now, peek, active }) {
   return (
     <div className={`${styles.stat} ${TONE[id]}`} data-side={id} data-peek {...peek(id)}>
-      <p className={styles.years}>
-        <span className={styles.yearsNum}>{years}</span>
-        <span className={styles.yearsUnit}>years</span>
-      </p>
+      <Years
+        value={years}
+        outOf={YEAR_SCALE}
+        tone={id === 'red' ? 'warm' : 'cool'}
+        look={active === id ? WORLD_LOOK[id] : 'light'}
+      />
       <p className={styles.statLabel}>
         <Emphasis text={label} />
       </p>
@@ -335,8 +342,21 @@ export default function HeroPills() {
       </p>
 
       <div className={styles.stats}>
-        <Stat id="blue" years={design.years} label={design.label} now={design.now} peek={peek} />
-        <Stat id="red" years={development.years} label={development.label} peek={peek} />
+        <Stat
+          id="blue"
+          years={design.years}
+          label={design.label}
+          now={design.now}
+          peek={peek}
+          active={active}
+        />
+        <Stat
+          id="red"
+          years={development.years}
+          label={development.label}
+          peek={peek}
+          active={active}
+        />
       </div>
 
       {live && (

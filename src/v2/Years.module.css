@@ -1,0 +1,339 @@
+.years {
+  --size: clamp(6rem, min(12vw, 21vh), 12rem);
+  --tone: #35c8ff;
+  --paint: linear-gradient(176deg, #ffffff 24%, #c9eeff 40%, #35c8ff 62%, #2347ff 88%);
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-4);
+}
+
+.years[data-tone='warm'] {
+  --tone: #ff6a42;
+  --paint: linear-gradient(176deg, #ffffff 24%, #ffe3b6 38%, #ffb347 52%, #ff4d2e 70%, #e8308c 90%);
+  flex-direction: row-reverse;
+}
+
+/* ── the numeral: stacked copies of the same digit, cross-faded ── */
+.numeral {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  font-family: var(--font-serif);
+  font-size: var(--size);
+  font-weight: 400;
+  line-height: 0.9;
+  /* it rises into place once, as if the light were filling it */
+  animation: fill 1100ms 450ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.numeral > span {
+  grid-area: 1 / 1;
+}
+
+/* the padding keeps the whole glyph inside the painted box; the negative
+   margin stops that padding from spacing things out */
+.face,
+.glow {
+  padding: 0.06em 0.07em 0.04em;
+}
+
+.numeral {
+  margin: -0.06em -0.07em -0.08em;
+}
+
+.glow {
+  z-index: -1;
+  color: var(--tone);
+  filter: blur(0.14em);
+  opacity: 0.62;
+  transition: opacity 400ms ease;
+}
+
+.face {
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  transition: opacity 360ms ease;
+}
+
+/* resting: light through ribbed glass, with one sheen passing over it */
+.lit {
+  /* a see-through stroke is painted too: it fattens the serif's hairlines */
+  -webkit-text-stroke: 0.018em transparent;
+  background-image:
+    linear-gradient(112deg, transparent 42%, rgba(255, 255, 255, 0.95) 50%, transparent 58%),
+    repeating-linear-gradient(90deg, rgba(4, 4, 12, 0.34) 0 1.5px, transparent 1.5px 6px),
+    var(--paint);
+  background-repeat: no-repeat, repeat, no-repeat;
+  background-size: 300% 100%, auto, 100% 100%;
+  background-position: -60% 0, 0 0, 0 0;
+  animation: sheen 1500ms 1500ms ease-in-out both;
+}
+
+.print,
+.code {
+  opacity: 0;
+}
+
+/* The serif's hairlines are too thin to hold a pattern, so each pill's version
+   also changes typeface: a heavy geometric one for design, a code face for
+   development. Sized to stand about as tall as the serif. */
+.numeral > .print,
+.numeral > .code {
+  align-self: end;
+  justify-self: center;
+  line-height: 1;
+  letter-spacing: 0;
+}
+
+.print {
+  font-family: var(--font-body);
+  font-size: 0.86em;
+  font-weight: 700;
+}
+
+.code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.88em;
+  font-weight: 800;
+}
+
+/* blue pill: a halftone print with a vector outline */
+.print {
+  background-image:
+    radial-gradient(circle, #effaff 0 1.7px, transparent 2.3px),
+    linear-gradient(180deg, #1f6bff, #0b1b7a);
+  background-size: 5.4px 5.4px, 100% 100%;
+  -webkit-text-stroke: 1.6px #7fe0ff;
+}
+
+/* red pill: the digit filled with falling characters */
+.code {
+  background-image: var(--code), linear-gradient(180deg, #5a070c, #25030a);
+  background-size: 64px 112px, 100% 100%;
+  -webkit-text-stroke: 1.5px #ff7a58;
+}
+
+.years[data-look='design'] .lit,
+.years[data-look='code'] .lit {
+  opacity: 0;
+  transition-delay: 260ms;
+}
+
+.years[data-look='design'] .print,
+.years[data-look='code'] .code {
+  opacity: 1;
+  transition-delay: 260ms;
+}
+
+.years[data-look='code'] .code {
+  animation: pour 1400ms steps(20) infinite;
+}
+
+.years[data-look='design'] .glow,
+.years[data-look='code'] .glow {
+  opacity: 0.14;
+}
+
+/* the design tool's handles round the digit */
+.handles {
+  grid-area: 1 / 1;
+  position: relative;
+  margin: 0.03em 0.01em 0.02em;
+  border: 1.5px solid #35c8ff;
+  opacity: 0;
+  transform: scale(1.14);
+  transition: opacity 220ms ease, transform 480ms cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none;
+}
+
+.handles i {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border: 1.5px solid #35c8ff;
+  background: #fff;
+}
+
+.handles i:nth-child(1) {
+  top: -4.5px;
+  left: -4.5px;
+}
+
+.handles i:nth-child(2) {
+  top: -4.5px;
+  right: -4.5px;
+}
+
+.handles i:nth-child(3) {
+  bottom: -4.5px;
+  left: -4.5px;
+}
+
+.handles i:nth-child(4) {
+  right: -4.5px;
+  bottom: -4.5px;
+}
+
+.years[data-look='design'] .handles {
+  opacity: 1;
+  transform: none;
+  transition-delay: 420ms;
+}
+
+/* ── the unit and the scale beside the numeral ── */
+.side {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding-bottom: 0.7rem;
+}
+
+.years[data-tone='warm'] .side {
+  align-items: flex-end;
+}
+
+.unit {
+  font-family: var(--font-body);
+  font-size: 0.82rem;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.34em;
+  /* the tracking trails the last letter; give it back */
+  margin-right: -0.34em;
+  text-transform: uppercase;
+  color: #fff;
+}
+
+/* one column of light per year */
+.scale {
+  display: flex;
+  gap: 5px;
+  height: clamp(1.9rem, 5vh, 2.9rem);
+}
+
+.scale i {
+  width: 9px;
+  border-radius: 2px;
+  background: rgba(244, 242, 238, 0.07);
+  box-shadow: inset 0 0 0 1px rgba(244, 242, 238, 0.3);
+  transform-origin: bottom;
+  /* they light one after another: the years counting up */
+  animation: column 620ms calc(700ms + var(--i) * 130ms) cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.scale i.on {
+  background:
+    linear-gradient(to top, transparent, rgba(255, 255, 255, 0.85)),
+    var(--tone);
+  box-shadow: 0 0 12px color-mix(in srgb, var(--tone) 80%, transparent);
+}
+
+.years[data-look='design'] .scale i {
+  border-radius: 0;
+}
+
+.years[data-look='design'] .scale i.on {
+  background:
+    radial-gradient(circle, #effaff 0 1.4px, transparent 2px) 0 0 / 4.5px 4.5px,
+    #1f6bff;
+  box-shadow: 0 0 0 1px #7fe0ff;
+}
+
+.years[data-look='code'] .scale i.on {
+  animation: flicker 900ms steps(1) calc(var(--i) * 110ms) infinite;
+}
+
+@keyframes fill {
+  from {
+    clip-path: inset(100% -30% -30% -30%);
+    transform: translateY(14px);
+  }
+  to {
+    clip-path: inset(-30% -30% -30% -30%);
+    transform: none;
+  }
+}
+
+@keyframes sheen {
+  from {
+    background-position: 120% 0, 0 0, 0 0;
+  }
+  to {
+    background-position: -60% 0, 0 0, 0 0;
+  }
+}
+
+@keyframes pour {
+  from {
+    background-position: 0 0, 0 0;
+  }
+  to {
+    background-position: 0 112px, 0 0;
+  }
+}
+
+@keyframes column {
+  from {
+    opacity: 0;
+    transform: scaleY(0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes flicker {
+  0%,
+  70% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 0.35;
+  }
+}
+
+/* shorter desktop windows: leave room for the headline above */
+@media (max-height: 879px) {
+  .years {
+    --size: clamp(5rem, 15.5vh, 8.5rem);
+  }
+}
+
+@media (max-width: 1024px), (max-aspect-ratio: 7/5) {
+  .years {
+    --size: clamp(5.5rem, 15vw, 8.5rem);
+  }
+}
+
+/* phones: both marks read left to right */
+@media (max-width: 560px) {
+  .years {
+    --size: clamp(6rem, 30vw, 8rem);
+  }
+
+  .years[data-tone='warm'] {
+    flex-direction: row;
+  }
+
+  .years[data-tone='warm'] .side {
+    align-items: flex-start;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .numeral,
+  .lit,
+  .scale i,
+  .years[data-look='code'] .code,
+  .years[data-look='code'] .scale i.on {
+    animation: none;
+  }
+
+  .handles {
+    transform: none;
+  }
+}

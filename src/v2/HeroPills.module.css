@@ -148,8 +148,8 @@
   position: relative;
   isolation: isolate;
   width: min(19rem, 24vw);
-  padding-top: var(--space-4);
-  animation: rise 900ms 280ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  /* 'backwards', not 'both': a held last frame would override the dimming */
+  animation: rise 900ms 280ms cubic-bezier(0.16, 1, 0.3, 1) backwards;
 }
 
 .warm {
@@ -167,50 +167,24 @@
   background: radial-gradient(closest-side, rgba(4, 4, 6, 0.86) 0 55%, transparent 100%);
 }
 
-.stat::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: linear-gradient(90deg, var(--tone), transparent 88%);
-}
-
-.warm::before {
-  background: linear-gradient(270deg, var(--tone), transparent 88%);
-}
-
-.years {
-  display: flex;
-  align-items: baseline;
-  gap: var(--space-3);
-}
-
-.warm .years {
-  justify-content: flex-end;
-}
-
-.yearsNum {
-  font-family: var(--font-serif);
-  font-size: clamp(2.8rem, 8vh, 4.5rem);
-  line-height: 0.9;
-  color: var(--tone);
-}
-
-.yearsUnit {
-  font-size: 0.72rem;
-  font-weight: 600;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-  color: rgba(244, 242, 238, 0.75);
-}
-
 .statLabel {
   margin-top: var(--space-3);
   font-size: clamp(1rem, 1.3vw, 1.15rem);
   line-height: 1.4;
   color: rgba(244, 242, 238, 0.84);
+}
+
+/* a hairline of the side's colour sets the number apart from its caption */
+.statLabel::before {
+  content: '';
+  display: block;
+  height: 1px;
+  margin-bottom: var(--space-3);
+  background: linear-gradient(90deg, var(--tone), transparent 88%);
+}
+
+.warm .statLabel::before {
+  background: linear-gradient(270deg, var(--tone), transparent 88%);
 }
 
 .statLabel strong,
@@ -508,7 +482,7 @@
 .panel {
   position: absolute;
   z-index: 3;
-  top: 34%;
+  top: 25%;
   margin: 0;
   pointer-events: none;
   opacity: 0;
@@ -674,18 +648,23 @@
 
 /* shorter desktop windows: tighter panels, then none, so they never crowd
    the headline or the stats */
-@media (max-height: 819px) {
+@media (max-height: 879px) {
   .panel {
-    top: 29%;
+    top: 26%;
   }
 
   .designPanel .panelTitle ~ .panelTitle,
   .swatches {
     display: none;
   }
+
+  .codePanel {
+    font-size: 0.66rem;
+    line-height: 1.4;
+  }
 }
 
-@media (max-height: 659px) {
+@media (max-height: 779px) {
   .panel {
     display: none;
   }
@@ -832,11 +811,7 @@
     text-align: left;
   }
 
-  .warm .years {
-    justify-content: flex-start;
-  }
-
-  .warm::before {
+  .warm .statLabel::before {
     background: linear-gradient(90deg, var(--tone), transparent 88%);
   }
 }

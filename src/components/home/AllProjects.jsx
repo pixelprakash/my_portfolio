@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { disciplines, projects, projectTypes } from '../../data/projects';
 import GalleryDialog from './GalleryDialog';
 import { EmbedDialog, ProjectCard } from './ProjectCard';
@@ -9,7 +10,12 @@ const TYPE_ORDER = Object.keys(projectTypes);
 // The full list of work, grouped by discipline (design, development, craft)
 // with filter chips. Lives on the all-projects page.
 export default function AllProjects() {
-  const [filter, setFilter] = useState('all');
+  // a link can arrive with a filter already chosen: /work?show=design
+  const [params] = useSearchParams();
+  const [filter, setFilter] = useState(() => {
+    const asked = params.get('show');
+    return asked && Object.hasOwn(disciplines, asked) ? asked : 'all';
+  });
   const [playing, setPlaying] = useState(null);
   const [gallery, setGallery] = useState(null);
 

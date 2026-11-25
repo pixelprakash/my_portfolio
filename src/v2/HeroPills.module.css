@@ -1,0 +1,861 @@
+/* v2 hero, option 2 ("choose your pill"). Started as a copy of HeroV2's styles;
+   the two are kept apart so changing one never changes the other.
+   One dark stage. The WebGL canvas fills it; the headline sits in
+   the top corners, clear of the beams, and the two experience notes sit in the
+   bottom corners, outside the shoulders. */
+.hero {
+  --frame-h: calc(100vh - var(--nav-height) - 1.25rem);
+  position: relative;
+  isolation: isolate;
+  width: 100%;
+  height: calc(100vh - var(--nav-height));
+  min-height: 560px;
+  overflow: hidden;
+  background: #040406;
+  /* a vertical swipe still scrolls; sideways drags clear the glass */
+  touch-action: pan-y;
+}
+
+/* melts into the page below */
+.hero::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 6%;
+  z-index: 2;
+  pointer-events: none;
+  background: linear-gradient(to bottom, transparent, var(--color-bg));
+}
+
+.stage {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.stage canvas {
+  display: block;
+}
+
+/* The portrait's box, cropped to chest height (--crop of the photo). The
+   canvas draws into this box; the <img> is what shows until it is ready, and
+   stays if WebGL isn't there. */
+.frame {
+  position: absolute;
+  z-index: 1;
+  left: 50%;
+  bottom: 0;
+  height: var(--frame-h);
+  aspect-ratio: calc(1100 / (1422 * var(--crop)));
+  transform: translateX(-50%);
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.photo {
+  display: block;
+  width: 100%;
+  max-width: none;
+  height: auto;
+  -webkit-mask-image: linear-gradient(to bottom, #000 93%, transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 93%, transparent 100%);
+}
+
+.live .photo {
+  opacity: 0;
+}
+
+.headline {
+  position: absolute;
+  z-index: 3;
+  top: clamp(1.25rem, 4vh, 3rem);
+  left: var(--container-padding);
+  right: var(--container-padding);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--space-5);
+  margin: 0;
+  pointer-events: none;
+}
+
+.headline:focus {
+  outline: none;
+}
+
+.headLeft,
+.headRight {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  animation: rise 900ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.headRight {
+  align-items: flex-end;
+  text-align: right;
+  animation-delay: 140ms;
+}
+
+.eyebrow {
+  font-family: var(--font-body);
+  font-size: 0.78rem;
+  font-weight: 600;
+  line-height: 1.4;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: rgba(244, 242, 238, 0.78);
+}
+
+.word {
+  font-family: var(--font-serif);
+  font-size: clamp(3.25rem, min(8.4vw, 17vh), 11rem);
+  font-weight: 400;
+  line-height: 0.92;
+  letter-spacing: -0.025em;
+  white-space: nowrap;
+  color: #f4f2ee;
+  text-shadow: 0 6px 40px rgba(0, 0, 0, 0.7);
+}
+
+.amp {
+  font-style: italic;
+  background: linear-gradient(160deg, #ffb347, #ff4d2e 55%, #e8308c);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  padding-right: 0.04em;
+  text-shadow: none;
+}
+
+.stats {
+  position: absolute;
+  z-index: 3;
+  left: var(--container-padding);
+  right: var(--container-padding);
+  bottom: 5.25rem; /* clears the preview switch and back-to-top */
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: var(--space-5);
+  pointer-events: none;
+}
+
+.stat {
+  --tone: #35c8ff;
+  position: relative;
+  isolation: isolate;
+  width: min(19rem, 24vw);
+  padding-top: var(--space-4);
+  animation: rise 900ms 280ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.warm {
+  --tone: #ff7a52;
+  text-align: right;
+  animation-delay: 400ms;
+}
+
+/* a soft shadow, not a card, so the words hold up over the light */
+.stat::after {
+  content: '';
+  position: absolute;
+  inset: -28px -44px;
+  z-index: -1;
+  background: radial-gradient(closest-side, rgba(4, 4, 6, 0.86) 0 55%, transparent 100%);
+}
+
+.stat::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, var(--tone), transparent 88%);
+}
+
+.warm::before {
+  background: linear-gradient(270deg, var(--tone), transparent 88%);
+}
+
+.years {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-3);
+}
+
+.warm .years {
+  justify-content: flex-end;
+}
+
+.yearsNum {
+  font-family: var(--font-serif);
+  font-size: clamp(2.8rem, 8vh, 4.5rem);
+  line-height: 0.9;
+  color: var(--tone);
+}
+
+.yearsUnit {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(244, 242, 238, 0.75);
+}
+
+.statLabel {
+  margin-top: var(--space-3);
+  font-size: clamp(1rem, 1.3vw, 1.15rem);
+  line-height: 1.4;
+  color: rgba(244, 242, 238, 0.84);
+}
+
+.statLabel strong,
+.now strong {
+  font-weight: 700;
+  color: #fff;
+}
+
+.now {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  margin-top: var(--space-3);
+  font-size: 0.9rem;
+  line-height: 1.45;
+  color: rgba(244, 242, 238, 0.78);
+}
+
+.nowTag {
+  flex: none;
+  margin-top: 1px;
+  padding: 1px 8px;
+  border: 1px solid var(--tone);
+  border-radius: 999px;
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--tone);
+}
+
+.cleanToggle {
+  position: absolute;
+  z-index: 4;
+  right: var(--container-padding);
+  bottom: 1.15rem;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  height: 40px;
+  padding: 0 var(--space-5) 0 var(--space-3);
+  border: 1px solid rgba(244, 242, 238, 0.24);
+  border-radius: 999px;
+  background: rgba(6, 6, 9, 0.66);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  font-size: 0.82rem;
+  font-weight: 600;
+  white-space: nowrap;
+  color: #f4f2ee;
+  transition: border-color var(--transition-fast), background var(--transition-fast);
+}
+
+.cleanToggle:hover {
+  border-color: rgba(244, 242, 238, 0.7);
+}
+
+.swatch {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: repeating-linear-gradient(90deg, #35c8ff 0 2px, #14143a 2px 4px, #ff7a52 4px 6px);
+}
+
+.cleanToggle[aria-pressed='true'] .swatch {
+  background: #f4f2ee;
+}
+
+/* ═════════════ the two pills ═════════════ */
+
+/* the whole palm is the target, not just the little capsule */
+.pill {
+  --tone: #35c8ff;
+  position: absolute;
+  width: 25%;
+  height: 12%;
+  transform: translate(-50%, -50%);
+  border-radius: 999px;
+  pointer-events: auto;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.pill.warm {
+  --tone: #ff7a52;
+}
+
+.pill:focus-visible {
+  outline: 2px solid var(--tone);
+  outline-offset: 0;
+  border-radius: 999px;
+}
+
+.pillTag {
+  position: absolute;
+  left: 50%;
+  bottom: -6%;
+  transform: translateX(-50%);
+  padding: 3px 12px;
+  border: 1px solid var(--tone);
+  border-radius: 999px;
+  background: rgba(4, 4, 8, 0.82);
+  font-size: 0.68rem;
+  font-weight: 700;
+  line-height: 1.6;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: #fff;
+  transition: background var(--transition-fast), color var(--transition-fast),
+    box-shadow var(--transition-base);
+}
+
+.pill:hover .pillTag,
+.pill:focus-visible .pillTag,
+.pill[aria-pressed='true'] .pillTag {
+  background: var(--tone);
+  color: #04040a;
+  box-shadow: 0 0 22px var(--tone);
+}
+
+/* "Choose your pill", then the way into that side's work: between the hands */
+.choice {
+  position: absolute;
+  z-index: 4;
+  left: 50%;
+  bottom: 4.75rem;
+  transform: translateX(-50%);
+  display: flex;
+  justify-content: center;
+  width: max-content;
+  max-width: 90%;
+  pointer-events: none;
+}
+
+.hint {
+  font-size: 0.74rem;
+  font-weight: 600;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: rgba(244, 242, 238, 0.82);
+  text-shadow: 0 1px 12px #000, 0 0 4px #000;
+}
+
+.cta {
+  --tone: #35c8ff;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-5);
+  border-radius: 999px;
+  background: #f4f2ee;
+  font-size: 0.9rem;
+  font-weight: 700;
+  white-space: nowrap;
+  color: #08080b;
+  box-shadow: 0 0 0 1px var(--tone), 0 10px 40px -6px var(--tone);
+  pointer-events: auto;
+  animation: rise 420ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.cta.warm {
+  --tone: #ff5a3c;
+}
+
+/* ── the headline and stats take sides ── */
+.word {
+  position: relative;
+  pointer-events: auto;
+  transition: opacity 350ms ease;
+}
+
+.stat {
+  pointer-events: auto;
+  transition: opacity 350ms ease;
+}
+
+.hero[data-world='blue'] [data-side='red']:not(button),
+.hero[data-world='red'] [data-side='blue']:not(button) {
+  opacity: 0.28;
+}
+
+/* "Designer" gets picked up like a layer in a design tool */
+.selection {
+  position: absolute;
+  inset: -2px -10px;
+  border: 1.5px solid #35c8ff;
+  opacity: 0;
+  transition: opacity 220ms ease;
+}
+
+.selection i,
+.headBox i {
+  position: absolute;
+  width: 9px;
+  height: 9px;
+  border: 1.5px solid #35c8ff;
+  background: #fff;
+}
+
+.selection i:nth-child(1),
+.headBox i:nth-child(1) {
+  top: -5px;
+  left: -5px;
+}
+
+.selection i:nth-child(2),
+.headBox i:nth-child(2) {
+  top: -5px;
+  right: -5px;
+}
+
+.selection i:nth-child(3),
+.headBox i:nth-child(3) {
+  bottom: -5px;
+  left: -5px;
+}
+
+.selection i:nth-child(4),
+.headBox i:nth-child(4) {
+  right: -5px;
+  bottom: -5px;
+}
+
+.hero[data-world='blue'] .selection {
+  opacity: 1;
+}
+
+/* "Developer" gets a terminal's block cursor */
+.caret {
+  position: absolute;
+  top: 18%;
+  left: calc(100% + 0.06em);
+  width: 0.09em;
+  height: 0.66em;
+  background: #ff5a3c;
+  box-shadow: 0 0 18px #ff4d2e;
+  opacity: 0;
+}
+
+.hero[data-world='red'] .caret {
+  animation: blink 900ms steps(1) infinite;
+  opacity: 1;
+}
+
+/* ── design view: the selection round the head ── */
+.headBox {
+  position: absolute;
+  border: 1.5px solid #35c8ff;
+  opacity: 0;
+  transform: scale(1.12);
+  transition: opacity 260ms ease, transform 520ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.hero[data-world='blue'] .headBox {
+  opacity: 1;
+  transform: none;
+  transition-delay: 380ms;
+}
+
+.headBox b,
+.headBox s {
+  position: absolute;
+  padding: 1px 7px;
+  font-size: 0.66rem;
+  font-weight: 600;
+  line-height: 1.5;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.headBox b {
+  bottom: calc(100% + 4px);
+  left: -1px;
+  color: #7fe0ff;
+}
+
+.headBox s {
+  top: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  border-radius: 3px;
+  background: #35c8ff;
+  color: #04121c;
+}
+
+/* the box starts at the very top of the frame: keep its name inside it */
+.headBox b {
+  bottom: auto;
+  top: 4px;
+  left: 6px;
+}
+
+/* ── the side panels ── */
+.panel {
+  position: absolute;
+  z-index: 3;
+  top: 34%;
+  margin: 0;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 260ms ease, visibility 0s 260ms;
+}
+
+.hero[data-world='blue'] .designPanel,
+.hero[data-world='red'] .codePanel {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 300ms 300ms ease, visibility 0s;
+}
+
+.designPanel {
+  left: var(--container-padding);
+  width: min(14rem, 20vw);
+  padding: var(--space-3) var(--space-4) var(--space-4);
+  border: 1px solid rgba(127, 224, 255, 0.3);
+  border-radius: 8px;
+  background: rgba(4, 10, 40, 0.82);
+}
+
+.panelTitle {
+  margin: var(--space-2) 0;
+  font-size: 0.64rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #8fbfff;
+}
+
+.layers li {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: 4px 6px;
+  border-radius: 4px;
+  font-size: 0.82rem;
+  color: #eef6ff;
+}
+
+.layers li:first-child {
+  background: rgba(53, 200, 255, 0.24);
+}
+
+.layerIcon {
+  width: 9px;
+  height: 9px;
+  border: 1.5px solid #7fe0ff;
+}
+
+.swatches {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-2);
+}
+
+.swatches span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.66rem;
+  color: #cfe3ff;
+}
+
+.swatches i {
+  flex: none;
+  width: 14px;
+  height: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  border-radius: 3px;
+  background: var(--c);
+}
+
+.codePanel {
+  right: var(--container-padding);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid rgba(255, 90, 60, 0.38);
+  border-radius: 8px;
+  background: rgba(16, 2, 4, 0.84);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: clamp(0.66rem, 1.5vh, 0.8rem);
+  line-height: 1.55;
+  text-align: left;
+  color: #ffd9d0;
+}
+
+.codePanel b {
+  font-weight: 700;
+  color: #ff6a4d;
+}
+
+.codePanel em {
+  font-style: normal;
+  color: #ffb38a;
+}
+
+.line {
+  display: block;
+  white-space: pre;
+}
+
+/* the lines arrive one after another, like they're being typed */
+.hero[data-world='red'] .line {
+  animation: typeIn 220ms steps(6) calc(360ms + var(--i) * 70ms) both;
+}
+
+.hero[data-world='blue'] .layers li,
+.hero[data-world='blue'] .swatches span {
+  animation: rise 420ms cubic-bezier(0.16, 1, 0.3, 1) calc(360ms + var(--i) * 70ms) both;
+}
+
+/* ── the pointer wears a name tag, as it would in each tool ── */
+.cursorTag {
+  position: absolute;
+  z-index: 5;
+  top: 0;
+  left: 0;
+  padding: 2px 9px;
+  border-radius: 2px 10px 10px 10px;
+  background: #35c8ff;
+  font-size: 0.74rem;
+  font-weight: 700;
+  line-height: 1.6;
+  white-space: nowrap;
+  color: #04121c;
+  pointer-events: none;
+  opacity: 0;
+}
+
+.hero[data-world='red'] .cursorTag {
+  border-radius: 0;
+  background: #14020a;
+  box-shadow: 0 0 0 1px #ff5a3c;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  color: #ff9a80;
+}
+
+.hero[data-world='red'] .cursorTag::after {
+  content: '▌';
+  animation: blink 900ms steps(1) infinite;
+}
+
+.cursorOn {
+  opacity: 1;
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+@keyframes typeIn {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+/* shorter desktop windows: tighter panels, then none, so they never crowd
+   the headline or the stats */
+@media (max-height: 819px) {
+  .panel {
+    top: 29%;
+  }
+
+  .designPanel .panelTitle ~ .panelTitle,
+  .swatches {
+    display: none;
+  }
+}
+
+@media (max-height: 659px) {
+  .panel {
+    display: none;
+  }
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Tablets, phones and near-square windows: everything stacks. */
+@media (max-width: 1024px), (max-aspect-ratio: 7/5) {
+  .hero {
+    --frame-w: min(100%, 640px, 78vh);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: auto;
+    min-height: calc(100vh - var(--nav-height));
+    padding-top: var(--space-6);
+  }
+
+  .headline {
+    position: relative;
+    top: auto;
+    left: auto;
+    right: auto;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+    width: 100%;
+    padding: 0 var(--container-padding);
+  }
+
+  .headLeft,
+  .headRight {
+    align-items: center;
+    gap: var(--space-3);
+    text-align: center;
+  }
+
+  /* one name line is enough when the two halves stack */
+  .headRight .eyebrow {
+    display: none;
+  }
+
+  .word {
+    font-size: clamp(3.4rem, 16vw, 7.5rem);
+  }
+
+  /* no room for side panels once the layout stacks */
+  .panel {
+    display: none;
+  }
+
+  .caret {
+    display: none;
+  }
+
+  .frame {
+    position: relative;
+    left: auto;
+    bottom: auto;
+    flex: none;
+    width: var(--frame-w);
+    height: auto;
+    margin-top: auto;
+    transform: none;
+  }
+
+  .stats {
+    position: relative;
+    left: auto;
+    right: auto;
+    bottom: auto;
+    order: 2;
+    align-items: flex-start;
+    width: 100%;
+    margin: var(--space-7) 0 var(--space-8);
+    padding: 0 var(--container-padding);
+  }
+
+  .stat {
+    flex: 1 1 0;
+    width: auto;
+    min-width: 0;
+  }
+
+  /* the hint or link, then the button, straight under the hands */
+  .choice {
+    position: relative;
+    order: 1;
+    left: auto;
+    bottom: auto;
+    transform: none;
+    align-items: center;
+    min-height: 3rem;
+    margin-top: -1.25rem;
+  }
+
+  .cleanToggle {
+    position: relative;
+    order: 1;
+    right: auto;
+    bottom: auto;
+    margin-top: var(--space-3);
+  }
+}
+
+@media (max-width: 560px) {
+  /* the hands are small here: a bigger target and a quieter label */
+  .pill {
+    width: 30%;
+    height: 14%;
+  }
+
+  .pillTag {
+    bottom: -4%;
+    padding: 2px 8px;
+    font-size: 0.6rem;
+    letter-spacing: 0.12em;
+  }
+
+  .headBox b,
+  .headBox s {
+    display: none;
+  }
+
+  .stats {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--space-6);
+  }
+
+  .stat,
+  .warm {
+    flex: none;
+    text-align: left;
+  }
+
+  .warm .years {
+    justify-content: flex-start;
+  }
+
+  .warm::before {
+    background: linear-gradient(90deg, var(--tone), transparent 88%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .headLeft,
+  .headRight,
+  .stat,
+  .cta,
+  .hero .line,
+  .hero .layers li,
+  .hero .swatches span,
+  .hero .caret,
+  .hero .cursorTag::after {
+    animation: none;
+  }
+
+  .hero .headBox {
+    transform: none;
+    transition-delay: 0s;
+  }
+}

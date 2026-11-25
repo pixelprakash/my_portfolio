@@ -7,12 +7,14 @@ import ContactCta from '../components/home/ContactCta';
 // import Works from '../components/home/Works';
 import { useDocumentHead } from '../hooks/useDocumentHead';
 import { siteConfig } from '../data/siteConfig';
-import { useUiVersion } from '../lib/uiVersion';
+import { useHeroOption, useUiVersion } from '../lib/uiVersion';
 
 const HeroV2 = lazy(() => import('../v2/HeroV2'));
+const HeroPills = lazy(() => import('../v2/HeroPills'));
 
 export default function HomePage() {
   const version = useUiVersion();
+  const NewHero = useHeroOption() === '2' ? HeroPills : HeroV2;
   useDocumentHead({
     title: `${siteConfig.role}`,
     description: `Portfolio of ${siteConfig.name} — ${siteConfig.tagline}. Websites, films, branding, visual design and app projects.`,
@@ -23,7 +25,7 @@ export default function HomePage() {
     <>
       {version === 'v2' ? (
         <Suspense fallback={<div style={{ minHeight: 'calc(100vh - var(--nav-height))' }} />}>
-          <HeroV2 />
+          <NewHero />
         </Suspense>
       ) : (
         <Hero />

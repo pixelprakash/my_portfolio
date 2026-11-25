@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { disciplines, projectTypes } from '../../data/projects';
+import { getCaseStudyBySlug } from '../../data/caseStudies';
 import { lockAgain, lockWords, useUnlocked } from '../../lib/lock';
+import { useUiVersion } from '../../lib/uiVersion';
 import LockDialog, { LockIcon } from './LockDialog';
 import cardStyles from './CaseStudyCard.module.css';
 import styles from './ProjectShowcase.module.css';
@@ -18,8 +20,13 @@ const ACCENT = {
 function trackPointer(event) {
   if (event.pointerType === 'touch') return;
   const rect = event.currentTarget.getBoundingClientRect();
-  event.currentTarget.style.setProperty('--mx', `${event.clientX - rect.left}px`);
-  event.currentTarget.style.setProperty('--my', `${event.clientY - rect.top}px`);
+  const x = event.clientX - rect.left;
+  const y = event.clientY - rect.top;
+  event.currentTarget.style.setProperty('--mx', `${x}px`);
+  event.currentTarget.style.setProperty('--my', `${y}px`);
+  // the same point from the centre, -0.5 to 0.5, for v2's tilting laptops
+  event.currentTarget.style.setProperty('--tx', (x / rect.width - 0.5).toFixed(3));
+  event.currentTarget.style.setProperty('--ty', (y / rect.height - 0.5).toFixed(3));
 }
 
 // Each cover has a 600w and a 1200w WebP next to the JPG (see public/work):
@@ -107,6 +114,24 @@ export function EmbedDialog({ video, onClose }) {
   );
 }
 
+// A card's second way in: the story behind a site whose card opens the site
+// itself. Until the case study is written it only says so, and leads nowhere.
+function CaseStudyButton({ slug, title }) {
+  if (!getCaseStudyBySlug(slug)) {
+    return (
+      <span className={`${styles.studyButton} ${styles.studySoon}`} data-skin="study-soon">
+        Case study <span className={styles.soonTag}>Soon</span>
+      </span>
+    );
+  }
+  return (
+    <Link className={styles.studyButton} data-skin="pill-primary" to={`/work/${slug}`}>
+      Case study <span aria-hidden="true">→</span>
+      <span className="visually-hidden">: {title}</span>
+    </Link>
+  );
+}
+
 export function ProjectCard({ project: listed, onOpen, index, lead = false, sizes = COVER_SIZES }) {
   // NDA projects carry no link, screenshot or description in the page: those
   // come from the encrypted file, once the visitor has the password.
@@ -119,6 +144,11 @@ export function ProjectCard({ project: listed, onOpen, index, lead = false, size
 
   const type = projectTypes[project.type];
   const accent = ACCENT[disciplines[type.discipline].accent];
+  // v2 shows a cut-out device on a lit stage, where a project has one. The
+  // mock-up draws its own browser bar, so the card's frame is left off.
+  const version = useUiVersion();
+  const stage = version === 'v2' && !locked ? project.stage : undefined;
+  const studySlug = version === 'v2' && !locked ? project.caseStudyButton : undefined;
   // video + presentations open in a lightbox; websites link out
   const opensEmbed = Boolean(project.videoId || project.embed);
   const isGallery = Boolean(project.gallery);
@@ -128,10 +158,11 @@ export function ProjectCard({ project: listed, onOpen, index, lead = false, size
     <article
       onPointerMove={trackPointer}
       data-skin="card"
+      style={stage ? { '--stage-light': stage.light, '--stage-accent': stage.accent } : undefined}
       className={`${cardStyles.card} ${styles.card} ${accent.card} ${lead ? styles.cardLead : ''}`}
     >
-      <div className={`${styles.cover} ${opensLightbox ? styles.coverVideo : ''}`} data-skin="card-cover">
-        {type.frame === 'browser' && (
+      <div className={`${styles.cover} ${opensLightbox ? styles.coverVideo : ''}`} data-skin="card-cover" data-stage={stage ? '' : undefined}>
+        {type.frame === 'browser' && !stage && (
           <div className={styles.chrome} data-skin="card-chrome" aria-hidden="true">
             <span className={styles.dots}>
               <i />
@@ -141,7 +172,7 @@ export function ProjectCard({ project: listed, onOpen, index, lead = false, size
             <span className={styles.host}>{locked ? words.host : hostOf(project.href)}</span>
           </div>
         )}
-        <div className={styles.shot}>
+        <div className={styles.shot} data-skin="card-shot">
           {isGallery ? (
             <div className={styles.mosaic} aria-hidden="true">
               {project.gallery.slice(0, 6).map((item) => (
@@ -158,6 +189,8 @@ export function ProjectCard({ project: listed, onOpen, index, lead = false, size
               <span className={styles.slideKicker}>{words.kicker}</span>
               <span className={styles.slideTitle}>{project.title}</span>
             </div>
+          ) : stage ? (
+            <img data-skin="stage-device" src={stage.image} alt="" loading="lazy" width="2000" height="1485" />
           ) : project.cover ? (
             <img
               src={project.cover}
@@ -276,9 +309,18 @@ export function ProjectCard({ project: listed, onOpen, index, lead = false, size
           </button>
         )}
 
-        <span data-skin="card-link" className={`${cardStyles.link} ${accent.link}`} aria-hidden="true">
-          {locked ? 'Unlock with password' : (project.cta ?? type.cta)}
-        </span>
+        {studySlug ? (
+          <div className={styles.actionRow}>
+            <span data-skin="card-link" className={`${cardStyles.link} ${accent.link}`} aria-hidden="true">
+              {locked ? 'Unlock with password' : (project.cta ?? type.cta)}
+            </span>
+            <CaseStudyButton slug={studySlug} title={project.title} />
+          </div>
+        ) : (
+          <span data-skin="card-link" className={`${cardStyles.link} ${accent.link}`} aria-hidden="true">
+            {locked ? 'Unlock with password' : (project.cta ?? type.cta)}
+          </span>
+        )}
       </div>
 
       {isNda && (locked || asking) && (

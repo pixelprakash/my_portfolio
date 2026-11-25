@@ -334,6 +334,100 @@ html[data-ui='v2'] [data-skin='card-slide'] > span:last-child {
   }
 }
 
+/* the waiting case study picks up a hint of the project's own light */
+html[data-ui='v2'] [data-skin='study-soon'] {
+  border-color: color-mix(in srgb, var(--stage-light, var(--color-text)) 55%, var(--color-border-strong));
+}
+
+html[data-ui='v2'] [data-skin='study-soon'] > span {
+  background: linear-gradient(100deg, color-mix(in srgb, var(--stage-light, #6fb4ff) 55%, transparent), color-mix(in srgb, var(--stage-accent, #ff7a52) 42%, transparent));
+}
+
+/* ── Lit stages: transparent device mock-ups (projects with a `stage`) ──
+   The light behind each laptop takes that site's own colours. At rest the
+   laptop stands inside the stage; on hover it comes forward, breaks out over
+   the top edge and turns toward the pointer. */
+html[data-ui='v2'] [data-skin='card'][data-skin]:has([data-stage]) {
+  --glow-a: color-mix(in srgb, var(--stage-light) 75%, transparent);
+  --glow-b: color-mix(in srgb, var(--stage-accent) 55%, transparent);
+}
+
+html[data-ui='v2'] [data-skin='card-cover'][data-stage] {
+  isolation: isolate;
+  overflow: visible;
+  background: #06060b;
+  perspective: 1100px;
+}
+
+/* the backlight, and the pool of light the laptop stands in */
+html[data-ui='v2'] [data-skin='card-cover'][data-stage]::before,
+html[data-ui='v2'] [data-skin='card-cover'][data-stage]::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+html[data-ui='v2'] [data-skin='card-cover'][data-stage]::before {
+  z-index: -1;
+  background:
+    radial-gradient(52% 6% at 50% 91%, rgba(244, 242, 238, 0.5), transparent 100%),
+    radial-gradient(60% 17% at 50% 92%, color-mix(in srgb, var(--stage-light) 85%, transparent), transparent 100%),
+    /* placed at the sides: the laptop hides whatever sits dead centre */
+    radial-gradient(44% 74% at 6% 38%, var(--stage-light), transparent 100%),
+    radial-gradient(40% 70% at 96% 46%, color-mix(in srgb, var(--stage-accent) 78%, transparent), transparent 100%),
+    radial-gradient(62% 34% at 50% 6%, color-mix(in srgb, var(--stage-light) 66%, transparent), transparent 100%),
+    linear-gradient(180deg, #07070d 68%, #111119 69%, #06060a);
+  opacity: 0.82;
+  transition: opacity var(--transition-slow);
+}
+
+/* ribbed light standing up from the floor, the v2 motif */
+html[data-ui='v2'] [data-skin='card-cover'][data-stage]::after {
+  z-index: -1;
+  background: repeating-linear-gradient(90deg, rgba(4, 4, 6, 0.62) 0 2px, transparent 2px 8px);
+  -webkit-mask-image: linear-gradient(to top, transparent 4%, #000 34%, transparent 88%);
+  mask-image: linear-gradient(to top, transparent 4%, #000 34%, transparent 88%);
+}
+
+html[data-ui='v2'] [data-skin='card-cover'][data-stage] [data-skin='card-shot'] {
+  overflow: visible;
+  aspect-ratio: 10 / 7;
+}
+
+html[data-ui='v2'] [data-skin='card-cover'][data-stage] [data-skin='stage-device'] {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 99%;
+  height: auto;
+  max-width: none;
+  object-fit: contain;
+  transform: translate(-50%, -50%);
+  transform-origin: 50% 85%;
+  /* a hairline of light keeps the dark body apart from the dark stage */
+  filter: drop-shadow(0 0 1px rgba(244, 242, 238, 0.42)) drop-shadow(0 18px 18px rgba(0, 0, 0, 0.55));
+  transition: transform 700ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* the stage holds still while the laptop moves: that difference is the depth */
+html[data-ui='v2'] [data-skin='card']:hover [data-skin='card-cover'][data-stage],
+html[data-ui='v2'] [data-skin='card']:focus-within [data-skin='card-cover'][data-stage] {
+  transform: none;
+}
+
+html[data-ui='v2'] [data-skin='card']:hover [data-stage]::before,
+html[data-ui='v2'] [data-skin='card']:focus-within [data-stage]::before {
+  opacity: 1;
+}
+
+html[data-ui='v2'] [data-skin='card']:hover [data-stage] [data-skin='stage-device'],
+html[data-ui='v2'] [data-skin='card']:focus-within [data-stage] [data-skin='stage-device'] {
+  transform: translate(-50%, -50%) translateY(-5%)
+    rotateX(calc(var(--ty, 0) * -7deg)) rotateY(calc(var(--tx, 0) * 11deg)) scale(1.1);
+}
+
 /* ── All-projects page ── */
 html[data-ui='v2'] [data-skin='page-title'] {
   font-size: clamp(2.5rem, 6.5vw, 5.5rem);
@@ -548,5 +642,10 @@ html[data-ui='v2'] [data-skin='badge'] {
 @media (prefers-reduced-motion: reduce) {
   html[data-ui='v2'] [data-skin='card']:hover [data-skin='card-cover'] {
     transform: none;
+  }
+
+  html[data-ui='v2'] [data-skin='card']:hover [data-stage] [data-skin='stage-device'],
+  html[data-ui='v2'] [data-skin='card']:focus-within [data-stage] [data-skin='stage-device'] {
+    transform: translate(-50%, -50%);
   }
 }

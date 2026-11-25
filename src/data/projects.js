@@ -18,6 +18,9 @@
 //   coverTitle — text for the placeholder cover when `cover` is omitted.
 //   coverPosition — CSS object-position for the cover crop (default is
 //              the top of the image, which suits full-page screenshots).
+//   stage    — v2 only: { image, light, accent }. A transparent device mock-up
+//              (about 4:3, device centred) shown on a stage lit in those two
+//              colours, in place of `cover`. v1 keeps using `cover`.
 //   inProgress — shows the IN PROGRESS badge.
 //   lockId   — puts the project under an NDA lock. Leave out href, cover and any
 //              real description: they live encrypted in public/work/locked/<id>.enc
@@ -25,6 +28,10 @@
 //   lockKind — 'private' words the lock as "Private" instead of "Under NDA".
 //   caseStudy — slug of a case study in caseStudies.js: the card then opens that
 //              page on this site instead of an external link or a lightbox.
+//   caseStudyButton — v2 only: a second button for a card that still opens
+//              something else (a live site). 'soon' shows it as not written
+//              yet, leading nowhere; change it to the slug of an entry in
+//              caseStudies.js to turn it into a link.
 //   role     — what you did on it ("Solo Designer & Developer"), shown on
 //              every card so work from different sources reads the same.
 //   year     — optional; shown after the role.
@@ -73,6 +80,8 @@ export const projects = [
     href: 'https://www.6thmobilestudiescongress.org/',
     cover: '/work/congress.jpg',
     coverHd: true,
+    stage: { image: '/work/congress-cutout.webp', light: '#0a5bff', accent: '#14ff5a' },
+    caseStudyButton: 'soon', // later: '6th-mobile-studies-congress'
     role: 'Solo Designer & Developer',
     year: '2026',
     summary: 'The official site for a live international academic congress at IIT Hyderabad: registration, schedule and speakers.',
@@ -85,6 +94,8 @@ export const projects = [
     href: 'https://djn.vercel.app/',
     cover: '/work/djn.jpg',
     coverHd: true,
+    stage: { image: '/work/djn-cutout.webp', light: '#9d92ff', accent: '#ff9f80' },
+    caseStudyButton: 'soon', // later: 'deepak-john-mathew-website'
     role: 'Solo Designer & Developer',
     year: '2026',
     summary: 'A personal site for a Professor of Design at IIT Hyderabad, with a CMS his team updates without code.',

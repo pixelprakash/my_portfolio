@@ -158,7 +158,13 @@ export function ProjectCard({ project: listed, onOpen, index, lead = false, size
     <article
       onPointerMove={trackPointer}
       data-skin="card"
-      style={stage ? { '--stage-light': stage.light, '--stage-accent': stage.accent } : undefined}
+      // a project with its own colours (a lit stage, or a theme) glows in them
+      data-themed={stage || project.theme ? '' : undefined}
+      style={
+        stage || project.theme
+          ? { '--stage-light': (stage ?? project.theme).light, '--stage-accent': (stage ?? project.theme).accent }
+          : undefined
+      }
       className={`${cardStyles.card} ${styles.card} ${accent.card} ${lead ? styles.cardLead : ''}`}
     >
       <div className={`${styles.cover} ${opensLightbox ? styles.coverVideo : ''}`} data-skin="card-cover" data-stage={stage ? '' : undefined}>
@@ -195,7 +201,11 @@ export function ProjectCard({ project: listed, onOpen, index, lead = false, size
             <img
               src={project.cover}
               // the unlocked screenshot is an inline image, so no responsive set
-              srcSet={project.cover.startsWith('data:') ? undefined : coverSrcSet(project.cover, project.coverHd)}
+              srcSet={
+                project.cover.startsWith('data:')
+                  ? undefined
+                  : (project.coverSet ?? coverSrcSet(project.cover, project.coverHd))
+              }
               sizes={sizes}
               alt=""
               loading="lazy"

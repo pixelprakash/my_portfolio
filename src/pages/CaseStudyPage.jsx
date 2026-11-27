@@ -15,14 +15,67 @@ import styles from './CaseStudyPage.module.css';
 //   { type: 'paragraph', text }
 //   { type: 'list', items: [string | { lead, text }] }   (lead is shown in bold)
 //   { type: 'table', caption, head: [...], rows: [[...]] }
-//   { type: 'figure', src, alt, caption, width, height, narrow? }
+//   { type: 'figure', src, alt, caption, width, height, narrow?, full?, scroll? }
+//       full = a double-size file: sharp screens use it, and a click opens it
+//       scroll = a very tall picture, shown in a frame that scrolls
+//   { type: 'gallery', items: [figure] }                   (figures two across)
+//   { type: 'board', columns, items: [{ title, tone: 'a' | 'b' | 'plain', notes? | text? }] }
+//       (sticky-note groups in the study's two `theme` colours)
 //   { type: 'note', label?, text }                        (a caveat worth setting apart)
 //   { type: 'stats', items: [{ value, label }] }          (big numbers)
 //   { type: 'steps', items: [{ title, text, part? }] }    (a numbered journey; part = 'design' | 'engineering' adds a link chip)
 //   { type: 'cards', items: [{ kicker, title, text, points?, href, linkLabel, accent? }] }  (large link cards)
+// A study may also have `theme: { light, accent }` (its own two colours), a
+// `hero` picture under the header, and `links: [{ label, href }]` to other sites.
 // A case study can also be split into parts: study.parts holds each part's banner
 // ({ number, kicker, name, blurb, accent }); a section joins one with section.part,
 // and section.group names its heading in the contents list.
+// A picture from the project. With a `full` file it is sharp on dense screens
+// and opens at that size in a new tab, so small text can be read on a phone.
+function Picture({ block, sizes, eager = false }) {
+  const img = (
+    <img
+      src={block.src}
+      srcSet={block.full ? `${block.src} ${block.width}w, ${block.full} ${block.width * 2}w` : undefined}
+      sizes={block.full ? sizes : undefined}
+      alt={block.alt}
+      width={block.width}
+      height={block.height}
+      loading={eager ? 'eager' : 'lazy'}
+      decoding="async"
+    />
+  );
+  if (!block.full) return img;
+  return (
+    <a className={styles.zoom} href={block.full} target="_blank" rel="noopener noreferrer">
+      {img}
+      <span className={styles.zoomHint} aria-hidden="true">
+        Full size ↗
+      </span>
+      <span className="visually-hidden"> (opens full size in a new tab)</span>
+    </a>
+  );
+}
+
+const FIGURE_SIZES = '(min-width: 901px) calc(100vw - 340px), 92vw';
+const GALLERY_SIZES = '(min-width: 901px) calc(50vw - 190px), 92vw';
+
+function Figure({ block, sizes = FIGURE_SIZES }) {
+  return (
+    <figure className={`${styles.figure} ${block.narrow ? styles.figureNarrow : ''}`}>
+      {block.scroll ? (
+        // focusable, so the keyboard can scroll it too
+        <div className={styles.scrollFrame} tabIndex={0} role="group" aria-label={block.caption}>
+          <Picture block={block} sizes={sizes} />
+        </div>
+      ) : (
+        <Picture block={block} sizes={sizes} />
+      )}
+      {block.caption && <figcaption className={styles.figcaption}>{block.caption}</figcaption>}
+    </figure>
+  );
+}
+
 function Block({ block }) {
   switch (block.type) {
     case 'list':
@@ -78,18 +131,34 @@ function Block({ block }) {
       );
 
     case 'figure':
+      return <Figure block={block} />;
+
+    case 'gallery':
       return (
-        <figure className={`${styles.figure} ${block.narrow ? styles.figureNarrow : ''}`}>
-          <img
-            src={block.src}
-            alt={block.alt}
-            width={block.width}
-            height={block.height}
-            loading="lazy"
-            decoding="async"
-          />
-          {block.caption && <figcaption className={styles.figcaption}>{block.caption}</figcaption>}
-        </figure>
+        <div className={styles.gallery}>
+          {block.items.map((item) => (
+            <Figure key={item.src} block={item} sizes={GALLERY_SIZES} />
+          ))}
+        </div>
+      );
+
+    case 'board':
+      return (
+        <ul className={styles.board} data-columns={block.columns}>
+          {block.items.map((group) => (
+            <li key={group.title} className={styles.boardGroup} data-tone={group.tone}>
+              <p className={styles.boardTitle}>{group.title}</p>
+              {group.text && <p className={styles.boardText}>{group.text}</p>}
+              {group.notes && (
+                <ul className={styles.boardNotes}>
+                  {group.notes.map((note) => (
+                    <li key={note}>{note}</li>
+                  ))}
+                </ul>
+              )}
+            </li>
+          ))}
+        </ul>
       );
 
     case 'note':
@@ -548,8 +617,13 @@ export default function CaseStudyPage() {
     : {};
   const firstPartIndex = study.sections.findIndex((section) => section.part);
 
+  // the study's own two colours light its hero and boards
+  const themeVars = study.theme
+    ? { '--study-light': study.theme.light, '--study-accent': study.theme.accent }
+    : undefined;
+
   return (
-    <article className={styles.page} onClick={handleClick}>
+    <article className={styles.page} style={themeVars} onClick={handleClick}>
       <div className="section-container">
         <div className={styles.topRow}>
           <Breadcrumbs
@@ -574,39 +648,67 @@ export default function CaseStudyPage() {
           </div>
         </div>
 
-        <header className={styles.header}>
-          <span className={`${styles.tag} ${isBlue ? styles.tagBlue : styles.tagRed}`}>
-            {study.tag}
-          </span>
-          <h1 data-skin="page-title" className={styles.title}>{study.title}</h1>
-          <p className={styles.summary}>{study.summary}</p>
+        {/* with an opening picture, wide screens set it beside the title */}
+        <div className={study.hero ? styles.intro : undefined} data-skin={study.hero ? 'study-intro' : undefined}>
+          <header className={styles.header}>
+            <span className={`${styles.tag} ${isBlue ? styles.tagBlue : styles.tagRed}`}>
+              {study.tag}
+            </span>
+            <h1 data-skin="page-title" className={styles.title}>{study.title}</h1>
+            <p className={styles.summary}>{study.summary}</p>
 
-          <dl className={styles.metaList}>
-            <div>
-              <dt className={styles.metaLabel}>Role</dt>
-              <dd className={styles.metaValue}>{study.role}</dd>
-            </div>
-            <div>
-              <dt className={styles.metaLabel}>Timeline</dt>
-              <dd className={styles.metaValue}>{study.timeline}</dd>
-            </div>
-            <div>
-              <dt className={styles.metaLabel}>Tools</dt>
-              <dd className={styles.metaValue}>{study.tools.join(', ')}</dd>
-            </div>
-          </dl>
-
-          {study.facts && (
-            <dl className={styles.factList}>
-              {study.facts.map((fact) => (
-                <div key={fact.label}>
-                  <dt className={styles.metaLabel}>{fact.label}</dt>
-                  <dd className={styles.factValue}>{fact.value}</dd>
-                </div>
-              ))}
+            <dl className={styles.metaList}>
+              <div>
+                <dt className={styles.metaLabel}>Role</dt>
+                <dd className={styles.metaValue}>{study.role}</dd>
+              </div>
+              <div>
+                <dt className={styles.metaLabel}>Timeline</dt>
+                <dd className={styles.metaValue}>{study.timeline}</dd>
+              </div>
+              <div>
+                <dt className={styles.metaLabel}>Tools</dt>
+                <dd className={styles.metaValue}>{study.tools.join(', ')}</dd>
+              </div>
             </dl>
+
+            {study.facts && (
+              <dl className={styles.factList}>
+                {study.facts.map((fact) => (
+                  <div key={fact.label}>
+                    <dt className={styles.metaLabel}>{fact.label}</dt>
+                    <dd className={styles.factValue}>{fact.value}</dd>
+                  </div>
+                ))}
+              </dl>
+            )}
+
+            {study.links && (
+              <ul className={styles.studyLinks}>
+                {study.links.map((link, i) => (
+                  <li key={link.href}>
+                    <a
+                      className={i === 0 ? styles.studyLinkMain : styles.studyLink}
+                      data-skin={i === 0 ? 'pill-primary' : undefined}
+                      href={link.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {link.label} <span aria-hidden="true">↗</span>
+                      <span className="visually-hidden"> (opens in a new tab)</span>
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </header>
+
+          {study.hero && (
+            <figure className={styles.hero}>
+              <Picture block={study.hero} sizes="(min-width: 1100px) 52vw, 92vw" eager />
+            </figure>
           )}
-        </header>
+        </div>
 
         <div className={styles.layout}>
           <nav className={styles.sidebar} aria-label="Case study contents">

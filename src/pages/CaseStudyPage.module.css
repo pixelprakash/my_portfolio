@@ -283,6 +283,237 @@
   line-height: 1.5;
 }
 
+/* ── links out, and the picture that opens a study ── */
+.studyLinks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin-top: var(--space-6);
+}
+
+.studyLinkMain,
+.studyLink {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 44px;
+  padding: var(--space-2) var(--space-5);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-pill);
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: border-color var(--transition-fast), transform var(--transition-fast);
+}
+
+.studyLinkMain {
+  border-color: var(--color-text);
+  background: var(--color-text);
+  color: var(--color-bg);
+}
+
+.studyLink:hover {
+  border-color: var(--color-text);
+}
+
+.studyLinkMain:hover {
+  transform: translateY(-2px);
+}
+
+/* the opening picture sits in its own light, in the project's colours */
+.hero {
+  position: relative;
+  /* narrow enough that the 16:9 picture never fills a laptop screen */
+  max-width: min(960px, 112vh);
+  margin: 0 0 var(--space-9);
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: -3% -3% -12%;
+  z-index: -1;
+  border-radius: 50%;
+  background:
+    radial-gradient(closest-side at 28% 60%, var(--study-light, var(--color-blue)), transparent),
+    radial-gradient(closest-side at 74% 70%, var(--study-accent, var(--color-red)), transparent);
+  filter: blur(44px);
+  opacity: 0.75;
+}
+
+.hero img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  border-radius: var(--radius-lg);
+}
+
+@media (max-width: 700px) {
+  .hero {
+    max-width: none;
+  }
+
+  .hero img {
+    aspect-ratio: 4 / 3;
+  }
+}
+
+@media (min-width: 1100px) {
+  .intro {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+    gap: var(--space-8);
+    align-items: center;
+    margin-bottom: var(--space-9);
+  }
+
+  .intro .header,
+  .intro .hero {
+    margin-bottom: 0;
+  }
+
+  /* half a screen for the words: a smaller title and tighter facts */
+  .intro .title {
+    font-size: clamp(2rem, 3.2vw, 2.75rem);
+  }
+
+  .intro .metaList {
+    gap: var(--space-5) var(--space-6);
+  }
+
+  .intro .hero {
+    max-width: none;
+  }
+
+  /* both covers keep their phones whole at this shape */
+  .intro .hero img {
+    aspect-ratio: 4 / 3;
+  }
+}
+
+/* ── pictures that open at full size ── */
+.zoom {
+  position: relative;
+  display: block;
+}
+
+.zoomHint {
+  position: absolute;
+  right: var(--space-3);
+  bottom: var(--space-3);
+  padding: 3px var(--space-3);
+  border-radius: var(--radius-pill);
+  background: rgba(4, 4, 8, 0.82);
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 600;
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+}
+
+.zoom:hover .zoomHint,
+.zoom:focus-visible .zoomHint {
+  opacity: 1;
+}
+
+/* nothing hovers on a touch screen, so the hint stays up */
+@media (hover: none) {
+  .zoomHint {
+    opacity: 1;
+  }
+}
+
+.scrollFrame {
+  max-height: min(34rem, 70vh);
+  overflow-y: auto;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  overscroll-behavior: contain;
+}
+
+.scrollFrame img {
+  border: 0;
+  border-radius: 0;
+}
+
+.gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 19rem), 1fr));
+  gap: var(--space-4) var(--space-5);
+  margin: var(--space-5) 0;
+}
+
+.gallery .figure {
+  margin: 0;
+}
+
+/* ── boards: sticky-note groups in the project's two colours ── */
+.board {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-4);
+  margin: var(--space-5) 0;
+}
+
+@media (min-width: 700px) {
+  .board[data-columns='2'] {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1100px) {
+  .board[data-columns='3'] {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.boardGroup {
+  --note: var(--color-text-muted);
+  padding: var(--space-5);
+  border: 1px solid var(--color-border);
+  border-top: 3px solid var(--note);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+}
+
+.boardGroup[data-tone='a'] {
+  --note: var(--study-light, var(--color-blue));
+  background: linear-gradient(170deg, color-mix(in srgb, var(--note) 16%, transparent), var(--color-surface) 62%);
+}
+
+.boardGroup[data-tone='b'] {
+  --note: var(--study-accent, var(--color-red));
+  background: linear-gradient(170deg, color-mix(in srgb, var(--note) 12%, transparent), var(--color-surface) 62%);
+}
+
+.boardTitle {
+  color: var(--color-text);
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.boardText {
+  margin-top: var(--space-3);
+  color: var(--color-text-secondary);
+  font-size: 0.95rem;
+  line-height: 1.65;
+}
+
+.boardNotes {
+  display: flex;
+  flex-direction: column;
+  margin-top: var(--space-3);
+}
+
+.boardNotes li {
+  padding: var(--space-2) 0;
+  border-top: 1px solid var(--color-border);
+  color: var(--color-text-secondary);
+  font-size: 0.92rem;
+  line-height: 1.55;
+}
+
 /* tables: real <table>s on wide screens, stacked blocks on a phone */
 .tableBlock {
   margin: var(--space-5) 0;

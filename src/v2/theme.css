@@ -347,7 +347,7 @@ html[data-ui='v2'] [data-skin='study-soon'] > span {
    The light behind each laptop takes that site's own colours. At rest the
    laptop stands inside the stage; on hover it comes forward, breaks out over
    the top edge and turns toward the pointer. */
-html[data-ui='v2'] [data-skin='card'][data-skin]:has([data-stage]) {
+html[data-ui='v2'] [data-skin='card'][data-skin][data-themed] {
   --glow-a: color-mix(in srgb, var(--stage-light) 75%, transparent);
   --glow-b: color-mix(in srgb, var(--stage-accent) 55%, transparent);
 }
@@ -444,6 +444,13 @@ html[data-ui='v2'] [data-skin='group-header']::after {
   width: 9rem;
   height: 3px;
   background: var(--spectrum);
+}
+
+/* a study that opens beside its picture has half the width for its title */
+@media (min-width: 1100px) {
+  html[data-ui='v2'] [data-skin='study-intro'] [data-skin='page-title'] {
+    font-size: clamp(2.75rem, 4.3vw, 4.25rem);
+  }
 }
 
 /* ── About ── */

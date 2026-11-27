@@ -1,10 +1,15 @@
-// caseStudies[0] (6th Mobile Studies Congress), and [1] (Deepak John Mathew) are real, compiled from the
+import { pennyWise, sahaaya } from './uxCaseStudies';
+
+// The two UX studies (Penny Wise, Sahaaya) live in uxCaseStudies.js. The
+// 6th Mobile Studies Congress and Deepak John Mathew ones are real, compiled from the
 // project's actual git history (142 commits, Dec 2025 – Aug 2026) at
 // ~/6th mobile conf/mcv3/mcv3 — edit freely, this is a first draft.
 // The rest are placeholders — replace summary/section copy with real
 // project write-ups — the shape (slug, sections with id/label) is what the
 // app relies on.
 export const caseStudies = [
+  pennyWise,
+  sahaaya,
   {
     slug: '6th-mobile-studies-congress',
     tag: 'Design + Dev',

@@ -16,6 +16,10 @@
 //   embedAspect — CSS aspect-ratio for the lightbox player (default 16 / 9);
 //              e.g. '4 / 3' for taller Behance embeds.
 //   coverTitle — text for the placeholder cover when `cover` is omitted.
+//   coverSet — a cover's own srcset, for covers that don't follow the
+//              `name.jpg` + `name-600.webp` file naming.
+//   theme    — v2 only: { light, accent }, the project's colours for the glow
+//              round its card.
 //   coverPosition — CSS object-position for the cover crop (default is
 //              the top of the image, which suits full-page screenshots).
 //   stage    — v2 only: { image, light, accent }. A transparent device mock-up
@@ -240,21 +244,30 @@ export const projects = [
     id: 'penny-wise-expense-tracker',
     type: 'ux',
     title: 'Penny Wise — Expense Tracking App UX Case Study',
-    coverTitle: 'Penny Wise',
-    embed: 'https://www.behance.net/embed/project/197476263?ilo0=1',
-    embedAspect: '4 / 3',
-    role: 'UX designer',
-    summary: 'A UX case study for an expense-tracking app.',
+    caseStudy: 'penny-wise',
+    cover: '/work/pennywise/cover.webp',
+    coverSet: '/work/pennywise/cover.webp 1400w, /work/pennywise/cover@2x.webp 2800w',
+    coverPosition: 'center',
+    theme: { light: '#7c62ee', accent: '#ccff80' },
+    cta: 'Read case study →',
+    role: 'UX designer · team of 7',
+    year: '2023',
+    summary: 'An expense tracker for students and working professionals, researched and designed in a two-day designathon.',
+    tools: ['Figma'],
   },
   {
     id: 'sahaaya-salesforce-design-challenge',
     type: 'ux',
     title: 'Sahaaya — Salesforce Design Challenge',
-    coverTitle: 'Sahaaya',
-    embed: 'https://www.behance.net/embed/project/225913447?ilo0=1',
-    embedAspect: '4 / 3',
-    role: 'UX designer',
-    summary: 'A response to the Salesforce Design Challenge.',
+    caseStudy: 'sahaaya',
+    cover: '/work/sahaaya/cover.jpg',
+    coverSet: '/work/sahaaya/cover.jpg 1200w, /work/sahaaya/cover@2x.jpg 2400w',
+    coverPosition: 'center',
+    theme: { light: '#4a6ffc', accent: '#f9d66b' },
+    cta: 'Read case study →',
+    role: 'UX designer · team of 2',
+    summary: 'A concept app connecting people with reproductive health experts, for Salesforce Design Days ’24.',
+    tools: ['Figma'],
   },
   {
     id: 'village-stories-sangameswaram',

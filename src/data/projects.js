@@ -218,16 +218,6 @@ export const projects = [
     summary: 'Twelve YouTube thumbnails for design-career interviews and live sessions.',
   },
   {
-    id: 'online-course-brochure',
-    type: 'visual',
-    title: 'Online Course Brochure Design — Freelance Work',
-    coverTitle: 'Online Course Brochure',
-    embed: 'https://www.behance.net/embed/project/200337053?ilo0=1',
-    embedAspect: '4 / 3',
-    role: 'Visual designer (freelance)',
-    summary: 'A brochure for an online course, designed as freelance work.',
-  },
-  {
     id: 'progressflow',
     type: 'ux',
     title: 'ProgressFlow: formative assessment for Indian art classrooms',
